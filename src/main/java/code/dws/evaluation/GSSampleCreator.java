@@ -42,19 +42,24 @@ public class GSSampleCreator {
 	 */
 	public static void main(String[] args) {
 
-		// load constants file
-		Constants.loadConfigParameters(new String[] { "", args[0] });
+		if (args.length != 2) {
+			System.err
+					.print("Usage: java -jar GOLD_GENERATOR.jar <config file location> <no of triples>");
+		} else {
+			// load constants file
+			Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		String location = new File(Constants.OIE_DATA_PATH).getParent();
+			String location = new File(Constants.OIE_DATA_PATH).getParent();
 
-		// load the annotated OIE relations
-		loadAnnotatedProperties();
+			// load the annotated OIE relations
+			loadAnnotatedProperties();
 
-		// load the fminus File, randomly sampling lines
-		try {
-			sampleFile(location, Integer.parseInt(args[1]));
-		} catch (IOException e) {
-			e.printStackTrace();
+			// load the fminus File, randomly sampling lines
+			try {
+				sampleFile(location, Integer.parseInt(args[1]));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
