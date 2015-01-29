@@ -92,7 +92,6 @@ public class FileUtil {
 			for (Object elem : properties) {
 				writer.write(elem.toString() + "\n");
 			}
-
 		} catch (IOException e) {
 			logger.error("Something went wrong when writing out " + fileName
 					+ "\n");
