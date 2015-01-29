@@ -99,6 +99,7 @@ public class FileUtil {
 			e.printStackTrace();
 		} finally {
 			try {
+				logger.info("Done writing to " + directory + "/" + fileName);
 				writer.flush();
 				if (writer != null)
 					writer.close();

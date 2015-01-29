@@ -34,6 +34,5 @@ public class GeneratorClient {
 		List<String> properties = Generator.getReverbProperties(-1, 100L);
 
 		FileUtil.writeOut(properties, "Top." + 100 + ".Reverb.Properties.dat");
-
 	}
 }
