@@ -13,11 +13,11 @@ CONFIG.cfg = all the parameters and setup values are provided here with respecti
 ## Execution
 
 ### Download the source
-Download the compressed file from here. This would create two folders /DATA and /ESKO. For instance,
-/home/unixUser/DATA/ and /home/unixUser/ESKO/. An extrensive java documentation under /home/unixUser/ESKO/doc/.
+Download the compressed file from here. This would create two folders as,
+/home/unixUser/DATA/ and /home/unixUser/ESKO/. An extrensive java documentation is available under /home/unixUser/ESKO/doc/.
 
 ### Running the Pipeline
-The whole application os split into multiple modules. First one being an instance matching module. 
+The whole application is split into multiple modules. First one being an instance matching module. 
 
 
 #### Instance Matching
