@@ -29,6 +29,8 @@ After the inflating the compressed file, browse to the location /home/unixUser/E
 
 ./WF.3.PIPELINE.sh for running the Workflow 3
 
+The outputs will be generated under /home/unixUser/ESKO/src/main/resources/output/
+
 
 #### Clustering
 
