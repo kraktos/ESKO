@@ -26,7 +26,7 @@ public class ScriptGenarator {
 
 	static List<String> PROPS = new ArrayList<String>();
 
-	private static final String SHELL_SCRIPT = "PIPELINE.sh";
+	private static final String SHELL_SCRIPT = "src/main/resources/script/";
 
 	private static final int MAX_BOOT_ITER = 3;
 
@@ -56,11 +56,9 @@ public class ScriptGenarator {
 	 */
 	private static void generateScript() throws IOException {
 
-		String directory = new File(Constants.OIE_DATA_PATH).getParent()
-				.toString();
-
-		BufferedWriter scriptWriter = new BufferedWriter(new FileWriter(
-				directory + "/WF." + Constants.WORKFLOW + "." + SHELL_SCRIPT));
+		BufferedWriter scriptWriter = new BufferedWriter(
+				new FileWriter(SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
+						+ "PIPELINE.sh"));
 
 		scriptWriter.write("#!/bin/bash\n\n");
 

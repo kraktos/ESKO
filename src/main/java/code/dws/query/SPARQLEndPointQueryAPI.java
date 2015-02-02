@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.dto.PairDto;
+import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
@@ -143,69 +144,69 @@ public class SPARQLEndPointQueryAPI {
 	 *            instance
 	 * @return list of its type
 	 */
-//	public static List<String> getInstanceTypes(String inst) {
-//		List<String> result = new ArrayList<String>();
-//		String sparqlQuery = null;
-//		String yagoclass = null;
-//
-//		boolean hasDBPType = false;
-//		boolean hasYAGOType = false;
-//
-//		if (inst.indexOf("\"") != -1)
-//			inst = inst.replaceAll("\"", "%22");
-//
-//		if (inst.indexOf("\'") != -1)
-//			inst = inst.replaceAll("\'", "%27");
-//
-//		try {
-//			sparqlQuery = "select ?val where{ <http://dbpedia.org/resource/"
-//					+ inst
-//					+ "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?val}";
-//
-//			// fetch the result set
-//			List<QuerySolution> list = queryDBPediaEndPoint(sparqlQuery);
-//
-//			for (QuerySolution querySol : list) {
-//				// Get the next result row
-//				// QuerySolution querySol = results.next();
-//				if (querySol.get("val").toString()
-//						.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
-//					if (!result.contains(Utilities.cleanDBpediaURI(querySol
-//							.get("val").toString()))) {
-//						result.add(Utilities.cleanDBpediaURI(querySol
-//								.get("val").toString()));
-//						hasDBPType = true;
-//					}
-//				}
-//			}
-//
-//			// trying YAGO type inclusion module
-//			// do this only if the usual way of types fetching is a failure
-//			if (Constants.INCLUDE_YAGO_TYPES && result.size() == 0) {
-//				for (QuerySolution querySol : list) {
-//					if (querySol.get("val").toString()
-//							.indexOf(Constants.YAGO_HEADER) != -1) {
-//						yagoclass = YagoDbpediaMapping.getDBPClass(querySol
-//								.get("val").toString());
-//						if (yagoclass != null) {
-//							if (!result.contains(yagoclass.replaceAll("DBP:",
-//									""))) {
-//								result.add(yagoclass.replaceAll("DBP:", ""));
-//								hasYAGOType = true;
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			if (!hasDBPType && hasYAGOType)
-//				logger.debug("found for " + inst + "\t" + result);
-//
-//		} catch (Exception e) {
-//			logger.error("Problem with type fetching of instance  " + inst);
-//		}
-//		return result;
-//	}
+	public static List<String> getInstanceTypes(String inst) {
+		List<String> result = new ArrayList<String>();
+		String sparqlQuery = null;
+		String yagoclass = null;
+
+		boolean hasDBPType = false;
+		boolean hasYAGOType = false;
+
+		if (inst.indexOf("\"") != -1)
+			inst = inst.replaceAll("\"", "%22");
+
+		if (inst.indexOf("\'") != -1)
+			inst = inst.replaceAll("\'", "%27");
+
+		try {
+			sparqlQuery = "select ?val where{ <http://dbpedia.org/resource/"
+					+ inst
+					+ "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?val}";
+
+			// fetch the result set
+			List<QuerySolution> list = queryDBPediaEndPoint(sparqlQuery);
+
+			for (QuerySolution querySol : list) {
+				// Get the next result row
+				// QuerySolution querySol = results.next();
+				if (querySol.get("val").toString()
+						.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
+					if (!result.contains(Utilities.cleanDBpediaURI(querySol
+							.get("val").toString()))) {
+						result.add(Utilities.cleanDBpediaURI(querySol
+								.get("val").toString()));
+						hasDBPType = true;
+					}
+				}
+			}
+
+			// trying YAGO type inclusion module
+			// do this only if the usual way of types fetching is a failure
+			if (Constants.INCLUDE_YAGO_TYPES && result.size() == 0) {
+				for (QuerySolution querySol : list) {
+					if (querySol.get("val").toString()
+							.indexOf(Constants.YAGO_HEADER) != -1) {
+						yagoclass = YagoDbpediaMapping.getDBPClass(querySol
+								.get("val").toString());
+						if (yagoclass != null) {
+							if (!result.contains(yagoclass.replaceAll("DBP:",
+									""))) {
+								result.add(yagoclass.replaceAll("DBP:", ""));
+								hasYAGOType = true;
+							}
+						}
+					}
+				}
+			}
+
+			if (!hasDBPType && hasYAGOType)
+				logger.debug("found for " + inst + "\t" + result);
+
+		} catch (Exception e) {
+			logger.error("Problem with type fetching of instance  " + inst);
+		}
+		return result;
+	}
 
 	/**
 	 * get type of a given instance
