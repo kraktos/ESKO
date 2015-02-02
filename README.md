@@ -23,9 +23,9 @@ The whole application os split into multiple modules. First one being an instanc
 #### Instance Matching
 After the inflating the compressed file, browse to the location /home/unixUser/ESKO/src/main/resources/script/ from the command line and type
 
-./WF.1.PIPELINE.sh for running the Workflow 1, \\
-./WF.2.PIPELINE.sh for running the Workflow 2,
-./WF.3.PIPELINE.sh for running the Workflow 3,
+./WF.1.PIPELINE.sh for running the Workflow 1 
+./WF.2.PIPELINE.sh for running the Workflow 2
+./WF.3.PIPELINE.sh for running the Workflow 3
 
 
 #### Clustering
