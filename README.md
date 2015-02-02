@@ -1,5 +1,5 @@
 # ESKO
-Enriching Sructured Knowledge Base from Open Information Extraction
+Enriching Structured Knowledge Base from Open Information Extraction
 
 Suppose, you are in this location "/home/unixUser/" the rest of the setup follows based on this directory structure.
 
