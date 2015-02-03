@@ -4,22 +4,16 @@
 
 package code.dws.utils;
 
-import java.io.BufferedWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,70 +26,9 @@ import org.apache.log4j.Logger;
  */
 public class Utilities {
 	// define Logger
-	public static Logger logger = Logger.getLogger(Utilities.class.getName());
-
-	public static HashSet<String> dict = new HashSet<String>();
-
-	public static int countGlbl = 10;
-
-	public static Set<String> set = new TreeSet<String>();
+	private static Logger logger = Logger.getLogger(Utilities.class.getName());
 
 	// define Logger
-
-	static Set<Long> UNIQUE_PROPERTIES = new HashSet<Long>();
-
-	// set of stop words
-	static final Set<String> STOP_WORDS = new HashSet<String>(Arrays.asList(
-			"a", "the", "an", "of"));
-
-	/**
-	 * Prints a map
-	 * 
-	 * @param map
-	 */
-	public static void printMap(Map<?, ?> map) {
-		for (Iterator<?> it = map.entrySet().iterator(); it.hasNext();) {
-			Map.Entry<?, ?> entry = (Entry<?, ?>) it.next();
-			Object key = entry.getKey();
-			Object value = entry.getValue();
-			logger.info(key + "  " + value);
-		}
-	}
-
-	/**
-	 * Iterate the list and print out the string literals for the query
-	 * 
-	 * @param resultList
-	 * @param out
-	 */
-	public static void printList(List<Long> resultList, BufferedWriter out) {
-		try {
-			for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
-				// print only the odd values
-				if (listCounter % 2 != 0) {
-					// this gives a set of properties for the given query
-					UNIQUE_PROPERTIES.add(resultList.get(listCounter));
-				}
-			}
-			logger.info("Unique properties  = " + UNIQUE_PROPERTIES.size()
-					+ "\n");
-		} finally {
-			UNIQUE_PROPERTIES.clear();
-		}
-
-	}
-
-	/**
-	 * Prints a set
-	 * 
-	 * @param set
-	 */
-	public static void printSet(final Set<?> set) {
-		Iterator<?> it = set.iterator();
-		while (it.hasNext()) {
-			logger.info(it.next().toString());
-		}
-	}
 
 	/**
 	 * @param start
@@ -119,19 +52,9 @@ public class Utilities {
 		return System.currentTimeMillis();
 	}
 
-	public static void printList(List<?> resultList) {
-		for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
-			logger.info(resultList.get(listCounter).toString());
-		}
-	}
+	
 
-	public static String prun(String uri) {
-		String s = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
-		if (s.indexOf(":") != -1)
-			s = s.replaceAll(":", "");
-
-		return s;
-	}
+	
 
 	public static String cleanse(String arg) {
 
@@ -146,31 +69,9 @@ public class Utilities {
 		return arg.toLowerCase();
 	}
 
-	/**
-	 * oie instance cleaning
-	 * 
-	 * @param arg
-	 * @return
-	 */
-	public static String clean(String arg) {
-		if (arg.indexOf(":") != -1)
-			arg = arg.substring(arg.indexOf(":") + 1, arg.length());
+	
 
-		return arg.replaceAll("\\_+", " ");
-
-	}
-
-	public static String removeStopWords(String originalWord) {
-		StringBuffer retVal = new StringBuffer();
-		String[] arrWords = originalWord.split(" ");
-		for (String word : arrWords) {
-			if (!STOP_WORDS.contains(word.toLowerCase())) {
-				retVal.append(word + " ");
-			}
-		}
-
-		return retVal.toString().toLowerCase().trim();
-	}
+	
 
 	/**
 	 * encodes a string with special character to one with UTF-8 encoding
@@ -229,23 +130,6 @@ public class Utilities {
 			return prob;
 	}
 
-	// public static Map sortByValue(Map map) {
-	// List list = new LinkedList(map.entrySet());
-	// Collections.sort(list, new Comparator() {
-	// public int compare(Object o2, Object o1) {
-	// return ((Comparable) ((Map.Entry) (o1)).getValue())
-	// .compareTo(((Map.Entry) (o2)).getValue());
-	// }
-	// });
-	//
-	// Map result = new LinkedHashMap();
-	// for (Iterator it = list.iterator(); it.hasNext();) {
-	// Map.Entry entry = (Map.Entry) it.next();
-	// result.put(entry.getKey(), entry.getValue());
-	// }
-	// return result;
-	// }
-
 	// ***************************************************************
 	/**
 	 * removes the DBpedia header uri information and cleanes the concept from
@@ -261,26 +145,11 @@ public class Utilities {
 		// replaceAll(":_", "__")
 	}
 
-	public static String cleanYagoURI(String arg) {
-		return arg.replaceAll(Constants.YAGO_HEADER + "/", "")
-				.replaceAll(Constants.DBPEDIA_INSTANCE_NS, "")
-				.replaceAll("\"", ""); // TODO
-		// replaceAll(":_", "__")
-	}
+	
 
-	public static String cleanForMLNPresentation(String arg) {
-		arg = arg.replaceAll("(", "[");
-		arg = arg.replaceAll(")", "]");
-		arg = arg.replaceAll("&", "~26");
+	
 
-		return arg;
-	}
-
-	public static String cleanTerms(String arg) {
-		arg = arg.replaceAll("\"", "").trim();
-		arg = arg.replaceAll("http://dbpedia.org/resource/", "");
-		return arg;
-	}
+	
 
 	public static String cleanseInstances(String dbpInst) {
 		dbpInst = dbpInst.replaceAll("~", "%");
@@ -340,7 +209,7 @@ public class Utilities {
 	 * 
 	 * @param arg
 	 * @param identifier
-	 * @return 
+	 * @return
 	 */
 	public static String getInst(String arg) {
 
@@ -404,40 +273,8 @@ public class Utilities {
 		return arg;
 	}
 
-	public static String splitAtCapitals(String arg) {
-		String retStr = "";
-		for (int i = 0; i < arg.length(); i++) {
-			char c = arg.charAt(i);
-			if (Character.isUpperCase(c)) {
-				retStr = retStr + " " + c;
-			} else {
-				retStr = retStr + c;
-			}
-		}
-		return retStr;
-	}
+	
 
-	/**
-	 * extended splitter to take care of data type properties with
-	 * /ontologu/A/prop structure
-	 * 
-	 * @param arg
-	 * @return
-	 */
-	public static String splitAtCapitalsExt(String arg) {
-		String retStr = "";
-		if (arg.indexOf("/") != -1) {
-			arg = arg.substring(arg.lastIndexOf("/") + 1, arg.length());
-		}
-		for (int i = 0; i < arg.length(); i++) {
-			char c = arg.charAt(i);
-			if (Character.isUpperCase(c)) {
-				retStr = retStr + " " + c;
-			} else {
-				retStr = retStr + c;
-			}
-		}
-		return retStr;
-	}
+	
 
 }

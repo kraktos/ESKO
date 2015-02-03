@@ -2,7 +2,6 @@ package code.dws.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileUtil {
 
-	public final static Logger logger = LoggerFactory.getLogger(FileUtil.class);
+	private final static Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
 	public static ArrayList<ArrayList<String>> genericFileReader(
 			InputStream inputStream, String valueSeperator, boolean hasHeader) {
@@ -54,28 +51,7 @@ public class FileUtil {
 		return lines;
 	}
 
-	public static List<Pair<String, String>> readPairsOfProperties(
-			String string, String delimit) {
-		String line = null;
-		String[] arr = null;
-
-		List<Pair<String, String>> retList = new ArrayList<Pair<String, String>>();
-
-		try {
-			@SuppressWarnings("resource")
-			Scanner scan = new Scanner(new File(string));
-
-			while (scan.hasNextLine()) {
-				line = scan.nextLine();
-				arr = line.split(delimit);
-
-				retList.add(new ImmutablePair<String, String>(arr[0], arr[1]));
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return retList;
-	}
+	
 
 	/**
 	 * a file dump routine

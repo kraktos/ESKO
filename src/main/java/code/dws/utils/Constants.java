@@ -319,7 +319,7 @@ public class Constants {
 		}
 	}
 
-	public static void init() {
+	private static void init() {
 		ALL_MLN_EVIDENCE = sample_dumps + PREDICATE + "/AllEvidence.db";
 
 		/**

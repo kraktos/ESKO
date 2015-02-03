@@ -4,7 +4,6 @@
 package code.dws.setup;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,8 +87,6 @@ public class ScriptGenarator {
 	 * @param oieFilePath
 	 */
 	private static void loadOIEProps(String oieFilePath) {
-		boolean flag = false;
-
 		if (Constants.IS_NELL) {
 			// // load the NELL file in memory as a collection
 			// ArrayList<ArrayList<String>> nellFile =

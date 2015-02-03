@@ -8,19 +8,14 @@ import gnu.trove.map.hash.THashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import code.dws.dbConnectivity.DBWrapper;
-import code.dws.dto.PairDto;
 import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
@@ -38,59 +33,15 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
  */
 public class SPARQLEndPointQueryAPI {
 
-	public final static Logger logger = Logger
+	private final static Logger logger = Logger
 			.getLogger(SPARQLEndPointQueryAPI.class.getName());
 
 	// map of class and its subclasses
 	private static THashMap<String, Set<String>> classAndSubClassesMap = new THashMap<String, Set<String>>();
 
-	public static void queryDBPedia(final String QUERY) {
-
-		Logger logger = Logger
-				.getLogger(SPARQLEndPointQueryAPI.class.getName());
-
-		String sparqlQueryString1 = QUERY;
-
-		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				Constants.DBPEDIA_SPARQL_ENDPOINT_LOCAL, query);
-
-		// get the result set
-		ResultSet results = qexec.execSelect();
-
-		List<QuerySolution> listResults = ResultSetFormatter.toList(results);
-
-		List<String> listVarnames = results.getResultVars();
-
-		for (QuerySolution querySol : listResults) {
-			for (int indx = 0; indx < listVarnames.size();) {
-				String key = querySol.get(listVarnames.get(indx++)).toString();
-				String value = querySol.get(listVarnames.get(indx++))
-						.toString();
-				logger.info(key + "  " + value);
-			}
-		}
-
-		qexec.close();
-	}
-
-	/**
-	 * overloaded method to accept different query endpoint runtime
-	 * 
-	 * @param QUERY
-	 * @param endpoint
-	 * @return
+	/*
+	 * queries a SPARQL endpoint for results
 	 */
-	public static List<QuerySolution> queryDBPediaEndPoint(final String QUERY,
-			String endpoint) {
-		if (endpoint == null) {
-			endpoint = Constants.DBPEDIA_SPARQL_ENDPOINT_LOCAL;
-		} else {
-			Constants.DBPEDIA_SPARQL_ENDPOINT_LOCAL = endpoint;
-		}
-		return queryDBPediaEndPoint(QUERY);
-	}
-
 	public static List<QuerySolution> queryDBPediaEndPoint(final String QUERY) {
 		List<QuerySolution> listResults = null;
 
@@ -209,43 +160,13 @@ public class SPARQLEndPointQueryAPI {
 	}
 
 	/**
-	 * get type of a given instance
-	 * 
-	 * @param inst
-	 *            instance
-	 * @return list of its type
-	 */
-	public static List<String> getInstanceTypesAll(String inst) {
-		List<String> result = new ArrayList<String>();
-		String sparqlQuery = null;
-
-		try {
-			sparqlQuery = "select ?val where{ <"
-					+ inst
-					+ "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?val} ";
-
-			// fetch the result set
-			List<QuerySolution> listResults = queryDBPediaEndPoint(sparqlQuery);
-
-			for (QuerySolution querySol : listResults) {
-				if (querySol.get("val").toString()
-						.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1)
-					result.add(querySol.get("val").toString());
-			}
-		} catch (Exception e) {
-			logger.info("problem with " + sparqlQuery + " " + e.getMessage());
-		}
-		return result;
-	}
-
-	/**
 	 * This method finds the highest type in hierarchy given a list of such
 	 * types
 	 * 
 	 * @param types
 	 *            List of types
 	 */
-	public static void createClassVsSubclassMap(List<String> types) {
+	private static void createClassVsSubclassMap(List<String> types) {
 
 		Set<String> setSubClasses = null;
 
@@ -281,27 +202,6 @@ public class SPARQLEndPointQueryAPI {
 			// store in a collection
 			classAndSubClassesMap.put(key, setSubClasses);
 		}
-	}
-
-	/**
-	 * iterates the map and removes the types which occurs as subclass in some
-	 * other class
-	 * 
-	 * @param types
-	 * @return
-	 */
-	private static List<String> removeChildClasses(List<String> types) {
-
-		for (Map.Entry<String, Set<String>> e : classAndSubClassesMap
-				.entrySet()) {
-			for (String val : e.getValue()) {
-				if (types.contains(val)) {
-					types.remove(val);
-				}
-			}
-		}
-
-		return types;
 	}
 
 	private static List<String> removeSuperClasses(List<String> types) {
@@ -347,16 +247,6 @@ public class SPARQLEndPointQueryAPI {
 	 * @param types
 	 * @return
 	 */
-	public static List<String> getHighestType(List<String> types) {
-		createClassVsSubclassMap(types);
-		types = removeChildClasses(types);
-		return types;
-	}
-
-	/**
-	 * @param types
-	 * @return
-	 */
 	public static List<String> getLowestType(List<String> types) {
 		List<String> specificType = null;
 		createClassVsSubclassMap(types);
@@ -364,109 +254,5 @@ public class SPARQLEndPointQueryAPI {
 		return specificType;
 	}
 
-	/**
-	 * load DBP properties from SPARQL endpoint, -1 means all properties
-	 * 
-	 * @param topKDBPediaProperties
-	 * @param query
-	 * @return
-	 */
-	public static List<String> loadDbpediaProperties(
-			long topKDBPediaProperties, String query) {
-
-		String prop = null;
-		String cnt = "0";
-		int c = 0;
-
-		List<String> retS = new ArrayList<String>();
-
-		Map<String, Long> props = new HashMap<String, Long>();
-
-		List<QuerySolution> count = null;
-
-		List<QuerySolution> dbpObjProps = queryDBPediaEndPoint(query);
-
-		for (QuerySolution querySol : dbpObjProps) {
-			prop = querySol.get("val").toString();
-
-			if ((prop.indexOf(Constants.DBPEDIA_PREDICATE_NS) != -1)
-					&& (prop.indexOf("wikiPageWikiLink") == -1)
-					&& (prop.indexOf("wikiPageExternalLink") == -1)
-					&& (prop.indexOf("wikiPageRedirects") == -1)
-					&& (prop.indexOf("thumbnail") == -1)
-					&& (prop.indexOf("wikiPageDisambiguates") == -1)
-					&& (prop.indexOf("wikiPageInterLanguageLink") == -1)) {
-
-				if (topKDBPediaProperties != -1) {
-					count = queryDBPediaEndPoint("select (count(*)  as ?val)  where {?a <"
-							+ prop + "> ?c} ");
-					for (QuerySolution sol : count) {
-						cnt = sol.get("val").toString();
-					}
-					cnt = cnt.substring(0, cnt.indexOf("^"));
-					props.put(
-							prop.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""),
-							Long.parseLong(cnt));
-				} else {
-					retS.add(prop
-							.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""));
-				}
-			}
-		}
-
-		// sort only when interested in top-k, else makes no sense
-		if (topKDBPediaProperties != -1) {
-			props = Utilities.sortByValue(props);
-
-			for (Entry<String, Long> e : props.entrySet()) {
-				retS.add(e.getKey());
-
-				c++;
-				if (c == topKDBPediaProperties)
-					return retS;
-			}
-		}
-
-		return retS;
-	}
-
-	public static List<PairDto> getRandomInstance(String randomKBProp,
-			int nextInt) {
-		String dbpSub = null;
-		String dbpObj = null;
-
-		List<Pair<String, String>> sfPairs = null;
-		List<PairDto> pairDtos = new ArrayList<PairDto>();
-
-		String QUERY_RANDOM_PROPERTY_INSTANCE = "SELECT * WHERE {{SELECT * WHERE {?s <http://dbpedia.org/ontology/"
-				+ randomKBProp
-				+ "> ?o} ORDER BY ASC(?s)}} OFFSET "
-				+ nextInt
-				+ "  LIMIT 1";
-
-		List<QuerySolution> res = queryDBPediaEndPoint(QUERY_RANDOM_PROPERTY_INSTANCE);
-
-		for (QuerySolution querySol : res) {
-			dbpSub = querySol.get("s").toString();
-			dbpObj = querySol.get("o").toString();
-
-			dbpSub = Utilities.utf8ToCharacter(dbpSub.replaceAll(
-					Constants.DBPEDIA_INSTANCE_NS, "").replaceAll("_", " "));
-			dbpObj = Utilities.utf8ToCharacter(dbpObj.replaceAll(
-					Constants.DBPEDIA_INSTANCE_NS, "").replaceAll("_", " "));
-
-			// make a DB call for the surface forms
-			sfPairs = DBWrapper.getSurfaceForms(dbpSub, dbpObj);
-			for (Pair<String, String> pair : sfPairs) {
-				pairDtos.add(new PairDto(pair.getLeft(), randomKBProp, pair
-						.getRight(), dbpSub, dbpObj));
-			}
-			if (pairDtos.size() == 0)
-				return null;
-
-			return pairDtos;
-		}
-		return null;
-	}
 } // end class
 

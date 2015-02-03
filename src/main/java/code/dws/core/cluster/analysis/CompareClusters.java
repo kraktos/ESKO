@@ -38,10 +38,10 @@ public class CompareClusters {
 
 	private static String PAIR_SCORE_FILE = null;
 
-	public static String CLUSTER_INDICES = null;
+	private static String CLUSTER_INDICES = null;
 
 	// define Logger
-	public static Logger logger = Logger.getLogger(CompareClusters.class
+	private static Logger logger = Logger.getLogger(CompareClusters.class
 			.getName());
 
 	/**
@@ -52,7 +52,7 @@ public class CompareClusters {
 	private static Map<Pair<String, String>, Double> SCORE_MAP = new HashMap<Pair<String, String>, Double>();
 
 	// public static final double SIM_SCORE_THRESHOLD = 0.01;
-	public static double BEST_SCORE = Double.MAX_VALUE;
+	private static double BEST_SCORE = Double.MAX_VALUE;
 
 	/**
 	 * 
@@ -213,7 +213,7 @@ public class CompareClusters {
 	}
 
 	@SuppressWarnings("resource")
-	public static void loadScores(String file, String delimit)
+	private static void loadScores(String file, String delimit)
 			throws FileNotFoundException {
 
 		String sCurrentLine;
@@ -270,7 +270,7 @@ public class CompareClusters {
 	 * @return
 	 * @return
 	 */
-	public static double computeClusterIndex(Map<String, List<String>> mCl) {
+	private static double computeClusterIndex(Map<String, List<String>> mCl) {
 
 		double minCompactness = 0;
 		double tempIsolation = 0;
@@ -404,32 +404,6 @@ public class CompareClusters {
 			}
 		}
 		return score;
-	}
-
-	@SuppressWarnings("resource")
-	private static void readMarkovClusters(String inflation, String output)
-			throws IOException {
-		int cnt = 0;
-		Scanner scan;
-		scan = new Scanner(new File((output)), "UTF-8");
-
-		List<String> list = null;
-
-		String sCurrentLine = null;
-		String[] elem = null;
-
-		double infl = Double.parseDouble(inflation);
-		while (scan.hasNextLine()) {
-			list = new ArrayList<String>();
-			sCurrentLine = scan.nextLine();
-			elem = sCurrentLine.split("\t");
-			for (String s : elem)
-				list.add(s);
-
-			CLUSTER.put("C" + cnt++, list);
-
-		}
-
 	}
 
 }

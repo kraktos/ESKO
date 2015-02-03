@@ -28,10 +28,10 @@ import code.dws.utils.Utilities;
  * @author adutta
  *
  */
-public class Generator {
+class Generator {
 
 	// define class logger
-	public final static Logger logger = LoggerFactory
+	private final static Logger logger = LoggerFactory
 			.getLogger(Generator.class);
 
 	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
@@ -56,7 +56,7 @@ public class Generator {
 	 * @return List of properties
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<String> getReverbProperties(int topKRevbProps,
+	static List<String> getReverbProperties(int topKRevbProps,
 			Long atLeastInstancesCount) {
 
 		String line = null;

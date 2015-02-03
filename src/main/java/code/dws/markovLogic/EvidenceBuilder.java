@@ -36,24 +36,24 @@ public class EvidenceBuilder {
 	/**
 	 * logger
 	 */
-	public final static Logger logger = LoggerFactory
+	private final static Logger logger = LoggerFactory
 			.getLogger(EvidenceBuilder.class);
 
 	private String propertyName;
 	private List<String> propertyNames;
 
-	public static THashMap<String, Long> MAP_COUNTER = new THashMap<String, Long>();
+	private static THashMap<String, Long> MAP_COUNTER = new THashMap<String, Long>();
 
 	public static THashMap<String, List<String>> INSTANCE_CANDIDATES = new THashMap<String, List<String>>();
 	// public static THashMap<String, List<String>> INSTANCE_CANDIDATES2 = new
 	// THashMap<String, List<String>>();
 
-	public static THashMap<String, List<String>> INSTANCE_TYPES = new THashMap<String, List<String>>();
+	
 
 	// The input OIE file with raw web extracted data
-	public static File oieFile = null;
+	private static File oieFile = null;
 
-	public EvidenceBuilder(String[] args) throws IOException {
+	private EvidenceBuilder(String[] args) throws IOException {
 
 		if (Constants.IS_NELL) {
 			this.propertyName = args[0];
@@ -119,7 +119,7 @@ public class EvidenceBuilder {
 	 *            delimiter, comma or tab or something else
 	 * @throws IOException
 	 */
-	public void processTriple(File inputFile, OIE oieType, String delimit)
+	private void processTriple(File inputFile, OIE oieType, String delimit)
 			throws IOException {
 
 		String triple;
@@ -292,7 +292,7 @@ public class EvidenceBuilder {
 	 * @param identifier
 	 * @throws IOException
 	 */
-	public void createEvidenceForTopKCandidates(
+	private void createEvidenceForTopKCandidates(
 			BufferedWriter allEvidenceWriter, String oieInst,
 			String oiePostFixdInst, THashMap<String, String> termConceptPair,
 			String identifier) throws IOException {

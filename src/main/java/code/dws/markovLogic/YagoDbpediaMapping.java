@@ -29,7 +29,7 @@ import code.dws.utils.FileUtil;
 public class YagoDbpediaMapping {
 
 	// define class logger
-	public final static Logger log = LoggerFactory
+	private final static Logger log = LoggerFactory
 			.getLogger(YagoDbpediaMapping.class);
 
 	private static final String DBP_YAGO_CLASS_EQUIV = "src/main/resources/input/dbpedia_yago_matching.csv";
@@ -223,7 +223,7 @@ public class YagoDbpediaMapping {
 	 * 
 	 * @throws FileNotFoundException
 	 */
-	public static void parseOutputFile() throws FileNotFoundException {
+	private static void parseOutputFile() throws FileNotFoundException {
 		ArrayList<ArrayList<String>> yagoSubClasses = FileUtil
 				.genericFileReader(new FileInputStream(YAGO_SUBCLASS_OUTPUT),
 						";", false);
