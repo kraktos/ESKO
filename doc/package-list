@@ -1,6 +1,11 @@
+code.dws.bootstrap
+code.dws.core
+code.dws.core.cluster.analysis
 code.dws.dbConnectivity
 code.dws.dto
 code.dws.evaluation
+code.dws.experiment
+code.dws.markovLogic
 code.dws.query
 code.dws.setup
 code.dws.utils
