@@ -25,7 +25,9 @@ It must be noted the whole application is developed as three different component
 
 
 #### Instance Matching
-After the inflating the compressed file, browse to the location /home/unixUser/ESKO/src/main/resources/script/ from the command line and type
+After the inflating the compressed file, browse to the location /home/unixUser/ESKO/ and  run from the command line
+
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg
 
 ./WF.1.PIPELINE.sh for running the Workflow 1 
 
@@ -33,10 +35,6 @@ After the inflating the compressed file, browse to the location /home/unixUser/E
 
 ./WF.3.PIPELINE.sh for running the Workflow 3
 
-
-After this is over, run the following from the command line
-
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg
 
 
 The outputs will be generated under /home/unixUser/ESKO/src/main/resources/output/
