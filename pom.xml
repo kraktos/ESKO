@@ -21,6 +21,9 @@
 					<include>
 						**/input/*
 					</include>
+					<include>
+						**/script/*
+					</include>
 				</includes>
 			</resource>
 		</resources>
