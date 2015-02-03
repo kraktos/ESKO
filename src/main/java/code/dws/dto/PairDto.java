@@ -35,23 +35,9 @@ public class PairDto {
 		this.kbArg2 = kbArg2;
 	}
 
-	/**
-	 * @param arg1
-	 * @param rel
-	 * @param arg2
-	 */
-	public PairDto(String arg1, String rel, String arg2) {
-		this.arg1 = arg1;
-		this.rel = rel;
-		this.arg2 = arg2;
-	}
+	
 
-	public PairDto(String arg1, String arg2, Double score) {
-		super();
-		this.arg1 = arg1;
-		this.arg2 = arg2;
-		this.score = score;
-	}
+	
 
 	/**
 	 * @return the kbArg1

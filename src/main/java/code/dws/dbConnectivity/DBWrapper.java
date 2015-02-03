@@ -18,6 +18,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import code.dws.dto.FactDao;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
@@ -29,27 +30,27 @@ import code.dws.utils.Utilities;
  */
 public class DBWrapper {
 
-	public static final String GS_DELIMITER = "~~";
+	
 
 	// define Logger
-	static Logger logger = Logger.getLogger(DBWrapper.class.getName());
+	private static Logger logger = Logger.getLogger(DBWrapper.class.getName());
 
 	// DB connection instance, one per servlet
-	static Connection connection = null;
+	private static Connection connection = null;
 
 	// DBCOnnection
-	static DBConnection dbConnection = null;
+	private static DBConnection dbConnection = null;
 
 	// prepared statement instance
-	static PreparedStatement pstmt = null;
+	private static PreparedStatement pstmt = null;
 
-	static PreparedStatement insertDBPTypePrepstmnt = null;
+	private static PreparedStatement insertDBPTypePrepstmnt = null;
 
-	static PreparedStatement insertOIEPFxdPrepstmnt = null;
+	private static PreparedStatement insertOIEPFxdPrepstmnt = null;
 
-	static PreparedStatement fetchDbpTypePrepstmnt = null;
+	private static PreparedStatement fetchDbpTypePrepstmnt = null;
 
-	static int batchCounter = 0;
+	private static int batchCounter = 0;
 
 	/**
 	 * initiates the connection parameters
@@ -83,28 +84,7 @@ public class DBWrapper {
 		}
 	}
 
-	public static void insertIntoPropGS(String oieSub, String oieRel,
-			String oieObj, String kbSub, String kbRel, String kbObj, String inv) {
-		try {
-
-			pstmt.setString(1, oieSub);
-			pstmt.setString(2, oieRel);
-			pstmt.setString(3, oieObj);
-			pstmt.setString(4, kbSub);
-			pstmt.setString(5, kbRel);
-			pstmt.setString(6, kbObj);
-			pstmt.setString(7, "");
-			pstmt.setString(8, inv);
-
-			pstmt.execute();
-			connection.commit();
-			logger.info("FLUSHED TO OIE_GS...");
-
-		} catch (SQLException e) {
-			logger.error("Error with insertIntoPropGS .." + e.getMessage());
-		}
-
-	}
+	
 
 	public static void saveToOIEPostFxd(String oieSub, String oiePred,
 			String oieObj, String oieSubPfxd, String oieObjPfxd) {
@@ -143,104 +123,9 @@ public class DBWrapper {
 
 	}
 
-	public static void saveToDBPediaTypes(String instance, String instType) {
+	
 
-		try {
-
-			insertDBPTypePrepstmnt.setString(1, instance);
-			insertDBPTypePrepstmnt.setString(2, instType);
-
-			insertDBPTypePrepstmnt.addBatch();
-			insertDBPTypePrepstmnt.clearParameters();
-
-			batchCounter++;
-			if (batchCounter % Constants.BATCH_SIZE == 0
-					&& batchCounter > Constants.BATCH_SIZE) { // batches are
-				// flushed at
-				// a time
-				// execute batch update
-				insertDBPTypePrepstmnt.executeBatch();
-
-				logger.info("FLUSHED TO DBPEDIA_TYPES");
-				connection.commit();
-				insertDBPTypePrepstmnt.clearBatch();
-			}
-
-		} catch (SQLException e) {
-			logger.error("Error with batch insertion of DBPEDIA_TYPES .."
-					+ e.getMessage());
-		}
-
-	}
-
-	public static List<String> getFullyMappedFacts() {
-		List<String> types = new ArrayList<String>();
-
-		try {
-
-			ResultSet rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				types.add(rs.getString(1));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return types;
-	}
-
-	/**
-	 * works for both somain and range
-	 * 
-	 * @param param
-	 * @return
-	 */
-	// public static List<String> getOIEFeatures(String param) {
-	// List<String> types = new ArrayList<String>();
-	//
-	// try {
-	// pstmt.setString(1, param);
-	// ResultSet rs = pstmt.executeQuery();
-	//
-	// while (rs.next()) {
-	// types.add(rs.getString(1));
-	// if (!VectorCluster.featureSpace.contains(rs.getString(1)))
-	// VectorCluster.featureSpace.add(rs.getString(1));
-	// }
-	//
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// return types;
-	// }
-
-	// public static FactDao getRefinedDBPFact(FactDao key) {
-	//
-	// String dbpSub = null;
-	// String dbpObj = null;
-	//
-	// try {
-	//
-	// pstmt.setString(1, key.getSub());
-	// pstmt.setString(2, key.getRelation());
-	// pstmt.setString(3, key.getObj());
-	// ResultSet rs = pstmt.executeQuery();
-	//
-	// if (rs.next()) {
-	// dbpSub = (rs.getString(1).equals("X")) ? "?" : rs.getString(1);
-	// dbpObj = (rs.getString(2).equals("X")) ? "?" : rs.getString(2);
-	//
-	// return new FactDao(Utilities.utf8ToCharacter(dbpSub), "?",
-	// Utilities.utf8ToCharacter(dbpObj));
-	// }
-	//
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// return null;
-	// }
+	
 
 	public static List<String> getDBPInstanceType(String instance) {
 		List<String> types = new ArrayList<String>();
@@ -267,30 +152,7 @@ public class DBWrapper {
 		return types;
 	}
 
-	public static List<String> fetchWikiTitles(String arg) {
-		ResultSet rs = null;
-		List<String> results = null;
-
-		try {
-
-			pstmt.setString(1, arg.trim());
-			// pstmt.setInt(2, Constants.ATLEAST_LINKS);
-			pstmt.setInt(2, Constants.TOP_K_MATCHES);
-			// run the query finally
-			rs = pstmt.executeQuery();
-			results = new ArrayList<String>();
-
-			while (rs.next()) {
-				results.add(rs.getString(1));
-			}
-
-		} catch (Exception e) {
-			logger.error(" exception while fetching " + arg + " "
-					+ e.getMessage());
-		}
-
-		return results;
-	}
+	
 
 	/**
 	 * returns a pair of all possible surface forms, for a given pair of KB
@@ -558,4 +420,38 @@ public class DBWrapper {
 		}
 		return results;
 	}
+
+	/**
+	 * method to retrieve the refined KB fact for a given fact
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static FactDao getRefinedDBPFact(FactDao key) {
+
+		String dbpSub = null;
+		String dbpObj = null;
+
+		try {
+
+			pstmt.setString(1, key.getSub());
+			pstmt.setString(2, key.getRelation());
+			pstmt.setString(3, key.getObj());
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dbpSub = (rs.getString(1).equals("X")) ? "?" : rs.getString(1);
+				dbpObj = (rs.getString(2).equals("X")) ? "?" : rs.getString(2);
+
+				return new FactDao(Utilities.utf8ToCharacter(dbpSub), "?",
+						Utilities.utf8ToCharacter(dbpObj));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 }

@@ -222,38 +222,13 @@ public class GenericTreeNode {
 		return builder.toString();
 	}
 
-	/**
-	 * prints node and it children
-	 * 
-	 * @param node
-	 */
-	public void display(GenericTreeNode node) {
-		System.out.println(node.getNodeName().toString() + "  \t"
-				+ node.getNodeValue());
-
-		for (GenericTreeNode child : node.getChildren()) {
-			System.out.println(">>>\t" + child.getNodeName().toString()
-					+ "  \t" + child.getNodeValue());
-			display(child);
-		}
-	}
+	
 
 	public void addChild(GenericTreeNode child) {
 		this.children.add(child);
 	}
 
-	/**
-	 * removes a specific node by the node.
-	 * 
-	 * @param node
-	 * @throws IndexOutOfBoundsException
-	 */
-	public void removeChild(GenericTreeNode node)
-			throws IndexOutOfBoundsException {
-		int index = this.children.indexOf(node);
-		if (index != -1)
-			this.children.remove(index);
-	}
+	
 
 	/**
 	 * returns the number of children of this node

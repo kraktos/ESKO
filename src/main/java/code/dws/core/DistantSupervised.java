@@ -41,37 +41,30 @@ import code.dws.utils.Utilities;
  * 
  * @author Arnab Dutta
  */
-public class DistantSupervised {
+class DistantSupervised {
 	/**
 	 * logger
 	 */
-	public final static Logger logger = LoggerFactory
+	private final static Logger logger = LoggerFactory
 			.getLogger(DistantSupervised.class);
 
-	static String[] pNames = { "bookwriter", "actorstarredinmovie",
-			"bankbankincountry", "personleadsorganization",
-			"athleteledsportsteam", "citylocatedinstate", "companyalsoknownas",
-			"agentcollaborateswithagent", "teamplaysagainstteam",
-			"weaponmadeincountry", "lakeinstate", "animalistypeofanimal"
+	
 
-	};
+	
 
-	long subjectCount = 0;
-	long objectCount = 0;
+	private Map<String, Double> domainClassMap = new HashMap<String, Double>();
+	private Map<String, Double> rangeClassMap = new HashMap<String, Double>();
 
-	Map<String, Double> domainClassMap = new HashMap<String, Double>();
-	Map<String, Double> rangeClassMap = new HashMap<String, Double>();
-
-	String propertyName;
-	List<String> propertyNames;
+	private String propertyName;
+	private List<String> propertyNames;
 
 	// The input OIE file with raw web extracted data
-	static File oieFile = null;
+	private static File oieFile = null;
 
 	/**
 	 * @param propertyName
 	 */
-	public DistantSupervised(String[] args) {
+	DistantSupervised(String[] args) {
 
 		if (Constants.IS_NELL) {
 			this.propertyName = args[0];
@@ -128,7 +121,7 @@ public class DistantSupervised {
 	 * 
 	 * @throws IOException
 	 */
-	public void learnDomRanFromFullData() throws IOException {
+	void learnDomRanFromFullData() throws IOException {
 
 		if (Constants.ENGAGE_INTER_STEP) {
 			BootStrapMethod
@@ -150,7 +143,7 @@ public class DistantSupervised {
 	 * 
 	 * @throws IOException
 	 */
-	public void learnDomRanFromFilteredOutputFiles() throws IOException {
+	void learnDomRanFromFilteredOutputFiles() throws IOException {
 		this.processTripleFromOutputFiles();
 	}
 
@@ -166,7 +159,7 @@ public class DistantSupervised {
 	 *            delimiter, comma or tab or something else
 	 * @throws IOException
 	 */
-	public void processTripleFromOutputFiles() throws IOException {
+	private void processTripleFromOutputFiles() throws IOException {
 
 		// here create the domain and range class map in a different fashion
 		this.bootStrap();
@@ -233,7 +226,7 @@ public class DistantSupervised {
 	 *            delimiter, comma or tab or something else
 	 * @throws IOException
 	 */
-	public void processFullDataDump(File inputFile, OIE oieType, String delimit)
+	private void processFullDataDump(File inputFile, OIE oieType, String delimit)
 			throws IOException {
 
 		String triple;
@@ -316,7 +309,7 @@ public class DistantSupervised {
 	 *            the type of OIE project, NELL or Reverb, different types have
 	 *            diffeent format
 	 */
-	public void processEachTriple(String sub, String prop, String obj,
+	private void processEachTriple(String sub, String prop, String obj,
 			OIE oieType) {
 
 		List<String> subs = new ArrayList<String>();
@@ -371,7 +364,7 @@ public class DistantSupervised {
 	 * @param objEntities
 	 *            list of object candidates
 	 */
-	public void getTypes(List<String> entities, String domRanType) {
+	private void getTypes(List<String> entities, String domRanType) {
 		List<String> entityTypes = null;
 
 		double value = 0;
@@ -564,7 +557,7 @@ public class DistantSupervised {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map<String, Double> sortByValue(Map map) {
+	private static Map<String, Double> sortByValue(Map map) {
 		List list = new LinkedList(map.entrySet());
 		Collections.sort(list, new Comparator() {
 			public int compare(Object o2, Object o1) {
@@ -628,7 +621,7 @@ public class DistantSupervised {
 	 * @param topK
 	 * @return
 	 */
-	public List<Pair<String, Double>> getTopDomainClass(int topK) {
+	List<Pair<String, Double>> getTopDomainClass(int topK) {
 		List<Pair<String, Double>> listTopKClasses = new ArrayList<Pair<String, Double>>();
 
 		for (Map.Entry<String, Double> entry : domainClassMap.entrySet()) {
@@ -649,7 +642,7 @@ public class DistantSupervised {
 	 * @param topK
 	 * @return
 	 */
-	public List<Pair<String, Double>> getTopRangeClass(int topK) {
+	List<Pair<String, Double>> getTopRangeClass(int topK) {
 		List<Pair<String, Double>> listTopKClasses = new ArrayList<Pair<String, Double>>();
 
 		for (Map.Entry<String, Double> entry : rangeClassMap.entrySet()) {

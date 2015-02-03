@@ -20,31 +20,31 @@ import code.dws.utils.Constants;
  * 
  * @author Arnab Dutta
  */
-public class DBConnection {
+class DBConnection {
 
 	// logger
-	static Logger logger = Logger.getLogger(DBConnection.class.getName());
+	private static Logger logger = Logger.getLogger(DBConnection.class.getName());
 
 	// Connection reference
 	private Connection connection = null;
 
 	// Statement
-	Statement statement = null;
+	private Statement statement = null;
 
 	// DB Driver name
-	public static String driverName = Constants.DRIVER_NAME;
+	private static String driverName = Constants.DRIVER_NAME;
 
 	// Url to conenct to the Database
-	public static String connectionURL = Constants.CONNECTION_URL;
+	private static String connectionURL = Constants.CONNECTION_URL;
 
 	// name of the database
-	public static String dbName = Constants.DB_NAME;
+	private static String dbName = Constants.DB_NAME;
 
 	// user of the database. Make sure this user is created for the DB
-	public static String dbUser = Constants.DB_USER;
+	private static String dbUser = Constants.DB_USER;
 
 	// password for the user
-	public static String dbUserPassword = Constants.DB_PWD;
+	private static String dbUserPassword = Constants.DB_PWD;
 
 	/**
 	 * initialize the DB in the constructor
@@ -92,7 +92,7 @@ public class DBConnection {
 
 	}
 
-	public Connection initDB() throws SQLException {
+	private Connection initDB() throws SQLException {
 		this.connection = DriverManager.getConnection(connectionURL + dbName,
 				dbUser, dbUserPassword);
 
@@ -110,7 +110,7 @@ public class DBConnection {
 	/**
 	 * register the driver
 	 */
-	public static void registerDriver() {
+	private static void registerDriver() {
 		try {
 			Class.forName(driverName);
 		} catch (ClassNotFoundException e) {
@@ -121,27 +121,12 @@ public class DBConnection {
 		}
 	}
 
-	/**
-	 * performs the query execution
-	 * 
-	 * @param queryString
-	 *            input select query to be executed
-	 * @return a result set, can be null
-	 */
-	public ResultSet getResults(String queryString) {
-		try {
-			return this.statement.executeQuery(queryString);
-		} catch (SQLException e) {
-			logger.error("Exception while selecting " + queryString + "  "
-					+ e.getMessage());
-			return null;
-		}
-	}
+	
 
 	/**
 	 * Closes the database
 	 */
-	public void shutDown() {
+	void shutDown() {
 
 		try {
 			if (this.statement != null)

@@ -28,8 +28,8 @@ import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
 /**
- * this class reads the refined output files for each of the OIE property
- * files. and stores the mappings into Database
+ * this class reads the refined output files for each of the OIE property files.
+ * and stores the mappings into Database
  * 
  * @author arnab
  */
@@ -48,7 +48,7 @@ public class DBPMappingsLoader {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Constants.loadConfigParameters(new String[] { "", "CONFIG.cfg" });
+		Constants.loadConfigParameters(new String[] { "", args[0] });
 
 		String clusterName = null;
 

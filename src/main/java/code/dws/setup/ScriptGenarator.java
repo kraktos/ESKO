@@ -50,7 +50,7 @@ public class ScriptGenarator {
 
 	/**
 	 * takes the bunch of properties or clusters and generates script for
-	 * running instance mapping
+	 * running instance mapping.
 	 * 
 	 * @throws IOException
 	 */
@@ -73,7 +73,6 @@ public class ScriptGenarator {
 			}
 			scriptWriter.write("echo \"Done with complete reasoning of "
 					+ oieProp + "\"\n\n");
-
 		}
 
 		logger.info("echo \"Done with " + PROPS.size() + " clusters\n");

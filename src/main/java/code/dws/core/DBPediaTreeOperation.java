@@ -39,7 +39,7 @@ import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
  * 
  * @author Arnab Dutta
  */
-public class DBPediaTreeOperation {
+class DBPediaTreeOperation {
 
 	private OWLClass THING = null;
 	private OWLClass UNTYPED = null;
@@ -49,20 +49,20 @@ public class DBPediaTreeOperation {
 	private OWLOntology ontology;
 	private OWLOntologyManager manager;
 
-	List<Pair<String, Double>> domPairs;
-	List<Pair<String, Double>> ranPairs;
+	private List<Pair<String, Double>> domPairs;
+	private List<Pair<String, Double>> ranPairs;
 
 	// first create the top most concept "T"
-	GenericTreeNode TREE = null;
+	private GenericTreeNode TREE = null;
 
-	GenericTreeNode UNTYPEDNODE = null;
+	private GenericTreeNode UNTYPEDNODE = null;
 
 	// A collection of all the scored up nodes
-	static THashMap<String, GenericTreeNode> COLLECTION_NODES = new THashMap<String, GenericTreeNode>();
+	private static THashMap<String, GenericTreeNode> COLLECTION_NODES = new THashMap<String, GenericTreeNode>();
 
-	String identifier = null;
+	private String identifier = null;
 
-	boolean flag = false;
+	
 
 	// int nodeDepthCounter = 0;
 
@@ -86,7 +86,7 @@ public class DBPediaTreeOperation {
 	 * 
 	 * @param path
 	 */
-	public DBPediaTreeOperation(String path) {
+	DBPediaTreeOperation(String path) {
 
 		manager = OWLManager.createOWLOntologyManager();
 		File ontologyFile = new File(path);
@@ -142,19 +142,7 @@ public class DBPediaTreeOperation {
 		this.UNTYPEDNODE = uNTYPEDNODE;
 	}
 
-	/**
-	 * returns the score of a node, ie a given type
-	 * 
-	 * @param type
-	 *            DBPedia type
-	 * @return score
-	 */
-	public Double getNodeScore(String type) {
-		if (COLLECTION_NODES.containsKey(type))
-			return COLLECTION_NODES.get(type).getNodeDownScore();
-
-		return -1D;
-	}
+	
 
 	/**
 	 * @param dbPediaTypes
@@ -164,7 +152,7 @@ public class DBPediaTreeOperation {
 	 * @throws IOException
 	 */
 
-	public THashMap<String, Pair<Double, Double>> getNodeScore(
+	THashMap<String, Pair<Double, Double>> getNodeScore(
 			List<String> dbPediaTypes, Set<String> fullSetOfTpes) {
 
 		double totalScore = 0;
@@ -202,7 +190,7 @@ public class DBPediaTreeOperation {
 	 * @param tripleCounter
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private @SuppressWarnings({ "rawtypes", "unchecked" })
 	static THashMap<String, Pair<Double, Double>> sortByValue(THashMap map,
 			double totalScore) {
 		List list = new LinkedList(map.entrySet());
@@ -227,7 +215,7 @@ public class DBPediaTreeOperation {
 	 * @param args
 	 * @throws IOException
 	 */
-	public void buildDomRan(String[] args) throws IOException {
+	void buildDomRan(String[] args) throws IOException {
 
 		System.out.println("Learning domain/range values for " + args[0]);
 
@@ -239,7 +227,7 @@ public class DBPediaTreeOperation {
 	 * @param args
 	 * @throws IOException
 	 */
-	public void generateClassHierarchy(String args) throws IOException {
+	void generateClassHierarchy(String args) throws IOException {
 
 		this.setIdentifier(args);
 
@@ -262,7 +250,7 @@ public class DBPediaTreeOperation {
 	 * @param args
 	 * @throws IOException
 	 */
-	public void computeDomRan(final String[] args) throws IOException {
+	private void computeDomRan(final String[] args) throws IOException {
 
 		DistantSupervised distSup = new DistantSupervised(args);
 
@@ -329,7 +317,7 @@ public class DBPediaTreeOperation {
 	 * here we start from top node, and keep updating the down values till the
 	 * leaves. Basically it is guided by level-order traversal
 	 */
-	public void propagateValuesDown() {
+	private void propagateValuesDown() {
 		Queue<GenericTreeNode> queue = new LinkedList<GenericTreeNode>();
 		queue.add(TREE);
 
@@ -359,29 +347,7 @@ public class DBPediaTreeOperation {
 		}
 	}
 
-	/**
-	 * search a particular node in the tree
-	 * 
-	 * @param tree
-	 * @param searchnode
-	 * @return
-	 */
-	public GenericTreeNode searchForNode(GenericTreeNode tree,
-			OWLClass searchnode) {
-
-		GenericTreeNode result = null;
-		if (tree.getNodeName().equals(searchnode)) {
-			result = tree;
-		}
-
-		for (GenericTreeNode child : tree.getChildren()) {
-			result = searchForNode(child, searchnode);
-			if (result != null)
-				System.out.println(" GOT SOMETHNG.." + result);
-		}
-
-		return result;
-	}
+	
 
 	/*
 	 * get the down score of your parent
@@ -409,7 +375,7 @@ public class DBPediaTreeOperation {
 	 * 
 	 * @param node
 	 */
-	public void propagateValuesUp(GenericTreeNode node) {
+	private void propagateValuesUp(GenericTreeNode node) {
 		if (node != null) {
 			for (GenericTreeNode child : node.getChildren()) {
 				propagateValuesUp(child);
@@ -565,19 +531,6 @@ public class DBPediaTreeOperation {
 		return 0;
 	}
 
-	/**
-	 * this is not just post order traversal but it computes the up score in the
-	 * process
-	 * 
-	 * @param node
-	 */
-	public void preOrderTreeTraversal(GenericTreeNode node) {
-		if (node != null) {
-			for (GenericTreeNode child : node.getChildren()) {
-				System.out.println(child.printNode());
-				preOrderTreeTraversal(child);
-			}
-		}
-	}
+	
 
 }

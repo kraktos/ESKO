@@ -26,7 +26,7 @@ import code.dws.utils.Utilities;
  */
 public class AutomatedNodeScoringWrapper {
 
-	DBPediaTreeOperation dbTOp = null;
+	private DBPediaTreeOperation dbTOp = null;
 
 	/**
 	 * @param property
