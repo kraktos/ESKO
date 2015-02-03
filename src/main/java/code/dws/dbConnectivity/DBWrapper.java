@@ -30,8 +30,6 @@ import code.dws.utils.Utilities;
  */
 public class DBWrapper {
 
-	
-
 	// define Logger
 	private static Logger logger = Logger.getLogger(DBWrapper.class.getName());
 
@@ -84,8 +82,6 @@ public class DBWrapper {
 		}
 	}
 
-	
-
 	public static void saveToOIEPostFxd(String oieSub, String oiePred,
 			String oieObj, String oieSubPfxd, String oieObjPfxd) {
 
@@ -123,10 +119,6 @@ public class DBWrapper {
 
 	}
 
-	
-
-	
-
 	public static List<String> getDBPInstanceType(String instance) {
 		List<String> types = new ArrayList<String>();
 
@@ -151,8 +143,6 @@ public class DBWrapper {
 
 		return types;
 	}
-
-	
 
 	/**
 	 * returns a pair of all possible surface forms, for a given pair of KB
@@ -184,8 +174,6 @@ public class DBWrapper {
 
 		return results;
 	}
-
-	
 
 	/**
 	 * find the top k candidates for a given surface form/term/ oie instance
@@ -298,8 +286,59 @@ public class DBWrapper {
 
 	}
 
-	
+	/**
+	 * insert into the DBPEDIA_TYPES table, should run once
+	 * 
+	 * @param instance
+	 * @param instType
+	 */
+	public static void saveToDBPediaTypes(String instance, String instType) {
 
+		try {
+
+			insertDBPTypePrepstmnt.setString(1, instance);
+			insertDBPTypePrepstmnt.setString(2, instType);
+
+			insertDBPTypePrepstmnt.addBatch();
+			insertDBPTypePrepstmnt.clearParameters();
+
+			batchCounter++;
+			if (batchCounter % Constants.BATCH_SIZE == 0
+					&& batchCounter > Constants.BATCH_SIZE) { // batches are
+				// flushed at
+				// a time
+				// execute batch update
+				insertDBPTypePrepstmnt.executeBatch();
+
+				logger.info("FLUSHED TO DBPEDIA_TYPES");
+				connection.commit();
+				insertDBPTypePrepstmnt.clearBatch();
+			}
+
+		} catch (SQLException e) {
+			logger.error("Error with batch insertion of DBPEDIA_TYPES .."
+					+ e.getMessage());
+		}
+
+	}
+
+	/**
+	 * inserts residual rows after batch
+	 */
+	public static void saveResidualDBPTypes() {
+		try {
+			if (batchCounter % Constants.BATCH_SIZE != 0) {
+				insertDBPTypePrepstmnt.executeBatch();
+				logger.info("FLUSHED TO DBPEDIA_TYPES...");
+				connection.commit();
+			}
+		} catch (SQLException e) {
+		}
+	}
+
+	/**
+	 * shutting down the DB, its connections and statements
+	 */
 	public static void shutDown() {
 
 		if (pstmt != null) {

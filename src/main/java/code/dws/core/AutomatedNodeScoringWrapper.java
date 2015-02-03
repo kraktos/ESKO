@@ -81,14 +81,6 @@ public class AutomatedNodeScoringWrapper {
 					+ entry.getValue().getLeft() + ",\t"
 					+ entry.getValue().getRight() + ")\n");
 
-			// System.out.println(entry.getKey().replaceAll(Constants.ONTOLOGY_NAMESPACE,
-			// "DBP#ontology/"));
-
-			// domRangEvidenceWriter.write("isOfType" + identifier +
-			// "Conf(\""
-			// + entry.getKey().replaceAll(Constants.ONTOLOGY_NAMESPACE,
-			// "DBP#ontology/") + "\"," + entry.getValue().getSecond() + ")\n");
-
 			if (identifier.equals(Constants.DOMAIN))
 				domRangEvidenceWriter
 						.write(df.format(Utilities
