@@ -20,6 +20,9 @@ import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
 /**
+ * Creates a sample of Gold standard file. Only those properties actually
+ * annotated are sampled from fMinus file.
+ * 
  * @author adutta
  *
  */
@@ -164,6 +167,10 @@ public class GSSampleCreator {
 			List<String> candidateObjs, String oieSub, String oieRel,
 			String oieObj, BufferedWriter goldFile) throws IOException {
 
+		String kbSub = null;
+		String kbRel = null;
+		String kbObj = null;
+
 		// header section
 		goldFile.write(oieSub + "\t" + oieRel + "\t" + oieObj + "\t" + ""
 				+ "\t" + "" + "\t\n");
@@ -180,8 +187,18 @@ public class GSSampleCreator {
 			String candRel = (i >= ANNO_PROPS.get(oieRel).size()) ? ""
 					: ANNO_PROPS.get(oieRel).get(i).get(0);
 
-			goldFile.write("\t\t\t" + Utilities.utf8ToCharacter(candSub) + "\t"
-					+ candRel + "\t" + Utilities.utf8ToCharacter(candObj)
+			kbSub = (candSub.length() == 0) ? Utilities
+					.utf8ToCharacter(candSub) : Constants.DBPEDIA_INSTANCE_NS
+					+ Utilities.utf8ToCharacter(candSub);
+
+			kbRel = (candRel.length() == 0) ? candRel
+					: Constants.DBPEDIA_PREDICATE_NS + candRel;
+
+			kbObj = (candObj.length() == 0) ? Utilities
+					.utf8ToCharacter(candObj) : Constants.DBPEDIA_INSTANCE_NS
+					+ Utilities.utf8ToCharacter(candObj);
+
+			goldFile.write("\t\t\t" + kbSub + "\t" + kbRel + "\t" + kbObj
 					+ "\n");
 		}
 		// a line separator

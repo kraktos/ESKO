@@ -44,7 +44,7 @@ public class OIEFactSeperator {
 	public static void main(String[] args) {
 
 		// load constants file
-		Constants.loadConfigParameters(new String[] { "", args[0]});
+		Constants.loadConfigParameters(new String[] { "", args[0] });
 
 		// load OIE data file in memory and generate F+ and F- files
 		readOieFile(Constants.OIE_DATA_PATH);
@@ -192,6 +192,7 @@ public class OIEFactSeperator {
 		List<QuerySolution> listResults = SPARQLEndPointQueryAPI
 				.queryDBPediaEndPoint(sparqlQuery);
 
+		// if still empty
 		if (listResults.size() == 0) {
 			candSubj = Utilities.utf8ToCharacter(candSubj);
 			candObj = Utilities.utf8ToCharacter(candObj);

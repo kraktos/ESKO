@@ -8,12 +8,19 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.dto.FactDao;
 import code.dws.utils.Constants;
 
+/**
+ * primary class for evaluating the results
+ * 
+ * @author adutta
+ *
+ */
 public class Evaluation {
 
 	// define Logger
@@ -23,6 +30,8 @@ public class Evaluation {
 	 * gold standard file collection
 	 */
 	static THashMap<FactDao, FactDao> gold = new THashMap<FactDao, FactDao>();
+
+	static THashMap<String, List<Pair<String, String>>> mapRltnCandidates = new THashMap<String, List<Pair<String, String>>>();
 
 	/**
 	 * method output collection
@@ -34,11 +43,15 @@ public class Evaluation {
 
 	public static void main(String[] args) {
 
-		// load the respective gold standard and methods in memory
-		setup(args[0]);
+		if (args.length != 1)
+			logger.error("usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.Evaluation <GOLD file path>");
+		else {
+			// load the respective gold standard and methods in memory
+			setup(args[0]);
 
-		// perform comparison
-		compare();
+			// perform comparison
+			compare();
+		}
 	}
 
 	/**
@@ -66,9 +79,9 @@ public class Evaluation {
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
-					logger.debug(entry.getKey());
-					logger.debug("==>" + annotatedGoldFact);
-					logger.debug("==>" + dbpFact);
+					logger.info(entry.getKey());
+					logger.info("GOLD ==>" + annotatedGoldFact);
+					logger.info("ALGO ==>" + dbpFact);
 
 					// take the instances in Gold standard which have a
 					// corresponding refinement done.
@@ -103,25 +116,45 @@ public class Evaluation {
 		FactDao dbpFact = null;
 
 		THashMap<FactDao, FactDao> goldFacts = new THashMap<FactDao, FactDao>();
+		List<Pair<String, String>> rltnCandidates = null;
 
 		// load the NELL file in memory as a collection
 		List<String> gold = FileUtils.readLines(new File(goldFile));
 		for (String line : gold) {
+			arr = line.split("\t");
 
-			// if (line.indexOf("\tIP") != -1 || line.indexOf("\tUC") != -1) {
-			if (line.indexOf("\tIP") != -1) {
-				arr = line.split("\t");
+			if (isValidLine(arr)) { // TODO, check the condition.
+
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
+
 				dbpFact = new FactDao(StringUtils.replace(arr[3],
 						Constants.DBPEDIA_INSTANCE_NS, ""), arr[4],
 						StringUtils.replace(arr[5],
 								Constants.DBPEDIA_INSTANCE_NS, ""));
 
-				goldFacts.put(oieFact, dbpFact);
+				// get the KB relations for this OIE relation
+				rltnCandidates = DBWrapper
+						.fetchKBRelationsForAnOIERelation(arr[1]);
 
+				// store it in memory for access
+				if (rltnCandidates.size() > 0)
+					mapRltnCandidates.put(arr[1], rltnCandidates);
+
+				goldFacts.put(oieFact, dbpFact);
 			}
 		}
+
+		logger.info("Gold file has " + goldFacts.size() + " triples");
 		return goldFacts;
+	}
+
+	private static boolean isValidLine(String[] arr) {
+		if (arr.length == 6) {
+			if (arr[0] != null && arr[1] != null && arr[2] != null
+					&& arr[3] != null && arr[5] != null)
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -157,19 +190,14 @@ public class Evaluation {
 
 				// subjects
 				if (algoFact.getSub().equals(goldFact.getSub())) {
-					// && !algoFact.getSub().equals("?")) {
 					numer++;
 				}
-				// if (!goldFact.getSub().equals("?"))
-				denom++;
 
 				// objects
 				if (algoFact.getObj().equals(goldFact.getObj())) {
-					// && !algoFact.getObj().equals("?")) {
 					numer++;
 				}
-				// if (!goldFact.getObj().equals("?"))
-				denom++;
+				denom = denom + 2;
 			}
 		}
 		if (identifier.equals("R")) {
@@ -179,19 +207,14 @@ public class Evaluation {
 
 				// subjects
 				if (algoFact.getSub().equals(goldFact.getSub())) {
-					// && !goldFact.getSub().equals("?")) {
 					numer++;
 				}
-				// if (!goldFact.getSub().equals("?"))
-				denom++;
 
 				// objects
 				if (algoFact.getObj().equals(goldFact.getObj())) {
-					// && !goldFact.getObj().equals("?")) {
 					numer++;
 				}
-				// if (!goldFact.getObj().equals("?"))
-				denom++;
+				denom = denom + 2;
 
 			}
 		}

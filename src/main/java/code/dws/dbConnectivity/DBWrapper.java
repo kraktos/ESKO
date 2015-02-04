@@ -48,6 +48,8 @@ public class DBWrapper {
 
 	private static PreparedStatement fetchDbpTypePrepstmnt = null;
 
+	private static PreparedStatement fetchAnnoOIERelationsPrepstmnt = null;
+
 	private static int batchCounter = 0;
 
 	/**
@@ -72,6 +74,9 @@ public class DBWrapper {
 					.prepareStatement(Constants.OIE_POSTFIXED);
 			fetchDbpTypePrepstmnt = connection
 					.prepareStatement(Constants.GET_DBPTYPE);
+
+			fetchAnnoOIERelationsPrepstmnt = connection
+					.prepareStatement(Constants.GET_KB_RELATIONS_ANNOTATED);
 
 			connection.setAutoCommit(false);
 
@@ -117,6 +122,35 @@ public class DBWrapper {
 					+ e.getMessage());
 		}
 
+	}
+
+	/**
+	 * find the KB relations for a given OIE relation
+	 * 
+	 * @param oieRelation
+	 * @return
+	 */
+	public static List<Pair<String, String>> fetchKBRelationsForAnOIERelation(
+			String oieRelation) {
+		List<Pair<String, String>> types = new ArrayList<Pair<String, String>>();
+
+		try {
+			// if not cached
+			// if (!EvidenceBuilder.INSTANCE_TYPES.containsKey(instance)) {
+
+			fetchAnnoOIERelationsPrepstmnt.setString(1, oieRelation);
+			ResultSet rs = fetchAnnoOIERelationsPrepstmnt.executeQuery();
+
+			while (rs.next()) {
+				types.add(new ImmutablePair<String, String>(rs.getString(1), rs
+						.getString(2)));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return types;
 	}
 
 	public static List<String> getDBPInstanceType(String instance) {
@@ -351,6 +385,13 @@ public class DBWrapper {
 		if (fetchDbpTypePrepstmnt != null) {
 			try {
 				fetchDbpTypePrepstmnt.close();
+			} catch (Exception excp) {
+			}
+		}
+
+		if (fetchAnnoOIERelationsPrepstmnt != null) {
+			try {
+				fetchAnnoOIERelationsPrepstmnt.close();
 			} catch (Exception excp) {
 			}
 		}
