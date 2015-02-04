@@ -55,28 +55,51 @@ public class ScriptGenarator {
 	 */
 	private static void generateScript() throws IOException {
 
-		BufferedWriter scriptWriter = new BufferedWriter(
-				new FileWriter(SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
-						+ "PIPELINE.sh"));
+		boolean flag = true;
 
-		scriptWriter.write("#!/bin/bash\n\n");
+		BufferedWriter scriptWriter1 = new BufferedWriter(new FileWriter(
+				SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
+						+ "PIPELINE.N1.sh"));
+
+		scriptWriter1.write("#!/bin/bash\n\n");
+
+		BufferedWriter scriptWriter2 = new BufferedWriter(new FileWriter(
+				SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
+						+ "PIPELINE.N2.sh"));
+
+		scriptWriter2.write("#!/bin/bash\n\n");
 
 		for (String oieProp : PROPS) {
 
-			int bootIter = 2;
-
-			scriptWriter.write("sh ./" + PIPELINE_NAME + oieProp + "\n");
-			while (bootIter != MAX_BOOT_ITER + 2) {
-				scriptWriter.write("sh ./" + BOOTSTRAP_NAME + oieProp + " "
-						+ bootIter++ + "\n");
+			if (flag) {
+				int bootIter = 2;
+				scriptWriter1.write("sh ./" + PIPELINE_NAME + oieProp + "\n");
+				while (bootIter != MAX_BOOT_ITER + 2) {
+					scriptWriter1.write("sh ./" + BOOTSTRAP_NAME + oieProp
+							+ " " + bootIter++ + "\n");
+				}
+				scriptWriter1.write("echo \"Done with complete reasoning of "
+						+ oieProp + "\"\n\n");
+				flag = false;
+			} else {
+				int bootIter = 2;
+				scriptWriter2.write("sh ./" + PIPELINE_NAME + oieProp + "\n");
+				while (bootIter != MAX_BOOT_ITER + 2) {
+					scriptWriter2.write("sh ./" + BOOTSTRAP_NAME + oieProp
+							+ " " + bootIter++ + "\n");
+				}
+				scriptWriter2.write("echo \"Done with complete reasoning of "
+						+ oieProp + "\"\n\n");
+				flag = true;
 			}
-			scriptWriter.write("echo \"Done with complete reasoning of "
-					+ oieProp + "\"\n\n");
 		}
 
 		logger.info("echo \"Done with " + PROPS.size() + " clusters\n");
-		scriptWriter.flush();
-		scriptWriter.close();
+		scriptWriter1.flush();
+		scriptWriter1.close();
+
+		scriptWriter2.flush();
+		scriptWriter2.close();
 	}
 
 	/**
