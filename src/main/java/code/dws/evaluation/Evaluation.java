@@ -29,14 +29,14 @@ public class Evaluation {
 	/**
 	 * gold standard file collection
 	 */
-	static THashMap<FactDao, FactDao> gold = new THashMap<FactDao, FactDao>();
+	static THashMap<FactDao, FactDao> goldMap = new THashMap<FactDao, FactDao>();
 
 	static THashMap<String, List<Pair<String, String>>> mapRltnCandidates = new THashMap<String, List<Pair<String, String>>>();
 
 	/**
 	 * method output collection
 	 */
-	static THashMap<FactDao, FactDao> algo = new THashMap<FactDao, FactDao>();
+	static THashMap<FactDao, FactDao> algoMap = new THashMap<FactDao, FactDao>();
 
 	public Evaluation() {
 	}
@@ -79,19 +79,18 @@ public class Evaluation {
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
-					logger.info(entry.getKey());
-					logger.info("GOLD ==>" + annotatedGoldFact);
-					logger.info("ALGO ==>" + dbpFact);
+					// logger.info(entry.getKey());
+					// logger.info("GOLD ==>" + annotatedGoldFact);
+					// logger.info("ALGO ==>" + dbpFact);
 
 					// take the instances in Gold standard which have a
 					// corresponding refinement done.
-					algo.put(entry.getKey(), dbpFact);
-					gold.put(entry.getKey(), annotatedGoldFact);
+					algoMap.put(entry.getKey(), dbpFact);
 				}
 			}
 
-			logger.info("GS Size = " + gold.size());
-			logger.info("Algo Size = " + algo.size());
+			logger.info("GS Size = " + goldMap.size());
+			logger.info("Algo Size = " + algoMap.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -115,7 +114,6 @@ public class Evaluation {
 		FactDao oieFact = null;
 		FactDao dbpFact = null;
 
-		THashMap<FactDao, FactDao> goldFacts = new THashMap<FactDao, FactDao>();
 		List<Pair<String, String>> rltnCandidates = null;
 
 		// load the NELL file in memory as a collection
@@ -140,18 +138,17 @@ public class Evaluation {
 				if (rltnCandidates.size() > 0)
 					mapRltnCandidates.put(arr[1], rltnCandidates);
 
-				goldFacts.put(oieFact, dbpFact);
+				goldMap.put(oieFact, dbpFact);
 			}
 		}
-
-		logger.info("Gold file has " + goldFacts.size() + " triples");
-		return goldFacts;
+		return goldMap;
 	}
 
 	private static boolean isValidLine(String[] arr) {
 		if (arr.length == 6) {
-			if (arr[0] != null && arr[1] != null && arr[2] != null
-					&& arr[3] != null && arr[5] != null)
+			if (arr[0].length() > 0 && arr[1].length() > 0
+					&& arr[2].length() > 0 && arr[3].length() > 0
+					&& arr[5].length() > 0)
 				return true;
 		}
 		return false;
@@ -171,6 +168,7 @@ public class Evaluation {
 	}
 
 	/**
+	 * Computes the precision, recall
 	 * @param string
 	 * @return
 	 * 
@@ -184,40 +182,77 @@ public class Evaluation {
 
 		if (identifier.equals("P")) {
 			// FOR PRECISION
-			for (Map.Entry<FactDao, FactDao> entry : algo.entrySet()) {
+			for (Map.Entry<FactDao, FactDao> entry : algoMap.entrySet()) {
 				algoFact = entry.getValue();
-				goldFact = gold.get(entry.getKey());
+				goldFact = goldMap.get(entry.getKey());
 
 				// subjects
-				if (algoFact.getSub().equals(goldFact.getSub())) {
-					numer++;
+				// two things can happen, algo says not '?' or '?'
+				if (!algoFact.getSub().equals("?")) {
+					// now it can be right or wrong once it is not '?'
+					if (algoFact.getSub().equals(goldFact.getSub())) {
+						// a correct match, increment
+						numer++;
+						denom++;
+					} else {
+						if (!goldFact.getSub().equals("?")) {
+							denom++;
+						}
+					}
 				}
 
 				// objects
-				if (algoFact.getObj().equals(goldFact.getObj())) {
-					numer++;
+				// two things can happen, algo says not '?' or '?'
+				if (!algoFact.getObj().equals("?")) {
+					// now it can be right or wrong once it is not '?'
+					if (algoFact.getObj().equals(goldFact.getObj())) {
+						// a correct match, increment
+						numer++;
+						denom++;
+					} else {
+						if (!goldFact.getObj().equals("?")) {
+							denom++;
+						}
+					}
 				}
-				denom = denom + 2;
 			}
 		}
+
 		if (identifier.equals("R")) {
-			for (Map.Entry<FactDao, FactDao> entry : gold.entrySet()) {
-				algoFact = algo.get(entry.getKey());
+			for (Map.Entry<FactDao, FactDao> entry : goldMap.entrySet()) {
 				goldFact = entry.getValue();
 
 				// subjects
-				if (algoFact.getSub().equals(goldFact.getSub())) {
-					numer++;
-				}
+				// two things can happen, gold says not '?' or '?'
+				if (!goldFact.getSub().trim().equals("?")) {
+					algoFact = algoMap.get(entry.getKey());
+					if (algoFact != null) {
+						// now it can be right or wrong once it is not '?'
+						if (goldFact.getSub().equals(algoFact.getSub())) {
+							// a correct match, increment
+							numer++;
+						}
+					}
+					denom++;
+
+				} // do not bother when gold is '?'
 
 				// objects
-				if (algoFact.getObj().equals(goldFact.getObj())) {
-					numer++;
-				}
-				denom = denom + 2;
-
+				// two things can happen, gold says not '?' or '?'
+				if (!goldFact.getObj().trim().equals("?")) {
+					algoFact = algoMap.get(entry.getKey());
+					if (algoFact != null) {
+						// now it can be right or wrong once it is not '?'
+						if (goldFact.getObj().equals(algoFact.getObj())) {
+							// a correct match, increment
+							numer++;
+						}
+					}
+					denom++;
+				} // do not bother when gold is '?'
 			}
 		}
+
 		return (double) numer / denom;
 	}
 }
