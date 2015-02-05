@@ -151,7 +151,7 @@ public class Constants {
 
 	public static final String GET_OIE_PROPERTIES_ANNOTATED = "select distinct PHRASE, KB_PROP, EVAL, INV from OIE_PROP_GS where EVAL <> 'N' and EVAL <> ''";
 
-	public static final String GET_KB_RELATIONS_ANNOTATED = "select KB_PROP, EVAL from OIE_PROP_GS where PHRASE = ? and EVAL <> ''";
+	public static final String GET_KB_RELATIONS_ANNOTATED = "select KB_PROP, EVAL from OIE_PROP_GS where PHRASE = ? and EVAL <> '' and EVAL <> 'N'";
 
 	public static String OIE_DATA_SEPERARTOR = null;
 

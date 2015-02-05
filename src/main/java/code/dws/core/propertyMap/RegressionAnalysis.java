@@ -148,8 +148,10 @@ public class RegressionAnalysis {
 
 				run(inputLog, clusterNames);
 
+				// new triples will be generated on the fMinus file
 				if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
-					RegressionAnalysis.createNewTriples(inputLog, clusterNames);
+					RegressionAnalysis.createNewTriples(directory
+							+ "/fMinus.dat", clusterNames);
 			} finally {
 
 				MAP_PRED_COUNT.clear();
@@ -227,9 +229,9 @@ public class RegressionAnalysis {
 				directory + DISTRIBUTION_NEW_TRIPLES));
 
 		// read the file into memory
-		ArrayList<ArrayList<String>> directPropsFile = FileUtil
-				.genericFileReader(new FileInputStream(filePath),
-						PATH_SEPERATOR, false);
+		ArrayList<ArrayList<String>> fMinusFile = FileUtil.genericFileReader(
+				new FileInputStream(filePath), Constants.OIE_DATA_SEPERARTOR,
+				false);
 
 		// init DB for getting the most frequebt URI for the NELL terms
 
@@ -240,13 +242,13 @@ public class RegressionAnalysis {
 		DBWrapper.init(Constants.GET_REFINED_MAPPINGS_SQL);
 
 		// iterate through them
-		for (ArrayList<String> line : directPropsFile) {
+		for (ArrayList<String> line : fMinusFile) {
 			oieProp = line.get(1);
 
 			if (!Constants.IS_NELL && !Constants.WORKFLOW_NORMAL)
 				oieProp = clusterNames.get(oieProp);
 
-			if (line.size() == 3) {
+			if (line.size() == 4) {
 
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);

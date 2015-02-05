@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -38,8 +40,8 @@ public class Evaluation {
 	/**
 	 * algo output collection for instances, full and pruned
 	 */
-	static THashMap<FactDao, FactDao> prunedAlgoMapIM = new THashMap<FactDao, FactDao>();
 	static THashMap<FactDao, FactDao> algoMapIM = new THashMap<FactDao, FactDao>();
+	static THashMap<FactDao, FactDao> prunedAlgoMapIM = new THashMap<FactDao, FactDao>();
 
 	/**
 	 * gold output collection for properties
@@ -50,6 +52,7 @@ public class Evaluation {
 	 * algo output collection for properties
 	 */
 	static THashMap<String, List<Pair<String, String>>> algoMapPM = new THashMap<String, List<Pair<String, String>>>();
+	static THashMap<String, List<Pair<String, String>>> prunedAlgoMapPM = new THashMap<String, List<Pair<String, String>>>();
 
 	static THashMap<String, List<Pair<String, String>>> mapRltnCandidates = new THashMap<String, List<Pair<String, String>>>();
 
@@ -78,6 +81,7 @@ public class Evaluation {
 	 */
 	public static void setup(String goldFile, String algoFile) {
 		FactDao dbpFact = null;
+
 		try {
 			// init DB
 			DBWrapper.init(Constants.GET_REFINED_FACT);
@@ -94,7 +98,7 @@ public class Evaluation {
 			for (Map.Entry<FactDao, FactDao> entry : goldMapIM.entrySet()) {
 
 				// check the goldFact OIE triple,
-				logger.info(entry.getKey());
+				logger.debug(entry.getKey());
 
 				// try finding this oie triple from the algo map stored in
 				// collection
@@ -105,16 +109,20 @@ public class Evaluation {
 					// corresponding refinement done.
 					prunedAlgoMapIM.put(entry.getKey(), dbpFact);
 				}
-			}
 
-			logger.info("GS Size = " + goldMapIM.size());
-			logger.info("Algo Size = " + prunedAlgoMapIM.size());
+				// also prune for the properties, present in the GOLD file.
+				if (algoMapPM.contains(entry.getKey().getRelation()))
+					prunedAlgoMapPM.put(entry.getKey().getRelation(),
+							algoMapPM.get(entry.getKey().getRelation()));
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			algoMapIM.clear();
 			algoMapIM = null;
+			algoMapPM.clear();
+			algoMapPM = null;
 		}
 	}
 
@@ -130,7 +138,7 @@ public class Evaluation {
 
 		FactDao oieFact = null;
 		FactDao dbpFact = null;
-
+		Pair<String, String> pair = null;
 		List<Pair<String, String>> valuePairs = null;
 
 		try {
@@ -155,7 +163,12 @@ public class Evaluation {
 				// made a list of pairs to be in sync with the gold data
 				// structure. left element is the algo property, right is just
 				// blank
-				valuePairs.add(new ImmutablePair<String, String>(arr[4], ""));
+				pair = new ImmutablePair<String, String>(StringUtils.replace(
+						arr[4], Constants.DBPEDIA_CONCEPT_NS, ""), "");
+
+				if (!valuePairs.contains(pair))
+					valuePairs.add(pair);
+
 				algoMapPM.put(arr[1], valuePairs);
 			}
 		} catch (FileNotFoundException e) {
@@ -220,35 +233,110 @@ public class Evaluation {
 	 */
 	private static void compare() {
 
-		double prec = computePMScore("P");
-		double recall = computePMScore("R");
+		double imPrec = computeIMScore("P");
+		double imRecall = computeIMScore("R");
 
-		logger.info("Instance Precision = " + prec);
-		logger.info("Instance Recall = " + recall);
-		logger.info("Instance F1 = " + (double) 2 * recall * prec
-				/ (recall + prec));
+		logger.info("IM Precision = " + imPrec);
+		logger.info("IM Recall = " + imRecall);
+		if (imPrec == 0 || imRecall == 0)
+			logger.info("PM F1 = " + 0.0);
+		else
+			logger.info("IM F1 = " + (double) 2 * imRecall * imPrec
+					/ (imRecall + imPrec));
 
-		double prec = computeIMScore("P");
-		double recall = computeIMScore("R");
+		double pmPrec = computePMScore("P");
+		double pmRecall = computePMScore("R");
 
-		logger.info("Instance Precision = " + prec);
-		logger.info("Instance Recall = " + recall);
-		logger.info("Instance F1 = " + (double) 2 * recall * prec
-				/ (recall + prec));
+		logger.info("PM Precision = " + pmPrec);
+		logger.info("PM Recall = " + pmRecall);
+		if (pmRecall == 0 || pmPrec == 0)
+			logger.info("PM F1 = " + 0.0);
+		else
+			logger.info("PM F1 = " + (double) 2 * pmRecall * pmPrec
+					/ (pmRecall + pmPrec));
 
 	}
 
-	private static double computePMScore(String identifier) {
-		long numer = 0;
-		long denom = 0;
-		if (identifier.equals("P")) {
-			
+	/*
+	 * takes two lists, gold and algo and tries to check if it is a match or not
+	 */
+	private static boolean match(List<Pair<String, String>> algoPMCands,
+			List<Pair<String, String>> goldPMCands) {
+
+		List<String> algoVals = new ArrayList<String>();
+		List<String> goldVals = new ArrayList<String>();
+
+		for (Pair<String, String> algCands : algoPMCands) {
+			algoVals.add(algCands.getLeft());
 		}
-		return 0;
+
+		for (Pair<String, String> goldCands : goldPMCands) {
+			goldVals.add(goldCands.getLeft());
+		}
+
+		@SuppressWarnings("unchecked")
+		List<String> intersect = ListUtils.intersection(algoVals, goldVals);
+		if (intersect.size() > 0)
+			return true;
+		else
+			return false;
 	}
 
 	/**
-	 * Computes the precision, recall
+	 * computes the precision, recall for property matching (PM)
+	 * 
+	 * @param identifier
+	 * @return
+	 */
+	private static double computePMScore(String identifier) {
+		long numer = 0;
+		long denom = 0;
+		String oieRelation = null;
+		List<Pair<String, String>> algoPMCands = null;
+		List<Pair<String, String>> goldPMCands = null;
+
+		if (identifier.equals("P")) {
+			for (Entry<String, List<Pair<String, String>>> entry : prunedAlgoMapPM
+					.entrySet()) {
+
+				oieRelation = entry.getKey();
+				algoPMCands = entry.getValue();
+				goldPMCands = goldMapPM.get(oieRelation);
+
+				if (match(algoPMCands, goldPMCands)) {
+					numer++;
+				}
+				denom++;
+			}
+		}
+
+		if (identifier.equals("R")) {
+			for (Entry<String, List<Pair<String, String>>> entry : goldMapPM
+					.entrySet()) {
+
+				oieRelation = entry.getKey();
+				goldPMCands = entry.getValue();
+				algoPMCands = prunedAlgoMapPM.get(oieRelation);
+
+				if (algoPMCands != null) {
+					if (match(algoPMCands, goldPMCands)) {
+						numer++;
+					}
+				}
+				denom++;
+			}
+		}
+
+		if (denom == 0)
+			return 0;
+
+		// System.out.printf("%d %d \n", numer, denom);
+		return (double) numer / denom;
+
+	}
+
+	/**
+	 * Computes the precision, recall for instance matching (IM)
 	 * 
 	 * @param string
 	 * @return
@@ -261,8 +349,8 @@ public class Evaluation {
 		FactDao algoFact = null;
 		FactDao goldFact = null;
 
+		// FOR PRECISION
 		if (identifier.equals("P")) {
-			// FOR PRECISION
 			for (Map.Entry<FactDao, FactDao> entry : prunedAlgoMapIM.entrySet()) {
 				algoFact = entry.getValue();
 				goldFact = goldMapIM.get(entry.getKey());
