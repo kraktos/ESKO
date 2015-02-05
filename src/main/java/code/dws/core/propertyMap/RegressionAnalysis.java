@@ -81,7 +81,7 @@ public class RegressionAnalysis {
 	private static Map<String, Map<String, Integer>> MAP_OIE_IE_PROP_COUNTS = new HashMap<String, Map<String, Integer>>();
 
 	/**
-	 * collection to store the final mapped tripels from NELL to dbpedia
+	 * collection to store the final mapped triples from NELL to dbpedia
 	 */
 	public static Map<String, List<String>> FINAL_MAPPINGS = new HashMap<String, List<String>>();
 
