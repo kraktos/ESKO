@@ -6,7 +6,6 @@ package code.dws.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -22,22 +21,11 @@ public class Constants {
 		NELL, REVERB
 	}
 
-	public static final String QUERY_DATATYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty>} ";
-
-	public static final String QUERY_OBJECTTYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
-
-	public static long TIMEOUT_MINS = 0;
-
 	public static long WORKFLOW = 0;
-
-	public static DecimalFormat formatter = new DecimalFormat(
-			"###.############");
 
 	public static String DBPEDIA_TBOX;
 
 	public static String INSTANCE_THRESHOLD;
-
-	public static final String DELIMIT = "\",";
 
 	/**
 	 * Parameters
@@ -63,15 +51,13 @@ public class Constants {
 
 	public static boolean IS_NELL;
 
-	public static boolean USE_LOGIT;
+	static boolean USE_LOGIT;
 
 	public static boolean BOOTSTRAP;
 
 	public static boolean RELOAD_TYPE;
 
-	public static boolean LOAD_TYPES;
-
-	public static int SCALE_WEIGHT;
+	static int SCALE_WEIGHT;
 
 	public static boolean ENGAGE_INTER_STEP;
 
@@ -102,25 +88,13 @@ public class Constants {
 
 	public static String ONTOLOGY_NAMESPACE = "http://dbpedia.org/ontology/";
 
-	public static String DBPEDIA_NAMESPACE = "http://dbpedia.org/";
+	private static String DBPEDIA_NAMESPACE = "http://dbpedia.org/";
 
 	public static String DBPEDIA_INSTANCE_NS = DBPEDIA_NAMESPACE + "resource/";
 
 	public static String DBPEDIA_CONCEPT_NS = DBPEDIA_NAMESPACE + "ontology/";
 
 	public static String DBPEDIA_PREDICATE_NS = DBPEDIA_NAMESPACE + "ontology/";
-
-	/**
-	 * delimiter for the the CSV file coming as input from extraction engines'
-	 * output
-	 */
-	public static final String DELIMIT_IE_FILE = ",";
-
-	public static String VIRTUSO_ENDPOINT = "http://wifo5-38.informatik.uni-mannheim.de:8890/sparql";
-
-	public static String YAGO_KB = "http://yago-knowledge.org";
-
-	public static String YAGO_NS = "http://yago-knowledge.org/resource/";
 
 	/**
 	 * DBPedia End point URL
@@ -140,11 +114,6 @@ public class Constants {
 	public static final String sample_dumps = "src/main/resources/output/ds_";
 
 	public static String ALL_MLN_EVIDENCE;
-
-	/**
-	 * gold standard evidence file, post-fixed
-	 */
-	public static String ALL_MLN_EVIDENCE_T1;
 
 	public static String BASIC_REASON_OUT_FILE;
 
@@ -168,11 +137,6 @@ public class Constants {
 	public static final String GET_WIKI_LINKS_APRIORI_SQL = "select  URI, (SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  where SF =? group by BINARY URI order by p desc limit ?";
 
 	/**
-	 * find those properites which are actually mapped on both sub and obj
-	 */
-	public static final String GET_FULLY_MAPPED_OIE_PROPS_SQL = "select distinct OIE_PRED from OIE_REFINED where DBP_SUB <> 'X' and DBP_OBJ <> 'X'";
-
-	/**
 	 * given a surface form, fetch top titles it refers to
 	 */
 	public static final String GET_WIKI_TITLES_SQL = "select URI, SUM(COUNT) as cnt from wikiPrep where SF = ? group by BINARY URI order by cnt desc limit ?";
@@ -185,18 +149,6 @@ public class Constants {
 
 	public static final String GET_REFINED_FACT = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
-	public static final String GET_DOMAINS = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
-
-	public static final String GET_RANGES = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
-
-	public static final String GET_SF = "select r1.SF, r2.SF from (select SF from wikiPrep where URI=? order by COUNT DESC limit 15) as r1 cross join (select SF from wikiPrep where URI =? order by COUNT DESC limit 15) as r2";
-	// "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=? and r1.COUNT > 1 and r2.COUNT > 1";
-
-	public static final String INSERT_GS_PROP = "INSERT IGNORE INTO OIE_GS(OIE_SUB, OIE_REL, OIE_OBJ, KB_SUB, KB_REL, KB_OBJ, REL_EVAL, INVERSE) VALUES (?,?,?,?,?,?,?,? )";
-	// "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL, INV) VALUES (?,?,?,?)";
-
-	public static final String GET_ANNO_PROPERTIES = "SELECT PHRASE, KB_PROP, EVAL, INV FROM OIE_PROP_GS where EVAL = '' limit 1;";
-
 	public static final String GET_OIE_PROPERTIES_ANNOTATED = "select distinct PHRASE, KB_PROP, EVAL, INV from OIE_PROP_GS where EVAL <> 'N' and EVAL <> ''";
 
 	public static final String GET_KB_RELATIONS_ANNOTATED = "select KB_PROP, EVAL from OIE_PROP_GS where PHRASE = ? and EVAL <> ''";
@@ -207,12 +159,6 @@ public class Constants {
 	 * insert DBPedia types SQL
 	 */
 	public static String INSERT_DBP_TYPES = "INSERT IGNORE INTO DBPEDIA_TYPES (DBPEDIA_INSTANCE, INSTANCE_TYPE) VALUES ( ?, ? )";
-
-	public static int HTTP_CONN_MAX_TOTAL = 0;
-
-	public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
-
-	public static String WORDNET_DICTIONARY = null;
 
 	/*
 	 * DB Details
@@ -271,7 +217,7 @@ public class Constants {
 					.getProperty("INCLUDE_YAGO_TYPES"));
 
 			RELOAD_TYPE = false;// Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
-			LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
+			Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
 
 			BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));
 
@@ -297,7 +243,7 @@ public class Constants {
 
 			INSTANCE_THRESHOLD = prop.getProperty("INSTANCE_THRESHOLD");
 
-			WORDNET_DICTIONARY = prop.getProperty("WORDNET_DICTIONARY");
+			prop.getProperty("WORDNET_DICTIONARY");
 
 			SIMILARITY_FACTOR = Double.parseDouble(prop
 					.getProperty("SIMILARITY_FACTOR"));
@@ -305,13 +251,11 @@ public class Constants {
 			THREAD_MAX_POOL_SIZE = Integer.parseInt(prop
 					.getProperty("THREAD_MAX_POOL_SIZE"));
 
-			HTTP_CONN_MAX_TOTAL = Integer.parseInt(prop
-					.getProperty("HTTP_CONN_MAX_TOTAL"));
+			Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL"));
 
-			HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop
-					.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
+			Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
 
-			TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
+			Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
 
 			WORKFLOW = Integer.parseInt(prop.getProperty("WORKFLOW"));
 
@@ -323,11 +267,6 @@ public class Constants {
 
 	private static void init() {
 		ALL_MLN_EVIDENCE = sample_dumps + PREDICATE + "/AllEvidence.db";
-
-		/**
-		 * gold standard evidence file, post-fixed
-		 */
-		ALL_MLN_EVIDENCE_T1 = sample_dumps + PREDICATE + "/AllEvidence_T1.db";
 
 		BASIC_REASON_OUT_FILE = sample_dumps + PREDICATE + "/out.db";
 

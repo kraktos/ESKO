@@ -178,36 +178,7 @@ public class DBWrapper {
 		return types;
 	}
 
-	/**
-	 * returns a pair of all possible surface forms, for a given pair of KB
-	 * instances
-	 * 
-	 * @param dbpSub
-	 * @param dbpObj
-	 * @return
-	 */
-	public static List<Pair<String, String>> getSurfaceForms(String dbpSub,
-			String dbpObj) {
-		ResultSet rs = null;
-		List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
-
-		try {
-			pstmt.setString(1, dbpSub);
-			pstmt.setString(2, dbpObj);
-			// System.out.println(pstmt.toString());
-			rs = pstmt.executeQuery();
-
-			results = new ArrayList<Pair<String, String>>();
-
-			while (rs.next()) {
-				results.add(new ImmutablePair<String, String>(rs.getString(1),
-						rs.getString(2)));
-			}
-		} catch (Exception e) {
-		}
-
-		return results;
-	}
+	
 
 	/**
 	 * find the top k candidates for a given surface form/term/ oie instance

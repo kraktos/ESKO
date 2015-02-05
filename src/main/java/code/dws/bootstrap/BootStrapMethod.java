@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import code.dws.core.AutomatedNodeScoringWrapper;
+import code.dws.core.instanceMap.AutomatedNodeScoringWrapper;
 import code.dws.utils.Constants;
 
 /**
@@ -34,11 +34,11 @@ public class BootStrapMethod {
 
 	public static List<Pair<String, String>> SAME_AS_LIST = new ArrayList<Pair<String, String>>();
 
-	static List<String> NELL_SUBJECTS = new ArrayList<String>();
-	static List<String> NELL_OBJECTS = new ArrayList<String>();
+	private static List<String> NELL_SUBJECTS = new ArrayList<String>();
+	private static List<String> NELL_OBJECTS = new ArrayList<String>();
 
-	static Set<String> SET_FULL_SUB_TYPES = new HashSet<String>();
-	static Set<String> SET_FULL_OBJ_TYPES = new HashSet<String>();
+	private static Set<String> SET_FULL_SUB_TYPES = new HashSet<String>();
+	private static Set<String> SET_FULL_OBJ_TYPES = new HashSet<String>();
 
 	/**
 	 * @param args

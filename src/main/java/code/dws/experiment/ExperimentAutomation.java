@@ -10,7 +10,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import code.dws.core.AutomatedNodeScoringWrapper;
+import code.dws.core.instanceMap.AutomatedNodeScoringWrapper;
 import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.utils.Constants;

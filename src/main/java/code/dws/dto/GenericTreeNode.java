@@ -185,50 +185,14 @@ public class GenericTreeNode {
 			builder.append("nodeDownValue=");
 			builder.append(this.nodeDownScore);
 		}
-		// if (children != null) {
-		// builder.append("children=");
-		// for (GenericTreeNode childNodes : this.children) {
-		// builder.append(childNodes.getNodeName());
-		// builder.append(", ");
-		// builder.append(childNodes.getNodeValue());
-		// builder.append("\n");
-		// }
-		// }
+
 		builder.append("]");
 		return builder.toString();
 	}
-
-	/**
-	 * prints a particular node value
-	 * 
-	 * @param node
-	 * @return
-	 */
-	public String printNode() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(this.nodeName.toString());
-		builder.append("[");
-		builder.append("Original = " + this.nodeValue);
-		builder.append(", ");
-		builder.append("UP Score = " + this.nodeUpScore);
-		builder.append(", ");
-
-		builder.append("DOWN Score = " + this.nodeDownScore);
-		builder.append(", ");
-
-		builder.append("Children = " + getNumberOfChildren());
-		builder.append("]");
-
-		return builder.toString();
-	}
-
-	
 
 	public void addChild(GenericTreeNode child) {
 		this.children.add(child);
 	}
-
-	
 
 	/**
 	 * returns the number of children of this node

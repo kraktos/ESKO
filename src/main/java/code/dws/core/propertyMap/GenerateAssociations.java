@@ -35,6 +35,8 @@ import com.hp.hpl.jena.query.QuerySolution;
  */
 public class GenerateAssociations {
 
+	public static String DIRECTORY = null;
+
 	public static String INVERSE_PROP_LOG = null;
 
 	public static String DIRECT_PROP_LOG = null;
@@ -78,13 +80,12 @@ public class GenerateAssociations {
 		Constants.loadConfigParameters(new String[] { "", configFile });
 
 		// get the OIE File Path
-		String directory = new File(Constants.OIE_DATA_PATH).getParent()
-				.toString();
+		DIRECTORY = new File(Constants.OIE_DATA_PATH).getParent().toString();
 
-		INVERSE_PROP_LOG = (Constants.IS_NELL) ? directory
-				+ "/INVERSE_PROP.log" : directory + "/REVERB_INVERSE_PROP.log";
-		DIRECT_PROP_LOG = (Constants.IS_NELL) ? directory + "/DIRECT_PROP.log"
-				: directory + "/REVERB_DIRECT_PROP.log";
+		INVERSE_PROP_LOG = (Constants.IS_NELL) ? DIRECTORY
+				+ "/INVERSE_PROP.log" : DIRECTORY + "/REVERB_INVERSE_PROP.log";
+		DIRECT_PROP_LOG = (Constants.IS_NELL) ? DIRECTORY + "/DIRECT_PROP.log"
+				: DIRECTORY + "/REVERB_DIRECT_PROP.log";
 
 		// initiate yago info
 		if (Constants.INCLUDE_YAGO_TYPES)

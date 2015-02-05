@@ -62,8 +62,6 @@ public class Evaluation {
 	 */
 	public static void setup(String goldFile) {
 		FactDao dbpFact = null;
-		FactDao annotatedGoldFact = null;
-
 		try {
 			// init DB
 			DBWrapper.init(Constants.GET_REFINED_FACT);
@@ -75,7 +73,6 @@ public class Evaluation {
 
 			for (Map.Entry<FactDao, FactDao> entry : loadGoldFile(goldFile)
 					.entrySet()) {
-				annotatedGoldFact = entry.getValue();
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
