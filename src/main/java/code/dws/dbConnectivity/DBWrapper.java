@@ -487,4 +487,44 @@ public class DBWrapper {
 		return null;
 	}
 
+	/**
+	 * method to find the refined mappings for the oie subject and object from
+	 * DB. This is the stage after IM is complete.
+	 * 
+	 * @param oieSub
+	 * @param pred
+	 * @param oieObj
+	 * @return
+	 */
+	public static List<String> fetchRefinedMapping(String oieSub, String pred,
+			String oieObj) {
+		ResultSet rs = null;
+		List<String> results = null;
+
+		try {
+			pstmt.setString(1, oieSub);
+			pstmt.setString(2, pred);
+			pstmt.setString(3, oieObj);
+
+			rs = pstmt.executeQuery();
+			results = new ArrayList<String>();
+
+			while (rs.next()) {
+
+				results.add(Utilities.characterToUTF8((Utilities
+						.utf8ToCharacter(rs.getString(1)))
+						.replaceAll("\\s", "_").replaceAll("\\[", "\\(")
+						.replaceAll("\\]", "\\)")));
+				results.add(Utilities.characterToUTF8((Utilities
+						.utf8ToCharacter(rs.getString(2)))
+						.replaceAll("\\s", "_").replaceAll("\\[", "\\(")
+						.replaceAll("\\]", "\\")));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return results;
+	}
+
 }

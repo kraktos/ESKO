@@ -28,7 +28,7 @@ import code.dws.utils.Utilities;
  * @author adutta
  *
  */
-class Generator {
+public class Generator {
 
 	// define class logger
 	private final static Logger logger = LoggerFactory
@@ -56,7 +56,7 @@ class Generator {
 	 * @return List of properties
 	 */
 	@SuppressWarnings("unchecked")
-	static List<String> getReverbProperties(int topKRevbProps,
+	public static List<String> getReverbProperties(int topKRevbProps,
 			Long atLeastInstancesCount) {
 
 		String line = null;

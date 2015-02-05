@@ -58,7 +58,7 @@ public class SPARQLEndPointQueryAPI {
 			results = qexec.execSelect();
 
 		} catch (Exception e) {
-			logger.error("Problem with query + " + query);
+			// logger.error("Problem with query = " + query);
 
 			try {
 				// trying ENDPOINT 2
@@ -67,7 +67,7 @@ public class SPARQLEndPointQueryAPI {
 				results = qexec.execSelect();
 
 			} catch (Exception ee) {
-				logger.error("Problem with query + " + query);
+				// logger.error("Problem with query + " + query);
 
 				try {
 					// trying ENDPOINT 3

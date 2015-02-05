@@ -121,7 +121,7 @@ public class Evaluation {
 		for (String line : gold) {
 			arr = line.split("\t");
 
-			if (isValidLine(arr)) { // TODO, check the condition.
+			if (isValidLine(arr)) { 
 
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
 
