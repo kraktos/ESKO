@@ -82,8 +82,6 @@ public class ComputeSimilarity {
 			logger.info("Loaded " + revbProps.size() + " property pairs from "
 					+ args[1]);
 
-			System.out.println(new File(pairedRelationsFile).getName());
-
 			// perform scoring
 			doScoring(new File(pairedRelationsFile).getName());
 		}
@@ -93,11 +91,11 @@ public class ComputeSimilarity {
 	/**
 	 * read the basic cluster pattern and try to improve the scoring
 	 * 
-	 * @param string
+	 * @param fileName
 	 * 
 	 * @throws IOException
 	 */
-	private static void doScoring(String string) throws IOException {
+	private static void doScoring(String fileName) throws IOException {
 		String arg1 = null;
 		String arg2 = null;
 		PairDto resultPair = null;
@@ -108,8 +106,7 @@ public class ComputeSimilarity {
 
 		BufferedWriter writerRevWordnetSims = new BufferedWriter(
 				new FileWriter(new File(Constants.OIE_DATA_PATH).getParent()
-						+ "/all.trvb.wordnet.sim."
-						+ Constants.SIMILARITY_FACTOR + ".csv"));
+						+ "/sim." + fileName));
 
 		long start = Utilities.startTimer();
 
@@ -144,6 +141,10 @@ public class ComputeSimilarity {
 
 			logger.info("Pushed " + taskList.size() + " tasks to the pool ");
 			starTime = System.currentTimeMillis();
+
+			logger.info("Writing to "
+					+ new File(Constants.OIE_DATA_PATH).getParent() + "/sim."
+					+ fileName);
 
 			while (!executorPool.isTerminated()) {
 				try {

@@ -36,10 +36,11 @@ public class Worker implements Callable<PairDto> {
 
 	@Override
 	public PairDto call() throws Exception {
-
+		
 		double score = SimilatityWebService.getSimScore(
-				Utilities.splitAtCapitals(this.arg1),
-				Utilities.splitAtCapitals(this.arg2));
+				Utilities.splitAtCapitals(this.originalArg1),
+				Utilities.splitAtCapitals(this.originalArg2));
+
 		return new PairDto(this.originalArg1, this.originalArg2, score);
 	}
 }
