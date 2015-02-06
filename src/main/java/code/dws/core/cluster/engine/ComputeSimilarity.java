@@ -55,7 +55,6 @@ public class ComputeSimilarity {
 
 	private static List<Pair<String, String>> revbProps = null;
 
-	private static Map<String, THashSet<ImmutablePair<String, String>>> ALL_PROPS = new HashMap<String, THashSet<ImmutablePair<String, String>>>();
 
 	/**
      * 
@@ -100,13 +99,11 @@ public class ComputeSimilarity {
 		String arg2 = null;
 		PairDto resultPair = null;
 
-		long cnt = 0;
-		long starTime = 0;
 		long cntr = 0;
 
 		BufferedWriter writerRevWordnetSims = new BufferedWriter(
 				new FileWriter(new File(Constants.OIE_DATA_PATH).getParent()
-						+ "/sim." + fileName));
+						+ "/sim.WN." + fileName));
 
 		long start = Utilities.startTimer();
 
@@ -127,8 +124,6 @@ public class ComputeSimilarity {
 		try {
 
 			for (Pair<String, String> pair : revbProps) {
-				cnt++;
-
 				arg1 = pair.getLeft();
 				arg2 = pair.getRight();
 
@@ -140,7 +135,6 @@ public class ComputeSimilarity {
 			executorPool.shutdown();
 
 			logger.info("Pushed " + taskList.size() + " tasks to the pool ");
-			starTime = System.currentTimeMillis();
 
 			logger.info("Writing to "
 					+ new File(Constants.OIE_DATA_PATH).getParent() + "/sim."
