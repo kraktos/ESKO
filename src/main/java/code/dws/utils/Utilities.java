@@ -52,10 +52,6 @@ public class Utilities {
 		return System.currentTimeMillis();
 	}
 
-	
-
-	
-
 	public static String cleanse(String arg) {
 
 		if (arg.indexOf(":") != -1)
@@ -68,10 +64,6 @@ public class Utilities {
 
 		return arg.toLowerCase();
 	}
-
-	
-
-	
 
 	/**
 	 * encodes a string with special character to one with UTF-8 encoding
@@ -145,12 +137,6 @@ public class Utilities {
 		// replaceAll(":_", "__")
 	}
 
-	
-
-	
-
-	
-
 	public static String cleanseInstances(String dbpInst) {
 		dbpInst = dbpInst.replaceAll("~", "%");
 		dbpInst = dbpInst.replaceAll("\\[", "(");
@@ -159,7 +145,31 @@ public class Utilities {
 		return utf8ToCharacter(dbpInst);
 	}
 
-	
+	/**
+	 * sort a map by value descending
+	 * 
+	 * @param map
+	 * @param totalScore
+	 * @param tripleCounter
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, Long> sortByValue(Map map) {
+		List list = new LinkedList(map.entrySet());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o2, Object o1) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue())
+						.compareTo(((Map.Entry) (o2)).getValue());
+			}
+		});
+
+		Map result = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry<String, Long> entry = (Map.Entry) it.next();
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Map sortByValue(Map map, Long cutOff) {
@@ -248,9 +258,5 @@ public class Utilities {
 		arg = StringUtils.replace(arg, "%", "~25");
 		return arg;
 	}
-
-	
-
-	
 
 }

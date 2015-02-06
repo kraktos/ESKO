@@ -8,11 +8,13 @@ import gnu.trove.map.hash.THashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -227,6 +229,72 @@ public class SPARQLEndPointQueryAPI {
 			}
 		}
 		return subClass;
+	}
+
+	/**
+	 * load DBP properties from SPARQL endpoint, -1 means all properties
+	 * 
+	 * @param topKDBPediaProperties
+	 * @param query
+	 * @return
+	 */
+	public static List<String> loadDbpediaProperties(
+			long topKDBPediaProperties, String query) {
+
+		String prop = null;
+		String cnt = "0";
+		int c = 0;
+
+		List<String> retS = new ArrayList<String>();
+
+		Map<String, Long> props = new HashMap<String, Long>();
+
+		List<QuerySolution> count = null;
+
+		List<QuerySolution> dbpObjProps = queryDBPediaEndPoint(query);
+
+		for (QuerySolution querySol : dbpObjProps) {
+			prop = querySol.get("val").toString();
+
+			if ((prop.indexOf(Constants.DBPEDIA_PREDICATE_NS) != -1)
+					&& (prop.indexOf("wikiPageWikiLink") == -1)
+					&& (prop.indexOf("wikiPageExternalLink") == -1)
+					&& (prop.indexOf("wikiPageRedirects") == -1)
+					&& (prop.indexOf("thumbnail") == -1)
+					&& (prop.indexOf("wikiPageDisambiguates") == -1)
+					&& (prop.indexOf("wikiPageInterLanguageLink") == -1)) {
+
+				if (topKDBPediaProperties != -1) {
+					count = queryDBPediaEndPoint("select (count(*)  as ?val)  where {?a <"
+							+ prop + "> ?c} ");
+					for (QuerySolution sol : count) {
+						cnt = sol.get("val").toString();
+					}
+					cnt = cnt.substring(0, cnt.indexOf("^"));
+					props.put(
+							prop.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""),
+							Long.parseLong(cnt));
+				} else {
+					retS.add(prop
+							.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""));
+				}
+			}
+		}
+
+		// sort only when interested in top-k, else makes no sense
+		if (topKDBPediaProperties != -1) {
+			props = Utilities.sortByValue(props);
+
+			for (Entry<String, Long> e : props.entrySet()) {
+				retS.add(e.getKey());
+
+				c++;
+				if (c == topKDBPediaProperties)
+					return retS;
+			}
+		}
+
+		return retS;
 	}
 
 	/**

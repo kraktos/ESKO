@@ -1,6 +1,7 @@
 code.dws.bootstrap
-code.dws.core
 code.dws.core.cluster.analysis
+code.dws.core.cluster.engine
+code.dws.core.instanceMap
 code.dws.core.propertyMap
 code.dws.dbConnectivity
 code.dws.dto

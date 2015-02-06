@@ -153,6 +153,8 @@ public class Constants {
 
 	public static final String GET_KB_RELATIONS_ANNOTATED = "select KB_PROP, EVAL from OIE_PROP_GS where PHRASE = ? and EVAL <> '' and EVAL <> 'N'";
 
+	public static final String QUERY_OBJECTTYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
+
 	public static String OIE_DATA_SEPERARTOR = null;
 
 	/**
