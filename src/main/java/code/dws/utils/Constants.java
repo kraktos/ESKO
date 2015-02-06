@@ -6,6 +6,7 @@ package code.dws.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -20,6 +21,9 @@ public class Constants {
 	public static enum OIE {
 		NELL, REVERB
 	}
+
+	public static DecimalFormat formatter = new DecimalFormat(
+			"###.############");
 
 	public static long WORKFLOW = 0;
 
@@ -105,6 +109,8 @@ public class Constants {
 
 	public static String DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = null;
 
+	public static long TIMEOUT_MINS = 0;
+
 	// *****************DIRECTORY LOCATIONS
 	// ************************************************
 
@@ -155,6 +161,8 @@ public class Constants {
 
 	public static final String QUERY_OBJECTTYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
 
+	public static String WORDNET_API = null;
+
 	public static String OIE_DATA_SEPERARTOR = null;
 
 	/**
@@ -185,6 +193,10 @@ public class Constants {
 	public static Set<String> SUB_SET_TYPES = new HashSet<String>();
 
 	public static Set<String> OBJ_SET_TYPES = new HashSet<String>();
+
+	public static int HTTP_CONN_MAX_TOTAL = 0;
+
+	public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
 
 	/**
 	 * load the variables from Configuration file
@@ -253,13 +265,17 @@ public class Constants {
 			THREAD_MAX_POOL_SIZE = Integer.parseInt(prop
 					.getProperty("THREAD_MAX_POOL_SIZE"));
 
-			Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL"));
+			HTTP_CONN_MAX_TOTAL = Integer.parseInt(prop
+					.getProperty("HTTP_CONN_MAX_TOTAL"));
 
-			Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
-
-			Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
+			HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop
+					.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
 
 			WORKFLOW = Integer.parseInt(prop.getProperty("WORKFLOW"));
+
+			WORDNET_API = prop.getProperty("WORDNET_API");
+
+			TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
 
 			init();
 		} catch (IOException ex) {

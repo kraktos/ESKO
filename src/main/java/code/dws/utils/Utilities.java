@@ -191,6 +191,25 @@ public class Utilities {
 	}
 
 	/**
+	 * split a word at capitals, needed for DBP relations
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String splitAtCapitals(String arg) {
+		String retStr = "";
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+			if (Character.isUpperCase(c)) {
+				retStr = retStr + " " + c;
+			} else {
+				retStr = retStr + c;
+			}
+		}
+		return retStr;
+	}
+
+	/**
 	 * get the actual nell instance, following the ":" if any
 	 * 
 	 * @param arg

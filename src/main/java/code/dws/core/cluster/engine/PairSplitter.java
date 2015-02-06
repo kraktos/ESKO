@@ -70,14 +70,14 @@ public class PairSplitter {
 		int count = 0;
 
 		String filePath = new File(Constants.OIE_DATA_PATH).getParent()
-				+ "/pairNodeAll." + dataType + ".csv";
+				+ "/pairs.All." + dataType + ".csv";
 
 		BufferedWriter writerArr[] = new BufferedWriter[numberOfMachines];
 		for (int k = 0; k < numberOfMachines; k++) {
 			try {
 				writerArr[k] = new BufferedWriter(new FileWriter(new File(
 						Constants.OIE_DATA_PATH).getParent()
-						+ "/pairNodeAll."
+						+ "/pairs.All."
 						+ dataType + ".Node." + (k + 1) + ".csv"));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -97,7 +97,7 @@ public class PairSplitter {
 
 			try {
 
-				writerArr[bucket].write(scan.nextLine());
+				writerArr[bucket].write(scan.nextLine() + "\n");
 				writerArr[bucket].flush();
 			} catch (IOException e) {
 				logger.error("Problem while writing to " + writerArr[bucket]);
@@ -179,12 +179,12 @@ public class PairSplitter {
 
 		BufferedWriter pairNode = new BufferedWriter(new FileWriter(new File(
 				Constants.OIE_DATA_PATH).getParent()
-				+ "/pairNodeAll."
+				+ "/pairs.All."
 				+ identifier + ".csv"));
 
 		logger.info("Writing at "
-				+ new File(Constants.OIE_DATA_PATH).getParent()
-				+ "/pairNodeAll." + identifier + ".csv");
+				+ new File(Constants.OIE_DATA_PATH).getParent() + "/pairs.All."
+				+ identifier + ".csv");
 
 		if (identifier.equals("OIE") || identifier.equals("KB")) {
 			for (int outerIdx = 0; outerIdx < collArg1.size(); outerIdx++) {
