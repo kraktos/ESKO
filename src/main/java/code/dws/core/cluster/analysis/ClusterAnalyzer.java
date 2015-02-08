@@ -87,7 +87,7 @@ public class ClusterAnalyzer {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(directory
 				+ "/ClusterScoresTable.tsv"));
 
-		writer.write("ITERATION\tCLUSTER_SIZE\tMCL_SCORE\n");
+		writer.write("BETA\tITERATION\tCLUSTER_SIZE\tMCL_SCORE\n");
 
 		// patterns for extracting the beta and inflation values from the file
 		// name
@@ -142,8 +142,8 @@ public class ClusterAnalyzer {
 				// create a map of cluster key and its highest isolation
 				// value
 				logger.info("MCL Index Score = " + mclIndex);
-				writer.write(inf + "\t" + CLUSTER.size() + "\t" + mclIndex
-						+ "\n");
+				writer.write(beta + "\t" + inf + "\t" + CLUSTER.size() + "\t"
+						+ mclIndex + "\n");
 
 				writer.flush();
 
