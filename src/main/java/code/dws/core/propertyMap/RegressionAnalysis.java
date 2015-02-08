@@ -23,7 +23,6 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import code.dws.core.cluster.analysis.CompareClusters;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -171,20 +170,20 @@ public class RegressionAnalysis {
 		String line = null;
 		String[] arr = null;
 		if (Constants.WORKFLOW == 2) {
-			try {
-				CompareClusters.main(new String[] { "" });
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			Map<String, List<String>> propertyClusterNames = CompareClusters
-					.getCluster();
-
-			for (Map.Entry<String, List<String>> entry : propertyClusterNames
-					.entrySet()) {
-				for (String s : entry.getValue()) {
-					clusterNames.put(s, entry.getKey());
-				}
-			}
+			// try {
+			// CompareClusters.main(new String[] { "" });
+			// } catch (IOException e1) {
+			// e1.printStackTrace();
+			// }
+			// Map<String, List<String>> propertyClusterNames = CompareClusters
+			// .getCluster();
+			//
+			// for (Map.Entry<String, List<String>> entry : propertyClusterNames
+			// .entrySet()) {
+			// for (String s : entry.getValue()) {
+			// clusterNames.put(s, entry.getKey());
+			// }
+			// }
 
 		} else if (Constants.WORKFLOW == 3) {
 			try {

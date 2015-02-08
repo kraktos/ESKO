@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import code.dws.bootstrap.BootStrapMethod;
-import code.dws.core.cluster.analysis.CompareClusters;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -48,10 +47,6 @@ class DistantSupervised {
 	private final static Logger logger = LoggerFactory
 			.getLogger(DistantSupervised.class);
 
-	
-
-	
-
 	private Map<String, Double> domainClassMap = new HashMap<String, Double>();
 	private Map<String, Double> rangeClassMap = new HashMap<String, Double>();
 
@@ -71,18 +66,18 @@ class DistantSupervised {
 			oieFile = new File(Constants.NELL_DATA_PATH);
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
-				try {
-					CompareClusters.main(new String[] { "" });
-
-					logger.info("Optimal Inflation for workflow "
-							+ Constants.WORKFLOW + " = "
-							+ CompareClusters.getOptimalInflation());
-					this.propertyNames = CompareClusters.getCluster().get(
-							args[0]);
-				} catch (IOException e) {
-					logger.error(e.getMessage());
-					e.printStackTrace();
-				}
+				// try {
+				// CompareClusters.main(new String[] { "" });
+				//
+				// logger.info("Optimal Inflation for workflow "
+				// + Constants.WORKFLOW + " = "
+				// + CompareClusters.getOptimalInflation());
+				// this.propertyNames = CompareClusters.getCluster().get(
+				// args[0]);
+				// } catch (IOException e) {
+				// logger.error(e.getMessage());
+				// e.printStackTrace();
+				// }
 			} else {
 				this.propertyNames = new ArrayList<String>();
 				this.propertyNames

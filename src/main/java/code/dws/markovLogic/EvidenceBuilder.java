@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import code.dws.core.cluster.analysis.CompareClusters;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -48,8 +47,6 @@ public class EvidenceBuilder {
 	// public static THashMap<String, List<String>> INSTANCE_CANDIDATES2 = new
 	// THashMap<String, List<String>>();
 
-	
-
 	// The input OIE file with raw web extracted data
 	private static File oieFile = null;
 
@@ -66,14 +63,15 @@ public class EvidenceBuilder {
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
 
-				CompareClusters.main(new String[] { "" });
-				logger.info("Optimal Inflation for workflow "
-						+ Constants.WORKFLOW + " = "
-						+ CompareClusters.getOptimalInflation());
-
-				// retrieve only the properties relevant to the given cluster
-				// name
-				this.propertyNames = CompareClusters.getCluster().get(args[0]);
+				// CompareClusters.main(new String[] { "" });
+				// logger.info("Optimal Inflation for workflow "
+				// + Constants.WORKFLOW + " = "
+				// + CompareClusters.getOptimalInflation());
+				//
+				// // retrieve only the properties relevant to the given cluster
+				// // name
+				// this.propertyNames =
+				// CompareClusters.getCluster().get(args[0]);
 
 			} else {
 
