@@ -116,6 +116,8 @@ public class Evaluation {
 							algoMapPM.get(entry.getKey().getRelation()));
 			}
 
+			logger.info("Algo triples Count = " + prunedAlgoMapIM.size());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -148,8 +150,16 @@ public class Evaluation {
 				line = scan.nextLine();
 				arr = line.split("\t");
 
+				if (line.indexOf("Thunor") != -1) {
+					System.out.println(line);
+				}
+
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
-				dbpFact = new FactDao(arr[3], "", arr[5]);
+
+				dbpFact = new FactDao(StringUtils.replace(arr[3],
+						Constants.DBPEDIA_INSTANCE_NS, ""), "",
+						StringUtils.replace(arr[5],
+								Constants.DBPEDIA_INSTANCE_NS, ""));
 
 				// load the instances
 				algoMapIM.put(oieFact, dbpFact);
@@ -196,6 +206,9 @@ public class Evaluation {
 		for (String line : gold) {
 			arr = line.split("\t");
 
+			if (line.indexOf("Thunor") != -1) {
+				System.out.println("");
+			}
 			if (isValidLine(arr)) {
 
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
@@ -236,23 +249,23 @@ public class Evaluation {
 		double imPrec = computeIMScore("P");
 		double imRecall = computeIMScore("R");
 
-		logger.info("IM Precision = " + imPrec);
-		logger.info("IM Recall = " + imRecall);
+		logger.info("IM Precision = " + 100 * imPrec);
+		logger.info("IM Recall = " + 100 * imRecall);
 		if (imPrec == 0 || imRecall == 0)
 			logger.info("PM F1 = " + 0.0);
 		else
-			logger.info("IM F1 = " + (double) 2 * imRecall * imPrec
+			logger.info("IM F1 = " + (double) 200 * imRecall * imPrec
 					/ (imRecall + imPrec));
 
 		double pmPrec = computePMScore("P");
 		double pmRecall = computePMScore("R");
 
-		logger.info("PM Precision = " + pmPrec);
-		logger.info("PM Recall = " + pmRecall);
+		logger.info("PM Precision = " + 100 * pmPrec);
+		logger.info("PM Recall = " + 100 * pmRecall);
 		if (pmRecall == 0 || pmPrec == 0)
 			logger.info("PM F1 = " + 0.0);
 		else
-			logger.info("PM F1 = " + (double) 2 * pmRecall * pmPrec
+			logger.info("PM F1 = " + (double) 200 * pmRecall * pmPrec
 					/ (pmRecall + pmPrec));
 
 	}
@@ -362,12 +375,14 @@ public class Evaluation {
 					if (algoFact.getSub().equals(goldFact.getSub())) {
 						// a correct match, increment
 						numer++;
-						denom++;
+						// denom++;
 					} else {
 						if (!goldFact.getSub().equals("?")) {
-							denom++;
+
 						}
 					}
+
+					denom++;
 				}
 
 				// objects
@@ -377,12 +392,14 @@ public class Evaluation {
 					if (algoFact.getObj().equals(goldFact.getObj())) {
 						// a correct match, increment
 						numer++;
-						denom++;
+						// denom++;
 					} else {
 						if (!goldFact.getObj().equals("?")) {
-							denom++;
+							// denom++;
 						}
 					}
+
+					denom++;
 				}
 			}
 		}
