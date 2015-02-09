@@ -9,6 +9,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -56,8 +57,13 @@ public class SimilatityWebService {
 		poolManager
 				.setDefaultMaxPerRoute(Constants.HTTP_CONN_MAX_TOTAL_PER_ROUTE);
 
+		RequestConfig defaultRequestConfig = RequestConfig.custom()
+				.setSocketTimeout(5000).setConnectTimeout(5000)
+				.setConnectionRequestTimeout(5000).build();
+
 		httpclient = HttpClients.custom().setConnectionManager(poolManager)
-				.build();
+				.setDefaultRequestConfig(defaultRequestConfig).build();
+
 	}
 
 	/**

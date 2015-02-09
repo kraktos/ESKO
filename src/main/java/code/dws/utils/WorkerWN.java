@@ -6,7 +6,6 @@ package code.dws.utils;
 import java.util.concurrent.Callable;
 
 import code.dws.dto.PairDto;
-import code.dws.utils.Utilities;
 import code.dws.wordnet.SimilatityWebService;
 
 /**
