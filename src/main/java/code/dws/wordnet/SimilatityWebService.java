@@ -106,11 +106,13 @@ public class SimilatityWebService {
 
 		} catch (ConnectTimeoutException cTo) {
 			logger.error("ConnectTimeoutException out with " + arg1 + ", "
-					+ arg2);
+					+ arg2 + "" + cTo.getMessage());
 		} catch (ClientProtocolException e) {
-			logger.error("ClientProtocolException with " + arg1 + ", " + arg2);
+			logger.error("ClientProtocolException with " + arg1 + ", " + arg2
+					+ "" + e.getMessage());
 		} catch (IOException e) {
-			logger.error("IOException  with " + arg1 + ", " + arg2);
+			logger.error("IOException  with " + arg1 + ", " + arg2 + ""
+					+ e.getMessage());
 		}
 
 		try {

@@ -104,12 +104,12 @@ public class GSSampleCreator {
 		int gsSize = 0;
 
 		BufferedWriter goldFile = new BufferedWriter(new FileWriter(directory
-				+ "/GOLD.tsv"));
+				+ "/GOLD." + k + ".tsv"));
 
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
 
-		logger.info("Writing to " + directory + "/GOLD.tsv");
+		logger.info("Writing to " + directory + "/GOLD." + k + ".tsv");
 
 		Random rand = new Random();
 
