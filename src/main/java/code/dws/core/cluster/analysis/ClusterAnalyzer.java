@@ -69,6 +69,24 @@ public class ClusterAnalyzer {
 	}
 
 	/**
+	 * retrieve the cluster for the given path
+	 * 
+	 * @param optimalClusterPAth
+	 * @return
+	 */
+	public static Map<String, List<String>> getOptimalCluster(
+			String optimalClusterPAth) {
+		try {
+			readMarkovClusters(optimalClusterPAth);
+			return CLUSTER;
+		} catch (IOException e) {
+			logger.error("Error in getClusterScore()");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
 	 * look into the given directory and find the cluster score for each cluster
 	 * configuration
 	 * 

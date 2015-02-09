@@ -94,6 +94,7 @@ public class BetaSearcher {
 		for (Entry<Pair<String, String>, Double> entry : wnMap.entrySet()) {
 			key = entry.getKey();
 			wnSCore = entry.getValue();
+			ovlpSCore = 0;
 			if (ovlpMap.containsKey(key)) {
 				ovlpSCore = ovlpMap.get(key);
 			}
@@ -102,6 +103,17 @@ public class BetaSearcher {
 			writer.write(key.getLeft() + "\t" + key.getRight() + "\t"
 					+ finalScore + "\n");
 			writer.flush();
+		}
+
+		for (Entry<Pair<String, String>, Double> entry : ovlpMap.entrySet()) {
+			key = entry.getKey();
+			ovlpSCore = entry.getValue();
+			if (!wnMap.containsKey(key)) {
+				finalScore = beta * ovlpSCore;
+				writer.write(key.getLeft() + "\t" + key.getRight() + "\t"
+						+ finalScore + "\n");
+				writer.flush();
+			}
 		}
 	}
 

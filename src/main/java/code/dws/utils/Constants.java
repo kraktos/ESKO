@@ -198,6 +198,10 @@ public class Constants {
 
 	public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
 
+	public static int OPTI_INFLATION = 15;
+
+	public static double OPTI_BETA = 0.5;
+
 	/**
 	 * load the variables from Configuration file
 	 * 
@@ -276,6 +280,11 @@ public class Constants {
 			WORDNET_API = prop.getProperty("WORDNET_API");
 
 			TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
+
+			OPTI_BETA = Double.parseDouble(prop.getProperty("OPTI_BETA"));
+
+			OPTI_INFLATION = Integer.parseInt(prop
+					.getProperty("OPTI_INFLATION"));
 
 			init();
 		} catch (IOException ex) {

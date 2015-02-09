@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import code.dws.core.cluster.analysis.ClusterAnalyzer;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -61,17 +62,27 @@ public class EvidenceBuilder {
 			this.processTriple(oieFile, OIE.NELL, ",");
 
 		} else {
-			if (!Constants.WORKFLOW_NORMAL) {
-
+			// if (!Constants.WORKFLOW_NORMAL) {
+			if (Constants.WORKFLOW == 2) {
 				// CompareClusters.main(new String[] { "" });
+
+				String directory = new File(Constants.OIE_DATA_PATH)
+						.getParent()
+						+ "/clusters/cluster.beta."
+						+ (int) Constants.OPTI_BETA
+						* 10
+						+ ".inf."
+						+ Constants.OPTI_INFLATION + ".out";
+
 				// logger.info("Optimal Inflation for workflow "
 				// + Constants.WORKFLOW + " = "
 				// + CompareClusters.getOptimalInflation());
 				//
-				// // retrieve only the properties relevant to the given cluster
+				// retrieve only the properties relevant to the given
+				// cluster
 				// // name
-				// this.propertyNames =
-				// CompareClusters.getCluster().get(args[0]);
+				this.propertyNames = ClusterAnalyzer.getOptimalCluster(
+						directory).get(args[0]);
 
 			} else {
 
