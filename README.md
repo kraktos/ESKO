@@ -66,7 +66,7 @@ Combine these in the ratio of beta, using the following
 run mcl clustering, on each combination. 
 After clustering run,
 
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg
+**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg**
 
 This will compute a markov score for the clusters for a given beta and given inflation.
 
