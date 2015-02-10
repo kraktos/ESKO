@@ -64,7 +64,6 @@ public class EvidenceBuilder {
 		} else {
 			// if (!Constants.WORKFLOW_NORMAL) {
 			if (Constants.WORKFLOW == 2) {
-				// CompareClusters.main(new String[] { "" });
 
 				String directory = new File(Constants.OIE_DATA_PATH)
 						.getParent()
@@ -74,18 +73,13 @@ public class EvidenceBuilder {
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
 
-				// logger.info("Optimal Inflation for workflow "
-				// + Constants.WORKFLOW + " = "
-				// + CompareClusters.getOptimalInflation());
-				//
 				// retrieve only the properties relevant to the given
 				// cluster
-				// // name
+				// name
 				this.propertyNames = ClusterAnalyzer.getOptimalCluster(
 						directory).get(args[0]);
 
 			} else {
-
 				this.propertyNames = new ArrayList<String>();
 				this.propertyNames
 						.add(Constants.PREDICATE.replaceAll("-", " "));

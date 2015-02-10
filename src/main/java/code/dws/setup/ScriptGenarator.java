@@ -4,14 +4,17 @@
 package code.dws.setup;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import code.dws.core.cluster.analysis.ClusterAnalyzer;
 import code.dws.utils.Constants;
 
 /**
@@ -38,13 +41,16 @@ public class ScriptGenarator {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		if (args.length != 1) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg");
+		} else {
+			Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		Constants.loadConfigParameters(new String[] { "", args[0] });
+			// load the properties
+			loadOIEProps(Constants.OIE_DATA_PATH);
 
-		// load the properties
-		loadOIEProps(Constants.OIE_DATA_PATH);
-
-		generateScript();
+			generateScript();
+		}
 	}
 
 	/**
@@ -132,16 +138,20 @@ public class ScriptGenarator {
 		} else {
 
 			if (Constants.WORKFLOW == 2) {
-				// try {
-				// CompareClusters.main(new String[] { "" });
-				// for (Map.Entry<String, List<String>> e : CompareClusters
-				// .getCluster().entrySet()) {
-				//
-				// PROPS.add(e.getKey());
-				// }
-				// } catch (IOException e) {
-				// logger.error(e.getMessage());
-				// }
+
+				String directory = new File(Constants.OIE_DATA_PATH)
+						.getParent()
+						+ "/clusters/cluster.beta."
+						+ (int) Constants.OPTI_BETA
+						* 10
+						+ ".inf."
+						+ Constants.OPTI_INFLATION + ".out";
+
+				for (Entry<String, List<String>> e : ClusterAnalyzer
+						.getOptimalCluster(directory).entrySet()) {
+					PROPS.add(e.getKey());
+				}
+
 			} else if (Constants.WORKFLOW == 1) {
 				List<String> props = Generator.getReverbProperties(-1,
 						Long.parseLong(Constants.INSTANCE_THRESHOLD));
