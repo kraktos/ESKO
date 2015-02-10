@@ -46,14 +46,14 @@ This module, takes an OIE file as input, and produces instance mappings for the 
 The first step is to split the given input OIE data set file into pairs  of OIE realtions. For instance, a given OIE data set with n relations will have n*(n-1)/2 pairs. These pairs are computed and splitted into different files.
 To achieve this, run the following
 
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.PairSplitter CONFIG.cfg <type of file> <#machines>
+*java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar **code.dws.core.cluster.engine.PairSplitter** CONFIG.cfg <type of file> <#machines>*
 
 Once splitted, send the files to different machines, (probably scp), and run the following on each different machines..
 
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg <type of Sim> <pairFile>
+**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg <type of Sim> <pairFile>**
 
 e.g.
-**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg OV ../DATA/pairs.All.OIE.csv**
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg OV ../DATA/pairs.All.OIE.csv
 
 This distributed computing speeds up the pairwise scoring, and once done, needs to be merged (manually).
 
