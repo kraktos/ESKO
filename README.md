@@ -11,7 +11,9 @@ mvn clean package install
 CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions.
 
 ### General setup
+**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg**
 
+this generates a scripts for the IM pipeline. 
 ### Database setup
 
 ## Execution
