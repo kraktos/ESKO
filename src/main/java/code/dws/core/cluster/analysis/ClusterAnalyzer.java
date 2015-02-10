@@ -129,6 +129,10 @@ public class ClusterAnalyzer {
 			// gets the only relevant output files
 			Files.walkFileTree(filePath, fv);
 
+			// load the pairwise scores file for the given beta
+			loadScores(directory + "/sim.combined.beta." + 0.5
+					+ ".pairs.ALL.OIE.csv", "\t");
+			
 			// iterate the files
 			for (Path path : files) {
 				CLUSTER = new HashMap<String, List<String>>();
@@ -147,9 +151,9 @@ public class ClusterAnalyzer {
 				// extracted the beta and inflation values
 				logger.debug(beta + " \t " + inf);
 
-				// load the pairwise scores file for the given beta
-				loadScores(directory + "/sim.combined.beta." + beta
-						+ ".pairs.ALL.OIE.csv", "\t");
+//				// load the pairwise scores file for the given beta
+//				loadScores(directory + "/sim.combined.beta." + beta
+//						+ ".pairs.ALL.OIE.csv", "\t");
 
 				// read the particular cluster file
 				readMarkovClusters(path.toString());

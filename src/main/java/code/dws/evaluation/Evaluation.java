@@ -150,10 +150,6 @@ public class Evaluation {
 				line = scan.nextLine();
 				arr = line.split("\t");
 
-				if (line.indexOf("Thunor") != -1) {
-					System.out.println(line);
-				}
-
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
 
 				dbpFact = new FactDao(StringUtils.replace(arr[3],
@@ -206,9 +202,6 @@ public class Evaluation {
 		for (String line : gold) {
 			arr = line.split("\t");
 
-			if (line.indexOf("Thunor") != -1) {
-				System.out.println("");
-			}
 			if (isValidLine(arr)) {
 
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
