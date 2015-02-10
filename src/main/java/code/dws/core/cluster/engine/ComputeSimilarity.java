@@ -165,12 +165,13 @@ public class ComputeSimilarity {
 							resultPair = futureTask.get();
 
 							// write it out
-							writerSim.write(resultPair.getArg1()
-									+ "\t"
-									+ resultPair.getArg2()
-									+ "\t"
-									+ Constants.formatter.format(resultPair
-											.getScore()) + "\n");
+							if (resultPair.getScore() > 0)
+								writerSim.write(resultPair.getArg1()
+										+ "\t"
+										+ resultPair.getArg2()
+										+ "\t"
+										+ Constants.formatter.format(resultPair
+												.getScore()) + "\n");
 							if (cntr % 100000 == 0 && cntr > 100000) {
 								Utilities.endTimer(start, 100
 										* ((double) cntr / taskList.size())
@@ -240,12 +241,13 @@ public class ComputeSimilarity {
 							resultPair = futureTask.get();
 
 							// write it out
-							writerSim.write(resultPair.getArg1()
-									+ "\t"
-									+ resultPair.getArg2()
-									+ "\t"
-									+ Constants.formatter.format(resultPair
-											.getScore()) + "\n");
+							if (resultPair.getScore() > 0)
+								writerSim.write(resultPair.getArg1()
+										+ "\t"
+										+ resultPair.getArg2()
+										+ "\t"
+										+ Constants.formatter.format(resultPair
+												.getScore()) + "\n");
 							if (cntr % 100000 == 0 && cntr > 100000) {
 								Utilities.endTimer(start, 100
 										* ((double) cntr / taskList.size())
