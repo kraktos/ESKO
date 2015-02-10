@@ -15,7 +15,7 @@ echo "\n\n ======= RUNNING FULL REASONING FOR " $1 " ========"
 
 
 # running full pipeline
-java -jar ../DATA/EXECUTABLES/ESKO_MAPPER.jar $1 CONFIG.cfg
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.experiment.ExperimentAutomation $1 CONFIG.cfg
 
 
 #DYNAMICALLY CREATE THE MODEL FILE

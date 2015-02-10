@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
+import code.dws.core.cluster.analysis.ClusterAnalyzer;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -90,19 +91,17 @@ public class GenerateAssociations {
 		if (Constants.INCLUDE_YAGO_TYPES)
 			YagoDbpediaMapping.main(new String[] { "" });
 
-		if (!Constants.WORKFLOW_NORMAL) {
-			// if (Constants.WORKFLOW == 2) {
-			// CompareClusters.main(new String[] { "" });
-			// logger.info("Optimal Inflation for workflow "
-			// + Constants.WORKFLOW + " = "
-			// + CompareClusters.getOptimalInflation());
-			//
-			// // retrieve only the properties relevant to the given cluster
-			// // name
-			// propertyClusterNames = CompareClusters.getCluster();
-			// logger.info("Property Cluster size = "
-			// + propertyClusterNames.size());
-			// }
+		// if (!Constants.WORKFLOW_NORMAL) {
+		if (Constants.WORKFLOW == 2) {
+			String directory = new File(Constants.OIE_DATA_PATH).getParent()
+					+ "/clusters/cluster.beta." + (int) Constants.OPTI_BETA
+					* 10 + ".inf." + Constants.OPTI_INFLATION + ".out";
+
+			// retrieve the properties relevant to the given
+			// cluster
+			// name
+			propertyClusterNames = ClusterAnalyzer.getOptimalCluster(directory);
+
 		} else { // normal workflow, without cluster
 			propertyNames.addAll(Generator.getReverbProperties(-1, 100L));
 		}
@@ -232,7 +231,7 @@ public class GenerateAssociations {
 			if (propertyNames.contains(oieRawProp)) {
 				flag = true;
 			} else {
-				if (!Constants.WORKFLOW_NORMAL) {
+				if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
 					for (Entry<String, List<String>> e : propertyClusterNames
 							.entrySet()) {
 						for (String s : e.getValue()) {

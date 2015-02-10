@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import code.dws.bootstrap.BootStrapMethod;
+import code.dws.core.cluster.analysis.ClusterAnalyzer;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -65,19 +66,21 @@ class DistantSupervised {
 			this.propertyName = args[0];
 			oieFile = new File(Constants.NELL_DATA_PATH);
 		} else {
-			if (!Constants.WORKFLOW_NORMAL) {
-				// try {
-				// CompareClusters.main(new String[] { "" });
-				//
-				// logger.info("Optimal Inflation for workflow "
-				// + Constants.WORKFLOW + " = "
-				// + CompareClusters.getOptimalInflation());
-				// this.propertyNames = CompareClusters.getCluster().get(
-				// args[0]);
-				// } catch (IOException e) {
-				// logger.error(e.getMessage());
-				// e.printStackTrace();
-				// }
+			// if (!Constants.WORKFLOW_NORMAL) {
+			if (Constants.WORKFLOW == 2) {
+				String directory = new File(Constants.OIE_DATA_PATH)
+						.getParent()
+						+ "/clusters/cluster.beta."
+						+ (int) Constants.OPTI_BETA
+						* 10
+						+ ".inf."
+						+ Constants.OPTI_INFLATION + ".out";
+
+				// retrieve only the properties relevant to the given
+				// cluster
+				// name
+				this.propertyNames = ClusterAnalyzer.getOptimalCluster(
+						directory).get(args[0]);
 			} else {
 				this.propertyNames = new ArrayList<String>();
 				this.propertyNames

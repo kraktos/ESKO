@@ -23,6 +23,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import code.dws.core.cluster.analysis.ClusterAnalyzer;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -142,7 +143,8 @@ public class RegressionAnalysis {
 				// the association file
 
 				// for workflow 2,3 the property names will be cluster names
-				if (!Constants.IS_NELL && !Constants.WORKFLOW_NORMAL)
+				if (!Constants.IS_NELL
+						&& (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3))
 					clusterNames = getClusterNames(clusterNames);
 
 				run(inputLog, clusterNames);
@@ -170,20 +172,24 @@ public class RegressionAnalysis {
 		String line = null;
 		String[] arr = null;
 		if (Constants.WORKFLOW == 2) {
-			// try {
-			// CompareClusters.main(new String[] { "" });
-			// } catch (IOException e1) {
-			// e1.printStackTrace();
-			// }
-			// Map<String, List<String>> propertyClusterNames = CompareClusters
-			// .getCluster();
-			//
-			// for (Map.Entry<String, List<String>> entry : propertyClusterNames
-			// .entrySet()) {
-			// for (String s : entry.getValue()) {
-			// clusterNames.put(s, entry.getKey());
-			// }
-			// }
+
+			String directory = new File(Constants.OIE_DATA_PATH).getParent()
+					+ "/clusters/cluster.beta." + (int) Constants.OPTI_BETA
+					* 10 + ".inf." + Constants.OPTI_INFLATION + ".out";
+
+			// retrieve only the properties relevant to the given
+			// cluster
+			// name
+
+			Map<String, List<String>> propertyClusterNames = ClusterAnalyzer
+					.getOptimalCluster(directory);
+
+			for (Map.Entry<String, List<String>> entry : propertyClusterNames
+					.entrySet()) {
+				for (String s : entry.getValue()) {
+					clusterNames.put(s, entry.getKey());
+				}
+			}
 
 		} else if (Constants.WORKFLOW == 3) {
 			try {
@@ -244,7 +250,8 @@ public class RegressionAnalysis {
 		for (ArrayList<String> line : fMinusFile) {
 			oieProp = line.get(1);
 
-			if (!Constants.IS_NELL && !Constants.WORKFLOW_NORMAL)
+			if (!Constants.IS_NELL
+					&& (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3))
 				oieProp = clusterNames.get(oieProp);
 
 			if (line.size() == 4) {
@@ -482,7 +489,8 @@ public class RegressionAnalysis {
 
 			oieProp = line.get(1);
 
-			if (!Constants.IS_NELL && !Constants.WORKFLOW_NORMAL)
+			if (!Constants.IS_NELL
+					&& (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3))
 				oieProp = clusterNames.get(oieProp);
 
 			// for the clustered scenario, the property names are the cluster

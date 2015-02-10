@@ -8,7 +8,7 @@ cd $DIR/
 
 echo " \n\n ========== RUNNING BOOTSTRAP FOR  " $1 " ITERATION " $2 " ============ "
 
-java -jar ../DATA/EXECUTABLES/ESKO_BOOTSTRAPPER.jar $1 CONFIG.cfg
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.bootstrap.BootStrapMethod $1 CONFIG.cfg
 
 cat $ROCKIT'/modelBasic.mln' 'src/main/resources/output/ds_'$1'/domRanEvidenceBS.db'  > $ROCKIT'/model.mln'
 
