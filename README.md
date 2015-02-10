@@ -50,7 +50,10 @@ java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.clus
 
 Once splitted, send the files to different machines, (probably scp), and run the following on each different machines..
 
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ReverbClusterProperty CONFIG.cfg <type of Sim> <pairFile>
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg <type of Sim> <pairFile>
+
+e.g.
+java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.engine.ComputeSimilarity CONFIG.cfg OV ../DATA/pairs.All.OIE.csv 
 
 This distributed computing speeds up the pairwise scoring, and once done, needs to be merged (manually).
 
