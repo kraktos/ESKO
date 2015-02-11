@@ -125,6 +125,9 @@ public class ClusterAnalyzer {
 			}
 		};
 
+		// load the pairwise scores file for the given beta
+		loadScores(directory + "/sim.combined.beta.0.5.pairs.ALL.OIE.csv", "\t");
+
 		try {
 			// gets the only relevant output files
 			Files.walkFileTree(filePath, fv);
@@ -147,9 +150,9 @@ public class ClusterAnalyzer {
 				// extracted the beta and inflation values
 				logger.debug(beta + " \t " + inf);
 
-				// load the pairwise scores file for the given beta
-				loadScores(directory + "/sim.combined.beta." + beta
-						+ ".pairs.ALL.OIE.csv", "\t");
+				// // load the pairwise scores file for the given beta
+				// loadScores(directory + "/sim.combined.beta." + beta
+				// + ".pairs.ALL.OIE.csv", "\t");
 
 				// read the particular cluster file
 				readMarkovClusters(path.toString());
