@@ -174,8 +174,9 @@ public class RegressionAnalysis {
 		if (Constants.WORKFLOW == 2) {
 
 			String directory = new File(Constants.OIE_DATA_PATH).getParent()
-					+ "/clusters/cluster.beta." + (int) Constants.OPTI_BETA
-					* 10 + ".inf." + Constants.OPTI_INFLATION + ".out";
+					+ "/clusters/cluster.beta."
+					+ (int) (Constants.OPTI_BETA * 10) + ".inf."
+					+ Constants.OPTI_INFLATION + ".out";
 
 			// retrieve only the properties relevant to the given
 			// cluster

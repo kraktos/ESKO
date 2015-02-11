@@ -142,12 +142,12 @@ public class ScriptGenarator {
 				String directory = new File(Constants.OIE_DATA_PATH)
 						.getParent()
 						+ "/clusters/cluster.beta."
-						+ (int) Constants.OPTI_BETA
-						* 10
+						+ (int) (Constants.OPTI_BETA
+						* 10)
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
 				logger.info("Generating opti CLusters from " + directory);
-				
+
 				for (Entry<String, List<String>> e : ClusterAnalyzer
 						.getOptimalCluster(directory).entrySet()) {
 					PROPS.add(e.getKey());
