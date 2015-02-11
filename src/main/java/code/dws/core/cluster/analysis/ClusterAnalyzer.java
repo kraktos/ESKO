@@ -150,29 +150,32 @@ public class ClusterAnalyzer {
 				// extracted the beta and inflation values
 				logger.debug(beta + " \t " + inf);
 
-				// // load the pairwise scores file for the given beta
-				// loadScores(directory + "/sim.combined.beta." + beta
-				// + ".pairs.ALL.OIE.csv", "\t");
+				if (0 < beta && beta < 1) {
 
-				// read the particular cluster file
-				readMarkovClusters(path.toString());
+					// // load the pairwise scores file for the given beta
+					// loadScores(directory + "/sim.combined.beta." + beta
+					// + ".pairs.ALL.OIE.csv", "\t");
 
-				// compute its cluster score
-				mclIndex = computeClusterIndex(CLUSTER);
+					// read the particular cluster file
+					readMarkovClusters(path.toString());
 
-				// create a map of cluster key and its highest isolation
-				// value
-				logger.info("MCL Index Score = " + mclIndex);
-				writer.write(beta + "\t" + inf + "\t" + CLUSTER.size() + "\t"
-						+ mclIndex + "\n");
+					// compute its cluster score
+					mclIndex = computeClusterIndex(CLUSTER);
 
-				writer.flush();
+					// create a map of cluster key and its highest isolation
+					// value
+					logger.info("MCL Index Score = " + mclIndex);
+					writer.write(beta + "\t" + inf + "\t" + CLUSTER.size()
+							+ "\t" + mclIndex + "\n");
 
-				// scheme for the best score
-				if (mclIndex < BEST_SCORE) {
-					BEST_SCORE = mclIndex;
-					Constants.OPTI_INFLATION = inf;
-					Constants.OPTI_BETA = beta;
+					writer.flush();
+
+					// scheme for the best score
+					if (mclIndex < BEST_SCORE) {
+						BEST_SCORE = mclIndex;
+						Constants.OPTI_INFLATION = inf;
+						Constants.OPTI_BETA = beta;
+					}
 				}
 			}
 
