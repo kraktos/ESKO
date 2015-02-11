@@ -146,12 +146,12 @@ public class ScriptGenarator {
 						* 10
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
-
+				logger.info("Generating opti CLusters from " + directory);
+				
 				for (Entry<String, List<String>> e : ClusterAnalyzer
 						.getOptimalCluster(directory).entrySet()) {
 					PROPS.add(e.getKey());
 				}
-
 			} else if (Constants.WORKFLOW == 1) {
 				List<String> props = Generator.getReverbProperties(-1,
 						Long.parseLong(Constants.INSTANCE_THRESHOLD));
