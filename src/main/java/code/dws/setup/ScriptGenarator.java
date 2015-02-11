@@ -41,15 +41,15 @@ public class ScriptGenarator {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		if (args.length != 1) {
-			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg");
+		if (args.length != 2) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>");
 		} else {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
 			// load the properties
 			loadOIEProps(Constants.OIE_DATA_PATH);
 
-			generateScript();
+			generateScript(Integer.parseInt(args[1]));
 		}
 	}
 
@@ -57,55 +57,63 @@ public class ScriptGenarator {
 	 * takes the bunch of properties or clusters and generates script for
 	 * running instance mapping.
 	 * 
+	 * @param numberOfMachines
+	 * 
 	 * @throws IOException
 	 */
-	private static void generateScript() throws IOException {
+	private static void generateScript(int numberOfMachines) throws IOException {
+		int bucket = 0;
+		int count = 0;
 
-		boolean flag = true;
+		BufferedWriter scriptWrtr[] = new BufferedWriter[numberOfMachines];
+		for (int k = 0; k < numberOfMachines; k++) {
+			try {
+				scriptWrtr[k] = new BufferedWriter(new FileWriter(SHELL_SCRIPT
+						+ "WF." + Constants.WORKFLOW + "." + "PIPELINE.N"
+						+ (k + 1) + ".sh"));
 
-		BufferedWriter scriptWriter1 = new BufferedWriter(new FileWriter(
-				SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
-						+ "PIPELINE.N1.sh"));
+				// write the shell script header in each file
+				scriptWrtr[k].write("#!/bin/bash\n\n");
 
-		scriptWriter1.write("#!/bin/bash\n\n");
-
-		BufferedWriter scriptWriter2 = new BufferedWriter(new FileWriter(
-				SHELL_SCRIPT + "WF." + Constants.WORKFLOW + "."
-						+ "PIPELINE.N2.sh"));
-
-		scriptWriter2.write("#!/bin/bash\n\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		for (String oieProp : PROPS) {
 
-			if (flag) {
+			bucket = count++ % numberOfMachines;
+
+			try {
+
 				int bootIter = 2;
-				scriptWriter1.write("sh ./" + PIPELINE_NAME + oieProp + "\n");
+				scriptWrtr[bucket].write("sh ./" + PIPELINE_NAME + oieProp
+						+ "\n");
 				while (bootIter != MAX_BOOT_ITER + 2) {
-					scriptWriter1.write("sh ./" + BOOTSTRAP_NAME + oieProp
+					scriptWrtr[bucket].write("sh ./" + BOOTSTRAP_NAME + oieProp
 							+ " " + bootIter++ + "\n");
 				}
-				scriptWriter1.write("echo \"Done with complete reasoning of "
-						+ oieProp + "\"\n\n");
-				flag = false;
-			} else {
-				int bootIter = 2;
-				scriptWriter2.write("sh ./" + PIPELINE_NAME + oieProp + "\n");
-				while (bootIter != MAX_BOOT_ITER + 2) {
-					scriptWriter2.write("sh ./" + BOOTSTRAP_NAME + oieProp
-							+ " " + bootIter++ + "\n");
-				}
-				scriptWriter2.write("echo \"Done with complete reasoning of "
-						+ oieProp + "\"\n\n");
-				flag = true;
+				scriptWrtr[bucket]
+						.write("echo \"Done with complete reasoning of "
+								+ oieProp + "\"\n\n");
+
+				scriptWrtr[bucket].flush();
+
+			} catch (IOException e) {
+				logger.error("Problem while writing to " + scriptWrtr[bucket]);
+				e.printStackTrace();
 			}
 		}
 
 		logger.info("echo \"Done with " + PROPS.size() + " clusters\n");
-		scriptWriter1.flush();
-		scriptWriter1.close();
 
-		scriptWriter2.flush();
-		scriptWriter2.close();
+		for (int k = 0; k < numberOfMachines; k++) {
+			try {
+				scriptWrtr[k].close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -142,11 +150,10 @@ public class ScriptGenarator {
 				String directory = new File(Constants.OIE_DATA_PATH)
 						.getParent()
 						+ "/clusters/cluster.beta."
-						+ (int) (Constants.OPTI_BETA
-						* 10)
+						+ (int) (Constants.OPTI_BETA * 10)
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
-				logger.info("Generating opti CLusters from " + directory);
+				logger.info("Generating opti Clusters from " + directory);
 
 				for (Entry<String, List<String>> e : ClusterAnalyzer
 						.getOptimalCluster(directory).entrySet()) {
