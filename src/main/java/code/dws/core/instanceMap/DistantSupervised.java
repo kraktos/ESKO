@@ -71,7 +71,7 @@ class DistantSupervised {
 				String directory = new File(Constants.OIE_DATA_PATH)
 						.getParent()
 						+ "/clusters/optimalCluster.beta."
-						+ (int) (Constants.OPTI_BETA * 10)
+						+ Constants.OPTI_BETA
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
 
