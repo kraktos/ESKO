@@ -67,12 +67,13 @@ Combine these in the ratio of beta, using the following
 
 run mcl clustering, on each combination. 
 After clustering run,
-
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg**
 
-This will compute a markov score for the clusters for a given beta and given inflation.
+This will compute a markov score for the optimised clusters for a given beta, b and given inflation, i.
+Find the optimal. and set it in the CONFIG file. The file will be in /home/unixUser/DATA/clusters/cluster.beta.b.inf.i.out
 
-Find the optimal. and set it in the CONFIG file.
+Further optimise for optimal clusters
+**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterOptimizer CONFIG.cfg <partially optimised file from previous step>**
 
 
 
