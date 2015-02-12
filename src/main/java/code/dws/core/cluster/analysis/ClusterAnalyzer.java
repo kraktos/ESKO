@@ -45,7 +45,7 @@ public class ClusterAnalyzer {
 
 	private static Map<String, List<String>> CLUSTER = new HashMap<String, List<String>>();
 
-	private static Map<Pair<String, String>, Double> SCORE_MAP = new HashMap<Pair<String, String>, Double>();
+	public static Map<Pair<String, String>, Double> SCORE_MAP = new HashMap<Pair<String, String>, Double>();
 
 	private static double BEST_SCORE = Double.MAX_VALUE;
 
@@ -295,7 +295,7 @@ public class ClusterAnalyzer {
 	 * @throws FileNotFoundException
 	 */
 	@SuppressWarnings("resource")
-	private static void loadScores(String file, String delimit)
+	public static void loadScores(String file, String delimit)
 			throws FileNotFoundException {
 
 		String sCurrentLine;
