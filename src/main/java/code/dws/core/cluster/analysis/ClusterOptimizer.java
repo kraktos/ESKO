@@ -81,8 +81,10 @@ public class ClusterOptimizer {
 				// get the pairwise scores
 				PAIR_SCORE_MAP = ClusterAnalyzer.SCORE_MAP;
 
+				logger.info("Optimisisng..bitte warten !!");
 				// read the semi optimal clustered file into memory
-				readMarkovClusters(semiOptimalClusterFile);
+				readMarkovClusters(semiOptimalClusterFile,
+						Constants.OPTI_INFLATION);
 
 				BufferedWriter clusterWriter = new BufferedWriter(
 						new FileWriter(fullyOptimalClusterFile));
@@ -110,10 +112,11 @@ public class ClusterOptimizer {
 	 * read the cluster file to check and recluster if needed
 	 * 
 	 * @param clusterOutput
+	 * @param oPTI_INFLATION
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	private static void readMarkovClusters(String clusterOutput)
+	private static void readMarkovClusters(String clusterOutput, int inflation)
 			throws IOException {
 
 		Scanner scan;
@@ -128,13 +131,14 @@ public class ClusterOptimizer {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
 			elem = sCurrentLine.split("\t");
+
 			for (String s : elem)
 				list.add(s);
 
 			// still coarse try clustering again
-			if (list.size() > 10 && lastSize != 5) {
+			if (list.size() > 10 && lastSize != 20) {
 				lastSize++;
-				reCluster(list, cnt);
+				reCluster(list, inflation);
 			} else {
 				lastSize = 0;
 				CLUSTER.put("C" + cnt++, list);
@@ -147,10 +151,11 @@ public class ClusterOptimizer {
 	 * re-cluster a given list of relations
 	 * 
 	 * @param list
+	 * @param inflation
 	 * @param cnt
 	 * @throws IOException
 	 */
-	private static void reCluster(List<String> list, int cnt)
+	private static void reCluster(List<String> list, int inflation)
 			throws IOException {
 		double val = 0;
 		Pair<String, String> pair = null;
@@ -178,19 +183,18 @@ public class ClusterOptimizer {
 						val = 0;
 					}
 				}
-
-				scoreWrtr.write(pair.getLeft() + "\t" + pair.getRight() + "\t"
-						+ val + "\n");
+				if (val > 0.2)
+					scoreWrtr.write(pair.getLeft() + "\t" + pair.getRight()
+							+ "\t" + val + "\n");
 			}
-
 			scoreWrtr.flush();
 		}
 
 		// make mcl call to perform clustering
-		systemRoutine(Constants.OPTI_INFLATION, tempScores, tempOutput);
+		systemRoutine(inflation, tempScores, tempOutput);
 
 		// read the output to load in memory
-		readMarkovClusters(directory + tempClusters);
+		readMarkovClusters(directory + tempClusters, inflation);
 
 	}
 
