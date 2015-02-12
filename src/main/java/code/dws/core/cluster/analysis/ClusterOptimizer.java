@@ -124,8 +124,6 @@ public class ClusterOptimizer {
 		String sCurrentLine = null;
 		String[] elem = null;
 
-		logger.info("Optimising the cluster file at " + clusterOutput);
-		logger.info("Cluster sze = " + CLUSTER.size());
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
