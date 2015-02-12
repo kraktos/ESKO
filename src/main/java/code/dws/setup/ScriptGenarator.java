@@ -149,7 +149,7 @@ public class ScriptGenarator {
 
 				String directory = new File(Constants.OIE_DATA_PATH)
 						.getParent()
-						+ "/clusters/cluster.beta."
+						+ "/clusters/optimalCluster.beta."
 						+ (int) (Constants.OPTI_BETA * 10)
 						+ ".inf."
 						+ Constants.OPTI_INFLATION + ".out";
