@@ -54,18 +54,18 @@ public class RegressionAnalysis {
 	private static final double OIE_PROPERTY_MAPPED_THRESHOLD = 3;
 
 	private static final String PROP_STATS = "/MAP_PERCENT_VS_TAU_REVERB_"
-			+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
-			+ +OIE_PROPERTY_MAPPED_THRESHOLD + "_.tsv";
+			+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
+			+ +OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
-	private static final String ITEMS_RULES = "/PROP_RULES_DIRECT_REVERB.tsv";
+	private static final String ITEMS_RULES = "/PROP_RULES_DIRECT_REVERB.WF.";
 
 	private static final String NEW_TRIPLES = "/NEW_TRIPLES_REVERB_"
-			+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
-			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_.tsv";
+			+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
+			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
 	private static final String DISTRIBUTION_NEW_TRIPLES = "/NEW_TRIPLES_REVERB_DOM_RAN_"
 			+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
-			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_.tsv";
+			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
 	private static Map<String, Map<String, Map<Pair<String, String>, Long>>> GLOBAL_TRANSCS_MAP = new HashMap<String, Map<String, Map<Pair<String, String>, Long>>>();
 
@@ -229,9 +229,10 @@ public class RegressionAnalysis {
 
 		// write transactions to the file for analysis
 		BufferedWriter triplesWriter = new BufferedWriter(new FileWriter(
-				directory + NEW_TRIPLES));
+				directory + NEW_TRIPLES + Constants.WORKFLOW + ".tsv"));
 		BufferedWriter statStriplesWriter = new BufferedWriter(new FileWriter(
-				directory + DISTRIBUTION_NEW_TRIPLES));
+				directory + DISTRIBUTION_NEW_TRIPLES + Constants.WORKFLOW
+						+ ".tsv"));
 
 		// read the file into memory
 		ArrayList<ArrayList<String>> fMinusFile = FileUtil.genericFileReader(
@@ -473,11 +474,12 @@ public class RegressionAnalysis {
 
 		// write transactions to the file for analysis
 		BufferedWriter itemsWriter = new BufferedWriter(new FileWriter(
-				directory + ITEMS_RULES));
+				directory + ITEMS_RULES + Constants.WORKFLOW + ".tsv"));
 
 		// writer to dump the property stats
 		BufferedWriter mapPercentVsTauStatsWriter = new BufferedWriter(
-				new FileWriter(directory + PROP_STATS));
+				new FileWriter(directory + PROP_STATS + Constants.WORKFLOW
+						+ ".tsv"));
 
 		List<String> possibleProps = null;
 		List<String> possibleTypes = null;
