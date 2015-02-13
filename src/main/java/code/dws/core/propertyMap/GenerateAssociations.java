@@ -65,7 +65,7 @@ public class GenerateAssociations {
 		else {
 			init(args[0]);
 
-			readFiles(Constants.OIE_DATA_PATH);
+			findDomRanRestrictions(Constants.OIE_DATA_PATH);
 		}
 	}
 
@@ -83,9 +83,11 @@ public class GenerateAssociations {
 		DIRECTORY = new File(Constants.OIE_DATA_PATH).getParent().toString();
 
 		INVERSE_PROP_LOG = (Constants.IS_NELL) ? DIRECTORY
-				+ "/INVERSE_PROP.log" : DIRECTORY + "/REVERB_INVERSE_PROP.log";
+				+ "/INVERSE_PROP.log" : DIRECTORY + "/REVERB_INVERSE_PROP.WF."
+				+ Constants.WORKFLOW + ".log";
 		DIRECT_PROP_LOG = (Constants.IS_NELL) ? DIRECTORY + "/DIRECT_PROP.log"
-				: DIRECTORY + "/REVERB_DIRECT_PROP.log";
+				: DIRECTORY + "/REVERB_DIRECT_PROP.WF." + Constants.WORKFLOW
+						+ ".log";
 
 		// initiate yago info
 		if (Constants.INCLUDE_YAGO_TYPES)
@@ -97,9 +99,7 @@ public class GenerateAssociations {
 					+ "/clusters/optimalCluster.beta." + Constants.OPTI_BETA
 					+ ".inf." + Constants.OPTI_INFLATION + ".out";
 
-			// retrieve the properties relevant to the given
-			// cluster
-			// name
+			// retrieve the properties relevant to the given cluster name
 			propertyClusterNames = ClusterAnalyzer.getOptimalCluster(directory);
 
 		} else { // normal workflow, without cluster
@@ -117,7 +117,8 @@ public class GenerateAssociations {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	public static void readFiles(String oieFilePath) throws IOException {
+	public static void findDomRanRestrictions(String oieFilePath)
+			throws IOException {
 
 		int lineCounter = 0;
 
@@ -228,17 +229,17 @@ public class GenerateAssociations {
 		if (Constants.IS_NELL)
 			flag = true;
 		else {
-			if (propertyNames.contains(oieRawProp)) {
+			if (propertyNames.contains(oieRawProp)) { 
 				flag = true;
 			} else {
 				if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
-					for (Entry<String, List<String>> e : propertyClusterNames
+					for (Entry<String, List<String>> clusterName : propertyClusterNames
 							.entrySet()) {
-						for (String s : e.getValue()) {
-							if (!propertyNames.contains(s)) {
-								propertyNames.add(s);
+						for (String relation : clusterName.getValue()) {
+							if (!propertyNames.contains(relation)) {
+								propertyNames.add(relation);
 
-								if (s.equals(oieRawProp))
+								if (relation.equals(oieRawProp))
 									flag = true;
 							}
 						}
