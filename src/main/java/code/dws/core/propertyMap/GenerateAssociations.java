@@ -104,9 +104,9 @@ public class GenerateAssociations {
 
 		} else { // normal workflow, without cluster
 			propertyNames.addAll(Generator.getReverbProperties(-1, 100L));
+			logger.info("total properties added = " + propertyNames.size());
 		}
 
-		logger.info("total properties added = " + propertyNames.size());
 	}
 
 	/**

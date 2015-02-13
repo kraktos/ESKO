@@ -58,7 +58,6 @@ public class SPARQLEndPointQueryAPI {
 		try {
 			// get the result set
 			results = qexec.execSelect();
-
 		} catch (Exception e) {
 			// logger.error("Problem with query = " + query);
 
@@ -83,7 +82,11 @@ public class SPARQLEndPointQueryAPI {
 			}
 
 		} finally {
-			listResults = ResultSetFormatter.toList(results);
+			if (results == null)
+				listResults = new ArrayList<QuerySolution>();
+			else
+				listResults = ResultSetFormatter.toList(results);
+
 			qexec.close();
 		}
 
