@@ -48,53 +48,59 @@ public class DBPMappingsLoader {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Constants.loadConfigParameters(new String[] { "", args[0] });
-
-		String clusterName = null;
-
-		DBWrapper.init(Constants.UPDT_OIE_POSTFIXED);
-
-		if (Constants.IS_NELL) {
-			PREDICATE = args[0];
-			readOutputFiles();
+		if (args.length != 1) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.instanceMap.DBPMappingsLoader CONFIG.cfg");
 		} else {
 
-			Path filePath = Paths.get("src/main/resources/output/");
+			Constants.loadConfigParameters(new String[] { "", args[0] });
 
-			// VISIT THE FOLDER LOCATION AND ITERATE THROUGH ALL SUB FOLDERS FOR
-			// THE EXACT OUTPUT FILE
-			final List<Path> files = new ArrayList<Path>();
-			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile(Path file,
-						BasicFileAttributes attrs) throws IOException {
-					if (file.endsWith("out.db"))
-						files.add(file);
-					return FileVisitResult.CONTINUE;
+			String clusterName = null;
+
+			DBWrapper.init(Constants.UPDT_OIE_POSTFIXED);
+
+			if (Constants.IS_NELL) {
+				PREDICATE = args[0];
+				readOutputFiles();
+			} else {
+
+				Path filePath = Paths.get("src/main/resources/output/");
+
+				// VISIT THE FOLDER LOCATION AND ITERATE THROUGH ALL SUB FOLDERS
+				// FOR
+				// THE EXACT OUTPUT FILE
+				final List<Path> files = new ArrayList<Path>();
+				FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file,
+							BasicFileAttributes attrs) throws IOException {
+						if (file.endsWith("out.db"))
+							files.add(file);
+						return FileVisitResult.CONTINUE;
+					}
+				};
+
+				try {
+					// gets the only relevant output files
+					Files.walkFileTree(filePath, fv);
+
+					// iterate the files
+					for (Path path : files) {
+						clusterName = path.getParent().toString()
+								.replaceAll("src/main/resources/output/", "")
+								.replaceAll("ds_", "");
+
+						PREDICATE = clusterName;
+
+						logger.info("Currently in location " + clusterName
+								+ " .... ");
+						readOutputFiles();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					DBWrapper.updateResidualOIERefined();
+					DBWrapper.shutDown();
 				}
-			};
-
-			try {
-				// gets the only relevant output files
-				Files.walkFileTree(filePath, fv);
-
-				// iterate the files
-				for (Path path : files) {
-					clusterName = path.getParent().toString()
-							.replaceAll("src/main/resources/output/", "")
-							.replaceAll("ds_", "");
-
-					PREDICATE = clusterName;
-
-					logger.info("Currently in location " + clusterName
-							+ " .... ");
-					readOutputFiles();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				DBWrapper.updateResidualOIERefined();
-				DBWrapper.shutDown();
 			}
 		}
 	}
