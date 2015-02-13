@@ -677,8 +677,8 @@ public class RegressionAnalysis {
 
 		// read the file into memory
 		ArrayList<ArrayList<String>> propRules = FileUtil.genericFileReader(
-				new FileInputStream(directory + ITEMS_RULES), PATH_SEPERATOR,
-				false);
+				new FileInputStream(directory + ITEMS_RULES
+						+ Constants.WORKFLOW + ".tsv"), PATH_SEPERATOR, false);
 
 		String oieProp = null;
 		String dbProp = null;
