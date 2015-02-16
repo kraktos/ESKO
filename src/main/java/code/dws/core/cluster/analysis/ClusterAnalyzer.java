@@ -54,14 +54,21 @@ public class ClusterAnalyzer {
 	 */
 	public static void main(String[] args) {
 		String directory = null;
-		if (args.length != 1) {
-			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg");
+		String clusterOutputs = null;
+		String pairScoreFile = null;
+
+		if (args.length != 3) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg <where to look for clusters> <pairwise score file>");
 		} else {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
 			directory = new File(Constants.OIE_DATA_PATH).getParent();
+			clusterOutputs = args[1];
+			pairScoreFile = args[2];
+
 			try {
-				scanAndWriteClusterScores(directory);
+				scanAndWriteClusterScores(directory, clusterOutputs,
+						pairScoreFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -91,19 +98,21 @@ public class ClusterAnalyzer {
 	 * configuration
 	 * 
 	 * @param directory
+	 * @param clusterOutputs
+	 * @param pairScoreFile
 	 * @throws IOException
 	 */
-	private static void scanAndWriteClusterScores(String directory)
-			throws IOException {
+	private static void scanAndWriteClusterScores(String directory,
+			String clusterOutputs, String pairScoreFile) throws IOException {
 		double mclIndex = 0;
 		int inf = 0;
-		double beta = 0;
+		double beta = 0.5;
 		Matcher matcher = null;
 
-		Path filePath = Paths.get(directory + "/clusters/");
+		Path clustersOutputPath = Paths.get(clusterOutputs + "/");
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(directory
-				+ "/ClusterScoresTable.tsv"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(
+				clusterOutputs + "/ClusterScoresTable.tsv"));
 
 		writer.write("BETA\tITERATION\tCLUSTER_SIZE\tMCL_SCORE\n");
 
@@ -126,11 +135,11 @@ public class ClusterAnalyzer {
 		};
 
 		// load the pairwise scores file for the given beta
-		loadScores(directory + "/sim.combined.beta.0.5.pairs.ALL.OIE.csv", "\t");
+		loadScores(pairScoreFile, "\t");
 
 		try {
 			// gets the only relevant output files
-			Files.walkFileTree(filePath, fv);
+			Files.walkFileTree(clustersOutputPath, fv);
 
 			// iterate the files
 			for (Path path : files) {
