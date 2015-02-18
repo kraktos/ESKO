@@ -61,9 +61,7 @@
 //	 */
 //	public static void main(String[] args) throws IOException {
 //
-//		GenerateNewProperties.init();
-//		String inputLog = GenerateNewProperties.DIRECT_PROP_LOG;// GenerateNewProperties.DIRECT_PROP_LOG;
-//
+//		
 //		// read through all clusters to find the best, maximum clusters
 //		// essentially is not best, have to compute cluster index
 //		Map<String, List<String>> mCl = null;
@@ -79,7 +77,7 @@
 //		// logger.info((double) s / map.size());
 //
 //		// skim through the OIE input data file and try mapping
-//		 createNewTriples(inputLog, map);
+////		 createNewTriples(inputLog, map);
 //
 //	}
 //

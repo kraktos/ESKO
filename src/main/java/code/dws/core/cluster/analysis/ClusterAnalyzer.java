@@ -384,26 +384,53 @@ public class ClusterAnalyzer {
 	 */
 	@SuppressWarnings("resource")
 	private static void readMarkovClusters(String output) throws IOException {
-
+		List<String> dbpProps = null;
 		Scanner scan;
 		scan = new Scanner(new File((output)), "UTF-8");
 		int cnt = 1;
 
 		List<String> list = null;
-
+		Map<String, List<String>> map = null;
 		String sCurrentLine = null;
-		String[] elem = null;
+		String[] elements = null;
+
+		int cntr = 0;
 
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
 
-			elem = sCurrentLine.split("\t");
-			for (String s : elem)
-				list.add(s);
+			map = new HashMap<String, List<String>>();
+			dbpProps = new ArrayList<String>();
 
-			CLUSTER.put("C" + cnt++, list);
+			elements = sCurrentLine.split("\t");
+			for (String element : elements) {
+				if (element.indexOf(" ") == -1) {// presence of dbpedia property
+					dbpProps.add(element);
+				} else {
+					list.add(element);
+				}
+			}
+
+			if (dbpProps.size() > 0 && list.size() > 0) {
+				cntr++;
+				for (String elem : elements) {
+					if (elem.indexOf(" ") != -1) {
+						map.put(elem, dbpProps);
+					}
+				}
+			}
+
+			if (Constants.WORKFLOW == 3) {
+				if (list.size() > 0 && dbpProps.size() > 0)
+					CLUSTER.put("C" + cnt++, list);
+				dbpProps = null;
+			} else if (list.size() > 0)
+				CLUSTER.put("C" + cnt++, list);
 		}
+
+		logger.info("Total Cluster = " + (cnt - 1));
+		logger.info("Total Clusters  mapped = " + cntr);
 	}
 
 	public static String getOptimalClusterPath() {

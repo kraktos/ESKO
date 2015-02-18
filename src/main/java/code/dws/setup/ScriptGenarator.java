@@ -124,6 +124,7 @@ public class ScriptGenarator {
 	 * @param oieFilePath
 	 */
 	private static void loadOIEProps(String oieFilePath) {
+		
 		if (Constants.IS_NELL) {
 			// // load the NELL file in memory as a collection
 			// ArrayList<ArrayList<String>> nellFile =
@@ -144,11 +145,9 @@ public class ScriptGenarator {
 			// + PROPS.size());
 
 		} else {
-
 			if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
 
 				String directory = ClusterAnalyzer.getOptimalClusterPath();
-
 				logger.info("Generating opti Clusters from " + directory);
 
 				for (Entry<String, List<String>> e : ClusterAnalyzer
