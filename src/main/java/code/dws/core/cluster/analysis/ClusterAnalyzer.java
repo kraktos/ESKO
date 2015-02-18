@@ -406,4 +406,11 @@ public class ClusterAnalyzer {
 		}
 	}
 
+	public static String getOptimalClusterPath() {
+		return new File(Constants.OIE_DATA_PATH).getParent()
+				+ "/clusters/optimalCluster.WF." + Constants.WORKFLOW
+				+ ".beta." + Constants.OPTI_BETA + ".inf."
+				+ Constants.OPTI_INFLATION + ".out";
+	}
+
 }

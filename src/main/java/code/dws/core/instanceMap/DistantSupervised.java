@@ -67,13 +67,8 @@ class DistantSupervised {
 			oieFile = new File(Constants.NELL_DATA_PATH);
 		} else {
 			// if (!Constants.WORKFLOW_NORMAL) {
-			if (Constants.WORKFLOW == 2) {
-				String directory = new File(Constants.OIE_DATA_PATH)
-						.getParent()
-						+ "/clusters/optimalCluster.beta."
-						+ Constants.OPTI_BETA
-						+ ".inf."
-						+ Constants.OPTI_INFLATION + ".out";
+			if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
+				String directory = ClusterAnalyzer.getOptimalClusterPath();		
 
 				// retrieve only the properties relevant to the given
 				// cluster

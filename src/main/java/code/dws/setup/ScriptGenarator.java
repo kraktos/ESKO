@@ -145,14 +145,10 @@ public class ScriptGenarator {
 
 		} else {
 
-			if (Constants.WORKFLOW == 2) {
+			if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
 
-				String directory = new File(Constants.OIE_DATA_PATH)
-						.getParent()
-						+ "/clusters/optimalCluster.beta."
-						+ Constants.OPTI_BETA
-						+ ".inf."
-						+ Constants.OPTI_INFLATION + ".out";
+				String directory = ClusterAnalyzer.getOptimalClusterPath();
+
 				logger.info("Generating opti Clusters from " + directory);
 
 				for (Entry<String, List<String>> e : ClusterAnalyzer

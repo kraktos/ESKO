@@ -171,11 +171,9 @@ public class RegressionAnalysis {
 			Map<String, String> clusterNames) {
 		String line = null;
 		String[] arr = null;
-		if (Constants.WORKFLOW == 2) {
+		if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
 
-			String directory = new File(Constants.OIE_DATA_PATH).getParent()
-					+ "/clusters/optimalCluster.beta." + Constants.OPTI_BETA
-					+ ".inf." + Constants.OPTI_INFLATION + ".out";
+			String directory = ClusterAnalyzer.getOptimalClusterPath();
 
 			// retrieve only the properties relevant to the given
 			// cluster

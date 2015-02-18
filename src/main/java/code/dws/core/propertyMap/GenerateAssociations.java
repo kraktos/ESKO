@@ -94,10 +94,8 @@ public class GenerateAssociations {
 			YagoDbpediaMapping.main(new String[] { "" });
 
 		// if (!Constants.WORKFLOW_NORMAL) {
-		if (Constants.WORKFLOW == 2) {
-			String directory = new File(Constants.OIE_DATA_PATH).getParent()
-					+ "/clusters/optimalCluster.beta." + Constants.OPTI_BETA
-					+ ".inf." + Constants.OPTI_INFLATION + ".out";
+		if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
+			String directory = ClusterAnalyzer.getOptimalClusterPath();
 
 			// retrieve the properties relevant to the given cluster name
 			propertyClusterNames = ClusterAnalyzer.getOptimalCluster(directory);
@@ -229,7 +227,7 @@ public class GenerateAssociations {
 		if (Constants.IS_NELL)
 			flag = true;
 		else {
-			if (propertyNames.contains(oieRawProp)) { 
+			if (propertyNames.contains(oieRawProp)) {
 				flag = true;
 			} else {
 				if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {

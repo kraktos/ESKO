@@ -68,20 +68,26 @@ public class ClusterOptimizer {
 			directory = new File(Constants.OIE_DATA_PATH).getParent();
 
 			fullyOptimalClusterFile = directory
-					+ "/clusters/optimalCluster.beta." + Constants.OPTI_BETA
-					+ ".inf." + Constants.OPTI_INFLATION + ".out";
+					+ "/clusters/optimalCluster.WF." + Constants.WORKFLOW
+					+ ".beta." + Constants.OPTI_BETA + ".inf."
+					+ Constants.OPTI_INFLATION + ".out";
 
 			cnt = 1;
 
 			logger.info("loading pairwise scores..");
 			try {
-				ClusterAnalyzer.loadScores(directory
-						+ "/sim.combined.beta.0.5.pairs.ALL.OIE.csv", "\t");
+				if (Constants.WORKFLOW == 2)
+					ClusterAnalyzer.loadScores(directory
+							+ "/sim.combined.beta.0.5.pairs.ALL.OIE.csv", "\t");
+				else
+					ClusterAnalyzer.loadScores(directory
+							+ "/sim.WN.pairs.All.MIXED.csv", "\t");
 
 				// get the pairwise scores
 				PAIR_SCORE_MAP = ClusterAnalyzer.SCORE_MAP;
 
-				logger.info("Optimisisng..bitte warten !!");
+				logger.info("Optimising..bitte warten !!");
+
 				// read the semi optimal clustered file into memory
 				readMarkovClusters(semiOptimalClusterFile,
 						Constants.OPTI_INFLATION);
@@ -136,7 +142,7 @@ public class ClusterOptimizer {
 				list.add(s);
 
 			// still coarse try clustering again
-			if (list.size() > 10 && lastSize != 20) {
+			if (list.size() > 20 && lastSize != 5) {
 				lastSize++;
 				reCluster(list, inflation);
 			} else {
