@@ -56,16 +56,17 @@ public class ClusterOptimizer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		String scoreFile = null;
 		String semiOptimalClusterFile = null;
 		String fullyOptimalClusterFile = null;
 
-		if (args.length != 2) {
-			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterOptimizer CONFIG.cfg <semi-optimal cluster output>");
+		if (args.length != 3) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterOptimizer CONFIG.cfg <semi-optimal cluster output> <score File>");
 		} else {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 			semiOptimalClusterFile = args[1];
 			directory = new File(Constants.OIE_DATA_PATH).getParent();
+			scoreFile = args[2];
 
 			fullyOptimalClusterFile = directory
 					+ "/clusters/optimalCluster.WF." + Constants.WORKFLOW
@@ -76,12 +77,7 @@ public class ClusterOptimizer {
 
 			logger.info("loading pairwise scores..");
 			try {
-				if (Constants.WORKFLOW == 2)
-					ClusterAnalyzer.loadScores(directory
-							+ "/sim.combined.beta.0.5.pairs.ALL.OIE.csv", "\t");
-				else
-					ClusterAnalyzer.loadScores(directory
-							+ "/sim.WN.pairs.All.MIXED.csv", "\t");
+				ClusterAnalyzer.loadScores(scoreFile, "\t");
 
 				// get the pairwise scores
 				PAIR_SCORE_MAP = ClusterAnalyzer.SCORE_MAP;
