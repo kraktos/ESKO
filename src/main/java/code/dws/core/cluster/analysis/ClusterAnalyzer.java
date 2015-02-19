@@ -49,6 +49,8 @@ public class ClusterAnalyzer {
 
 	private static double BEST_SCORE = Double.MAX_VALUE;
 
+	private static Map<String, List<String>> OIE_DBP_PROP_MAP = null;
+
 	/**
 	 * @param args
 	 */
@@ -76,6 +78,15 @@ public class ClusterAnalyzer {
 	}
 
 	/**
+	 * return mappings of OIE relation to DBP relations
+	 * 
+	 * @return
+	 */
+	public static Map<String, List<String>> getOIE2KBRelationMappings() {
+		return OIE_DBP_PROP_MAP;
+	}
+
+	/**
 	 * retrieve the cluster for the given path
 	 * 
 	 * @param optimalClusterPAth
@@ -86,6 +97,24 @@ public class ClusterAnalyzer {
 		try {
 			readMarkovClusters(optimalClusterPAth);
 			return CLUSTER;
+		} catch (IOException e) {
+			logger.error("Error in getClusterScore()");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * retrieve the cluster for the given path
+	 * 
+	 * @param optimalClusterPath
+	 * @return
+	 */
+	public static Map<String, List<String>> getKBRelMappings(
+			String optimalClusterPath) {
+		try {
+			readMarkovClusters(optimalClusterPath);
+			return OIE_DBP_PROP_MAP;
 		} catch (IOException e) {
 			logger.error("Error in getClusterScore()");
 			e.printStackTrace();
@@ -390,17 +419,16 @@ public class ClusterAnalyzer {
 		int cnt = 1;
 
 		List<String> list = null;
-		Map<String, List<String>> map = null;
 		String sCurrentLine = null;
 		String[] elements = null;
 
 		int cntr = 0;
+		OIE_DBP_PROP_MAP = new HashMap<String, List<String>>();
 
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
 
-			map = new HashMap<String, List<String>>();
 			dbpProps = new ArrayList<String>();
 
 			elements = sCurrentLine.split("\t");
@@ -416,7 +444,7 @@ public class ClusterAnalyzer {
 				cntr++;
 				for (String elem : elements) {
 					if (elem.indexOf(" ") != -1) {
-						map.put(elem, dbpProps);
+						OIE_DBP_PROP_MAP.put(elem, dbpProps);
 					}
 				}
 			}
