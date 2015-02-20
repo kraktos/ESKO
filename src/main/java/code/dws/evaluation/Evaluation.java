@@ -117,6 +117,7 @@ public class Evaluation {
 			}
 
 			logger.info("Algo triples Count = " + prunedAlgoMapIM.size());
+			logger.info("Algo relations Count = " + prunedAlgoMapPM.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -218,12 +219,23 @@ public class Evaluation {
 				// store it in memory for access
 				if (rltnCandidates.size() > 0)
 					goldMapPM.put(arr[1], rltnCandidates);
+				else {
+					logger.info("Thullu with " + arr[1]);
+				}
 
 				goldMapIM.put(oieFact, dbpFact);
 			}
 		}
+
+		logger.info("Properties entered into GOLD PM = " + goldMapPM.size());
 	}
 
+	/**
+	 * checks everu GOld standard line, and determines which should be in or out
+	 * 
+	 * @param arr
+	 * @return
+	 */
 	private static boolean isValidLine(String[] arr) {
 		if (arr.length == 6) {
 			if (arr[0].length() > 0 && arr[1].length() > 0
@@ -231,6 +243,13 @@ public class Evaluation {
 					&& arr[5].length() > 0)
 				return true;
 		}
+
+		// unblock to check which annotated gold lines are missed
+		// else {
+		// if (arr.length > 3 && arr[0].length() > 0 && arr[1].length() > 0
+		// && arr[2].length() > 0)
+		// logger.info(arr[0] + "\t" + arr[1] + "\t" + arr[2]);
+		// }
 		return false;
 	}
 
@@ -284,8 +303,12 @@ public class Evaluation {
 		List<String> intersect = ListUtils.intersection(algoVals, goldVals);
 		if (intersect.size() > 0)
 			return true;
-		else
+		else {
+			logger.info("Algo = " + algoVals);
+			logger.info("Gold = " + goldVals);
 			return false;
+		}
+
 	}
 
 	/**
@@ -311,7 +334,10 @@ public class Evaluation {
 
 				if (match(algoPMCands, goldPMCands)) {
 					numer++;
+				} else {
+					logger.info("Garbr for = " + oieRelation);
 				}
+
 				denom++;
 			}
 		}

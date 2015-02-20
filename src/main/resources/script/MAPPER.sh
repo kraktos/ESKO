@@ -7,6 +7,9 @@ ROCKIT="/home/adutta/rockit"
 # CHANGE TO THE RELEVANT DIRECTORY
 cd $DIR/
 
+#remove all preexisting stuff
+rm -rf src/main/resources/output/*
+
 if [ ! -d 'src/main/resources/output/ds_'$1'' ]; then
 	mkdir 'src/main/resources/output/ds_'$1''
 fi
