@@ -4,7 +4,6 @@
 package code.dws.setup;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +74,9 @@ public class ScriptGenarator {
 				// write the shell script header in each file
 				scriptWrtr[k].write("#!/bin/bash\n\n");
 
+				// removing any old output files
+				scriptWrtr[k].write("rm -rf ../output/*\n\n");
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -124,7 +126,7 @@ public class ScriptGenarator {
 	 * @param oieFilePath
 	 */
 	private static void loadOIEProps(String oieFilePath) {
-		
+
 		if (Constants.IS_NELL) {
 			// // load the NELL file in memory as a collection
 			// ArrayList<ArrayList<String>> nellFile =
