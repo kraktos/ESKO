@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -18,6 +19,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+
+import code.dws.query.SPARQLEndPointQueryAPI;
+
+import com.hp.hpl.jena.query.QuerySolution;
 
 /**
  * All different kinds of utility methods are placed here
@@ -276,6 +281,84 @@ public class Utilities {
 		arg = StringUtils.replace(arg, "\\$", "~24");
 		arg = StringUtils.replace(arg, "%", "~25");
 		return arg;
+	}
+
+	/**
+	 * builds a hierarchy of DBPedia concepts, looking into is subClassOf
+	 * relation
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> buildRelationHierarchy() {
+		Map<String, String> CACHED_SUBCLASSES = new HashMap<String, String>();
+
+		String getAll = "SELECT * WHERE  { ?subclass <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> ?superclass}";
+		List<QuerySolution> allPairs = SPARQLEndPointQueryAPI
+				.queryDBPediaEndPoint(getAll);
+
+		for (QuerySolution querySol : allPairs) {
+			// Get the next result row
+			// QuerySolution querySol = results.next();
+			// if (querySol.get("subclass").toString()
+			// .indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1
+			// && querySol.get("superclass").toString()
+			// .indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
+
+			CACHED_SUBCLASSES.put(
+					querySol.get("subclass").toString()
+							.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""),
+					querySol.get("superclass").toString()
+							.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""));
+			// }
+		}
+
+		logger.debug(CACHED_SUBCLASSES.toString());
+		return CACHED_SUBCLASSES;
+	}
+
+	/**
+	 * builds a hierarchy of DBPedia concepts, looking into is subClassOf
+	 * relation
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> buildClassHierarchy() {
+		Map<String, String> CACHED_SUBCLASSES = new HashMap<String, String>();
+
+		String getAll = "SELECT * WHERE  { ?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass.FILTER(STRSTARTS(str(?subclass), 'http://dbpedia.org/ontology')).FILTER(STRSTARTS(str(?superclass), 'http://dbpedia.org/ontology'))}";
+		List<QuerySolution> allPairs = SPARQLEndPointQueryAPI
+				.queryDBPediaEndPoint(getAll);
+
+		for (QuerySolution querySol : allPairs) {
+			// Get the next result row
+			// QuerySolution querySol = results.next();
+			if (querySol.get("subclass").toString()
+					.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1
+					&& querySol.get("superclass").toString()
+							.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
+
+				CACHED_SUBCLASSES.put(
+						querySol.get("subclass").toString()
+								.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""),
+						querySol.get("superclass").toString()
+								.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""));
+			}
+		}
+
+		logger.debug(CACHED_SUBCLASSES.toString());
+		return CACHED_SUBCLASSES;
+	}
+
+	public static List<String> getAllMyParents(String particularClass,
+			List<String> coll, Map<String, String> CACHED_SUBCLASSES) {
+		String superCls = CACHED_SUBCLASSES.get(particularClass);
+		if (CACHED_SUBCLASSES.containsKey(superCls)) {
+			coll.add(superCls);
+			getAllMyParents(superCls, coll, CACHED_SUBCLASSES);
+		} else {
+			coll.add(superCls);
+		}
+		return coll;
 	}
 
 }

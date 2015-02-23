@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import code.dws.core.propertyMap.RegressionAnalysis;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.utils.Constants;
 import code.dws.utils.FileUtil;
+import code.dws.utils.Utilities;
 
 /**
  * Main class for workflow 2. reads the cluster info, finds mapping factors for
@@ -90,6 +92,8 @@ public class GenerateTriples {
 	 * @throws IOException
 	 */
 	private static void createNewTriples() throws IOException {
+		Map<String, String> CACHED_SUBCLASSES = new HashMap<String, String>();
+
 		// nell property in concern
 		String oieProp = null;
 
@@ -114,16 +118,23 @@ public class GenerateTriples {
 		// REFINED CASE
 		DBWrapper.init(Constants.GET_REFINED_MAPPINGS_SQL);
 
+		
+		CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
+
+		System.out.println("Size of CACHED_SUBCLASSES = "
+				+ CACHED_SUBCLASSES.size());
+		
 		// iterate through them
 		for (ArrayList<String> line : fMinusFile) {
 			oieProp = line.get(1);
 
-			if (line.size() == 4) {
+			if (line.size() == 4) {		
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);
 
 					RegressionAnalysis.reCreateTriples(dbProps, line,
-							triplesWriter, statStriplesWriter);
+							triplesWriter, statStriplesWriter,
+							CACHED_SUBCLASSES);
 				}
 			}
 		}

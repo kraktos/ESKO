@@ -126,7 +126,9 @@ public class SPARQLEndPointQueryAPI {
 				// Get the next result row
 				// QuerySolution querySol = results.next();
 				if (querySol.get("val").toString()
-						.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
+						.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1 && querySol.get("val").toString()
+						.indexOf("Wikidata") == -1) {
+					
 					if (!result.contains(Utilities.cleanDBpediaURI(querySol
 							.get("val").toString()))) {
 						result.add(Utilities.cleanDBpediaURI(querySol

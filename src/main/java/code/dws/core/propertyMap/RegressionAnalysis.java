@@ -30,8 +30,6 @@ import code.dws.utils.Constants;
 import code.dws.utils.FileUtil;
 import code.dws.utils.Utilities;
 
-import com.hp.hpl.jena.query.QuerySolution;
-
 /**
  * Responsible for computing the property statistics
  * 
@@ -98,7 +96,7 @@ public class RegressionAnalysis {
 	// property in the raw input file
 	private static Map<String, Integer> MAP_PRED_COUNT = new HashMap<String, Integer>();
 
-	private static Map<String, String> CACHED_SUBCLASSES = new HashMap<String, String>();
+	public static Map<String, String> CACHED_SUBCLASSES = new HashMap<String, String>();
 
 	static String directory = null;
 
@@ -122,7 +120,7 @@ public class RegressionAnalysis {
 
 			logger.info("Configuration loaded...");
 			logger.info("Building Class hierarchy...");
-			buildClassHierarchy();
+			CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
 
 			// initiate the paths
 			GenerateAssociations.init(args[0]);
@@ -151,8 +149,7 @@ public class RegressionAnalysis {
 
 				// new triples will be generated on the fMinus file
 				if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
-					RegressionAnalysis.createNewTriples(directory
-							+ "/fMinus.dat", clusterNames);
+					createNewTriples(directory + "/fMinus.dat", clusterNames);
 			} finally {
 
 				MAP_PRED_COUNT.clear();
@@ -259,7 +256,7 @@ public class RegressionAnalysis {
 					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);
 
 					reCreateTriples(dbProps, line, triplesWriter,
-							statStriplesWriter);
+							statStriplesWriter, CACHED_SUBCLASSES);
 				}
 			}
 		}
@@ -268,9 +265,20 @@ public class RegressionAnalysis {
 		statStriplesWriter.close();
 	}
 
+	/**
+	 * takes the possible KB property candidates and generates triples
+	 * 
+	 * @param dbProps
+	 * @param line
+	 * @param triplesWriter
+	 * @param statStriplesWriter
+	 * @param cACHED_SUBCLASSES2
+	 * @throws IOException
+	 */
 	public static void reCreateTriples(List<String> dbProps,
 			ArrayList<String> line, BufferedWriter triplesWriter,
-			BufferedWriter statStriplesWriter) throws IOException {
+			BufferedWriter statStriplesWriter,
+			Map<String, String> CACHED_SUBCLASSES) throws IOException {
 		String domainType = null;
 		String rangeType = null;
 
@@ -286,16 +294,6 @@ public class RegressionAnalysis {
 		oieRawSubj = line.get(0);
 		oieRawProp = line.get(1);
 		oieRawObj = line.get(2);
-
-		// get the top-k concepts for the subject
-		// candidateSubjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-		// .cleanse(nellRawSubj).replaceAll("\\_+", " ").trim(),
-		// SAMEAS_TOPK);
-		//
-		// // get the top-k concepts for the object
-		// candidateObjs = DBWrapper.fetchTopKLinksWikiPrepProb(
-		// Utilities.cleanse(nellRawObj).replaceAll("\\_+", " ").trim(),
-		// SAMEAS_TOPK);
 
 		candidates = DBWrapper.fetchRefinedMapping(Utilities
 				.cleanse(oieRawSubj).trim(), (Constants.IS_NELL) ? oieRawProp
@@ -336,12 +334,14 @@ public class RegressionAnalysis {
 						shoudBeIn(dbProps, domainType, rangeType, line,
 								triplesWriter, statStriplesWriter,
 								candidateSubjs.get(0).split("\t")[0],
-								candidateObjs.get(0).split("\t")[0]);
+								candidateObjs.get(0).split("\t")[0],
+								CACHED_SUBCLASSES);
 					else
 						shoudBeIn(dbProps, rangeType, domainType, line,
 								triplesWriter, statStriplesWriter,
 								candidateObjs.get(0).split("\t")[0],
-								candidateSubjs.get(0).split("\t")[0]);
+								candidateSubjs.get(0).split("\t")[0],
+								CACHED_SUBCLASSES);
 
 				} catch (Exception e) {
 				}
@@ -362,17 +362,22 @@ public class RegressionAnalysis {
 	 * @param line
 	 * @param dbpObj
 	 * @param dbpSub
+	 * @param cACHED_SUBCLASSES2
 	 * @return
 	 * @throws IOException
 	 */
 	private static void shoudBeIn(List<String> dbProps, String domainType,
 			String rangeType, ArrayList<String> line,
 			BufferedWriter triplesWriter, BufferedWriter statStriplesWriter,
-			String dbpSub, String dbpObj) throws IOException {
+			String dbpSub, String dbpObj, Map<String, String> CACHED_SUBCLASSES)
+			throws IOException {
 		String allowedDomain;
 		String allowedRange;
 
 		for (String dbprop : dbProps) {
+
+			if (dbprop.indexOf(Constants.DBPEDIA_CONCEPT_NS) == -1)
+				dbprop = Constants.DBPEDIA_CONCEPT_NS + dbprop;
 
 			allowedDomain = null;
 			allowedRange = null;
@@ -407,8 +412,8 @@ public class RegressionAnalysis {
 			}
 
 			// all good case
-			if (isSuperClass3(allowedDomain, domainType)
-					&& isSuperClass3(allowedRange, rangeType)) {
+			if (isSuperClass3(allowedDomain, domainType, CACHED_SUBCLASSES)
+					&& isSuperClass3(allowedRange, rangeType, CACHED_SUBCLASSES)) {
 				triplesWriter.write(line.get(0) + "\t" + line.get(1) + "\t"
 						+ line.get(2) + "\t" + Constants.DBPEDIA_INSTANCE_NS
 						+ Utilities.utf8ToCharacter(dbpSub) + "\t" + dbprop
@@ -1021,7 +1026,7 @@ public class RegressionAnalysis {
 	}
 
 	private static boolean isSuperClass3(String generalClass,
-			String particularClass) {
+			String particularClass, Map<String, String> CACHED_SUBCLASSES) {
 
 		if (generalClass == null)
 			return true;
@@ -1033,8 +1038,8 @@ public class RegressionAnalysis {
 			return true;
 
 		List<String> trailCol = new ArrayList<String>();
-		List<String> allSuperClasses = getAllMyParents(particularClass,
-				trailCol);
+		List<String> allSuperClasses = Utilities.getAllMyParents(
+				particularClass, trailCol, CACHED_SUBCLASSES);
 		logger.debug("SUPER CLASSES of " + particularClass + " = "
 				+ allSuperClasses.toString());
 		if (allSuperClasses.contains(generalClass))
@@ -1050,12 +1055,9 @@ public class RegressionAnalysis {
 		if (generalClass.equals(particularClass))
 			return true;
 
-		// if (generalClass == null || particularClass == null)
-		// return true;
-
 		List<String> trailCol = new ArrayList<String>();
-		List<String> allSuperClasses = getAllMyParents(particularClass,
-				trailCol);
+		List<String> allSuperClasses = Utilities.getAllMyParents(
+				particularClass, trailCol, CACHED_SUBCLASSES);
 		logger.debug("SUPER CLASSES of " + particularClass + " = "
 				+ allSuperClasses.toString());
 		if (allSuperClasses.contains(generalClass))
@@ -1064,39 +1066,4 @@ public class RegressionAnalysis {
 		return false;
 	}
 
-	private static List<String> getAllMyParents(String particularClass,
-			List<String> coll) {
-		String superCls = CACHED_SUBCLASSES.get(particularClass);
-		if (CACHED_SUBCLASSES.containsKey(superCls)) {
-			coll.add(superCls);
-			getAllMyParents(superCls, coll);
-		} else {
-			coll.add(superCls);
-		}
-		return coll;
-	}
-
-	public static void buildClassHierarchy() {
-		String getAll = "SELECT * WHERE  { ?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass}";
-		List<QuerySolution> allPairs = SPARQLEndPointQueryAPI
-				.queryDBPediaEndPoint(getAll);
-
-		for (QuerySolution querySol : allPairs) {
-			// Get the next result row
-			// QuerySolution querySol = results.next();
-			if (querySol.get("subclass").toString()
-					.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1
-					&& querySol.get("superclass").toString()
-							.indexOf(Constants.DBPEDIA_CONCEPT_NS) != -1) {
-
-				CACHED_SUBCLASSES.put(
-						querySol.get("subclass").toString()
-								.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""),
-						querySol.get("superclass").toString()
-								.replaceAll(Constants.DBPEDIA_CONCEPT_NS, ""));
-			}
-		}
-
-		logger.debug(CACHED_SUBCLASSES.toString());
-	}
 }
