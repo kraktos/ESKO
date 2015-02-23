@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.dto.FactDao;
 import code.dws.utils.Constants;
-import code.dws.utils.Utilities;
 
 /**
  * primary class for evaluating the results
@@ -66,7 +65,7 @@ public class Evaluation {
 			logger.error("usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.Evaluation CONFIG.cfg <GOLD file path> <NEW triples file>");
 		else {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
-			
+
 			// load the respective gold standard and methods in memory
 			setup(args[1], args[2]);
 
@@ -87,14 +86,9 @@ public class Evaluation {
 
 		try {
 			// laod the property hierarchy in memory
-			Map<String, String> CACHED_SUBPROPS = Utilities
-					.buildRelationHierarchy();
+//			Map<String, String> CACHED_SUBPROPS = Utilities
+//					.buildRelationHierarchy();
 
-			
-			for(Entry<String, String> e : CACHED_SUBPROPS.entrySet()){
-				System.out.println(e.getKey() + "\t" + e.getValue());
-			}
-			
 			// init DB
 			DBWrapper.init(Constants.GET_REFINED_FACT);
 
