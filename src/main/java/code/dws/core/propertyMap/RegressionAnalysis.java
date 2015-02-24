@@ -49,7 +49,7 @@ public class RegressionAnalysis {
 	// threshold to consider mappable predicates. It means consider NELL
 	// predicates
 	// which are atleast x % map-able
-	private static final double OIE_PROPERTY_MAPPED_THRESHOLD = 3;
+	private static double OIE_PROPERTY_MAPPED_THRESHOLD = 3;
 
 	private static final String PROP_STATS = "/MAP_PERCENT_VS_TAU_REVERB_"
 			+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
@@ -112,12 +112,13 @@ public class RegressionAnalysis {
 
 		Map<String, String> clusterNames = new HashMap<String, String>();
 
-		if (args.length != 1) {
-			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.RegressionAnalysis CONFIG.cfg");
+		if (args.length != 2) {
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.RegressionAnalysis CONFIG.cfg <threshold>");
 		} else {
 
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
+			OIE_PROPERTY_MAPPED_THRESHOLD = Double.valueOf(args[1]);
 			logger.info("Configuration loaded...");
 			logger.info("Building Class hierarchy...");
 			CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
