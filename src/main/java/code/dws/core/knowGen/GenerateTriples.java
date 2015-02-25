@@ -64,7 +64,11 @@ public class GenerateTriples {
 		} else {
 
 			Constants.loadConfigParameters(new String[] { "", args[0] });
-
+//
+//			Constants.WORKFLOW = 3;
+//			Constants.OPTI_BETA = 0.4;
+//			Constants.OPTI_INFLATION = 4;
+			
 			// get the OIE File Path
 			directory = new File(Constants.OIE_DATA_PATH).getParent()
 					.toString();
@@ -118,17 +122,18 @@ public class GenerateTriples {
 		// REFINED CASE
 		DBWrapper.init(Constants.GET_REFINED_MAPPINGS_SQL);
 
-		
 		CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
 
 		System.out.println("Size of CACHED_SUBCLASSES = "
 				+ CACHED_SUBCLASSES.size());
-		
+
 		// iterate through them
 		for (ArrayList<String> line : fMinusFile) {
 			oieProp = line.get(1);
 
-			if (line.size() == 4) {		
+			if (line.size() == 4) {
+				if (oieProp.indexOf("is the child of") != -1)
+					System.out.println();
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);
 

@@ -56,6 +56,9 @@ public class Evaluation {
 
 	static THashMap<String, List<Pair<String, String>>> mapRltnCandidates = new THashMap<String, List<Pair<String, String>>>();
 
+	static long glblNum = 0;
+	static long glblDenom = 0;
+
 	public Evaluation() {
 	}
 
@@ -86,8 +89,8 @@ public class Evaluation {
 
 		try {
 			// laod the property hierarchy in memory
-//			Map<String, String> CACHED_SUBPROPS = Utilities
-//					.buildRelationHierarchy();
+			// Map<String, String> CACHED_SUBPROPS = Utilities
+			// .buildRelationHierarchy();
 
 			// init DB
 			DBWrapper.init(Constants.GET_REFINED_FACT);
@@ -291,9 +294,11 @@ public class Evaluation {
 	/*
 	 * takes two lists, gold and algo and tries to check if it is a match or not
 	 */
-	private static boolean match(List<Pair<String, String>> algoPMCands,
-			List<Pair<String, String>> goldPMCands) {
+	private static void match(List<Pair<String, String>> algoPMCands,
+			List<Pair<String, String>> goldPMCands, String identifier) {
 
+		long n = 0;
+		long d = 0;
 		List<String> algoVals = new ArrayList<String>();
 		List<String> goldVals = new ArrayList<String>();
 
@@ -307,12 +312,24 @@ public class Evaluation {
 
 		@SuppressWarnings("unchecked")
 		List<String> intersect = ListUtils.intersection(algoVals, goldVals);
-		if (intersect.size() > 0)
-			return true;
-		else {
+		if (intersect.size() > 0) {
+			glblNum = glblNum + intersect.size();
+			n = intersect.size();
+		}
+
+		if (identifier.equals("R")) {
+			glblDenom = glblDenom + goldVals.size();
+			d = goldVals.size();
+		} else {
+			glblDenom = glblDenom + algoVals.size();
+			d = algoVals.size();
+		}
+
+		double s = (double) 100 * n / d;
+		if (s < 60) {
+			logger.info(s);
 			logger.info("Algo = " + algoVals);
 			logger.info("Gold = " + goldVals);
-			return false;
 		}
 	}
 
@@ -337,13 +354,8 @@ public class Evaluation {
 				algoPMCands = entry.getValue();
 				goldPMCands = goldMapPM.get(oieRelation);
 
-				if (match(algoPMCands, goldPMCands)) {
-					numer++;
-				} else {
-					logger.info("Garbr for = " + oieRelation);
-				}
-
-				denom++;
+				logger.info("\nPrecision for " + oieRelation);
+				match(algoPMCands, goldPMCands, identifier);
 			}
 		}
 
@@ -356,13 +368,14 @@ public class Evaluation {
 				algoPMCands = prunedAlgoMapPM.get(oieRelation);
 
 				if (algoPMCands != null) {
-					if (match(algoPMCands, goldPMCands)) {
-						numer++;
-					}
+					logger.info("\nRecall for " + oieRelation);
+					match(algoPMCands, goldPMCands, identifier);
 				}
-				denom++;
 			}
 		}
+
+		numer = glblNum;
+		denom = glblDenom;
 
 		if (denom == 0)
 			return 0;

@@ -51,19 +51,13 @@ public class RegressionAnalysis {
 	// which are atleast x % map-able
 	private static double OIE_PROPERTY_MAPPED_THRESHOLD = 3;
 
-	private static final String PROP_STATS = "/MAP_PERCENT_VS_TAU_REVERB_"
-			+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
-			+ +OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+	private static String PROP_STATS = null;
 
-	private static final String ITEMS_RULES = "/PROP_RULES_DIRECT_REVERB.WF.";
+	private static String ITEMS_RULES = "/PROP_RULES_DIRECT_REVERB.WF.";
 
-	private static final String NEW_TRIPLES = "/NEW_TRIPLES_REVERB_"
-			+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
-			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+	private static String NEW_TRIPLES = null;
 
-	private static final String DISTRIBUTION_NEW_TRIPLES = "/NEW_TRIPLES_REVERB_DOM_RAN_"
-			+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
-			+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+	private static String DISTRIBUTION_NEW_TRIPLES = null;
 
 	private static Map<String, Map<String, Map<Pair<String, String>, Long>>> GLOBAL_TRANSCS_MAP = new HashMap<String, Map<String, Map<Pair<String, String>, Long>>>();
 
@@ -119,6 +113,19 @@ public class RegressionAnalysis {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
 			OIE_PROPERTY_MAPPED_THRESHOLD = Double.valueOf(args[1]);
+
+			PROP_STATS = "/MAP_PERCENT_VS_TAU_REVERB_"
+					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
+					+ +OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+
+			NEW_TRIPLES = "/NEW_TRIPLES_REVERB_"
+					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
+					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+
+			DISTRIBUTION_NEW_TRIPLES = "/NEW_TRIPLES_REVERB_DOM_RAN_"
+					+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
+					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+
 			logger.info("Configuration loaded...");
 			logger.info("Building Class hierarchy...");
 			CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
@@ -357,8 +364,8 @@ public class RegressionAnalysis {
 	 * dbprop domain range
 	 * 
 	 * @param dbProps
-	 * @param domainType
-	 * @param rangeType
+	 * @param actualdomain
+	 * @param actualRange
 	 * @param triplesWriter
 	 * @param line
 	 * @param dbpObj
@@ -367,45 +374,45 @@ public class RegressionAnalysis {
 	 * @return
 	 * @throws IOException
 	 */
-	private static void shoudBeIn(List<String> dbProps, String domainType,
-			String rangeType, ArrayList<String> line,
+	private static void shoudBeIn(List<String> dbProps, String actualdomain,
+			String actualRange, ArrayList<String> line,
 			BufferedWriter triplesWriter, BufferedWriter statStriplesWriter,
 			String dbpSub, String dbpObj, Map<String, String> CACHED_SUBCLASSES)
 			throws IOException {
-		String allowedDomain;
-		String allowedRange;
+		String domainFromKBRelation;
+		String rangeFromKBRelation;
 
 		for (String dbprop : dbProps) {
 
 			if (dbprop.indexOf(Constants.DBPEDIA_CONCEPT_NS) == -1)
 				dbprop = Constants.DBPEDIA_CONCEPT_NS + dbprop;
 
-			allowedDomain = null;
-			allowedRange = null;
+			domainFromKBRelation = null;
+			rangeFromKBRelation = null;
 
 			try {
-				allowedDomain = SPARQLEndPointQueryAPI
+				domainFromKBRelation = SPARQLEndPointQueryAPI
 						.queryDBPediaEndPoint(
 								"select ?dom where {<"
 										+ dbprop
 										+ "> <http://www.w3.org/2000/01/rdf-schema#domain> ?dom}")
 						.get(0).get("dom").toString();
 
-				allowedDomain = allowedDomain.replaceAll(
+				domainFromKBRelation = domainFromKBRelation.replaceAll(
 						Constants.ONTOLOGY_NAMESPACE, "");
 
 			} catch (Exception e) {
 				// allowedDomain = "XX";
 			}
 			try {
-				allowedRange = SPARQLEndPointQueryAPI
+				rangeFromKBRelation = SPARQLEndPointQueryAPI
 						.queryDBPediaEndPoint(
 								"select ?ran where {<"
 										+ dbprop
 										+ "> <http://www.w3.org/2000/01/rdf-schema#range> ?ran}")
 						.get(0).get("ran").toString();
 
-				allowedRange = allowedRange.replaceAll(
+				rangeFromKBRelation = rangeFromKBRelation.replaceAll(
 						Constants.ONTOLOGY_NAMESPACE, "");
 
 			} catch (Exception e) {
@@ -413,8 +420,10 @@ public class RegressionAnalysis {
 			}
 
 			// all good case
-			if (isSuperClass3(allowedDomain, domainType, CACHED_SUBCLASSES)
-					&& isSuperClass3(allowedRange, rangeType, CACHED_SUBCLASSES)) {
+			if (isSuperClass3(domainFromKBRelation, actualdomain,
+					CACHED_SUBCLASSES)
+					&& isSuperClass3(rangeFromKBRelation, actualRange,
+							CACHED_SUBCLASSES)) {
 				triplesWriter.write(line.get(0) + "\t" + line.get(1) + "\t"
 						+ line.get(2) + "\t" + Constants.DBPEDIA_INSTANCE_NS
 						+ Utilities.utf8ToCharacter(dbpSub) + "\t" + dbprop
@@ -422,15 +431,17 @@ public class RegressionAnalysis {
 						+ Utilities.utf8ToCharacter(dbpObj) + "\n");
 				triplesWriter.flush();
 
-				statStriplesWriter.write(line.get(1) + "\t" + domainType + "\t"
-						+ allowedDomain + "\t" + dbprop + "\t" + rangeType
-						+ "\t" + allowedRange + "\n");
+				statStriplesWriter.write(line.get(1) + "\t"
+						+ domainFromKBRelation + "\t" + actualdomain + "\t"
+						+ dbprop + "\t" + actualRange + "\t"
+						+ rangeFromKBRelation + "\n");
 
 				statStriplesWriter.flush();
 			} else {
-				statStriplesWriter.write(line.get(1) + "~!" + "\t" + domainType
-						+ "\t" + allowedDomain + "\t" + dbprop + "\t"
-						+ rangeType + "\t" + allowedRange + "\n");
+				statStriplesWriter.write(line.get(1) + "~!" + "\t"
+						+ domainFromKBRelation + "\t" + actualdomain + "\t"
+						+ dbprop + "\t" + actualRange + "\t"
+						+ rangeFromKBRelation + "\n");
 
 				statStriplesWriter.flush();
 			}
@@ -1029,11 +1040,10 @@ public class RegressionAnalysis {
 	private static boolean isSuperClass3(String generalClass,
 			String particularClass, Map<String, String> CACHED_SUBCLASSES) {
 
-		if (generalClass == null)
+		if (generalClass == null && particularClass == null)
+			return false;
+		else if (generalClass == null)
 			return true;
-
-		// if (particularClass == null)
-		// return true;
 
 		if (generalClass.equals(particularClass))
 			return true;

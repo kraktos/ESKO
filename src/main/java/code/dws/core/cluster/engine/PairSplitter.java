@@ -146,6 +146,7 @@ public class PairSplitter {
 			dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(-1,
 					Constants.QUERY_OBJECTTYPE);
 			logger.info("Loaded " + dbpProps.size() + " DBpedia properties");
+
 		}
 
 		try {
