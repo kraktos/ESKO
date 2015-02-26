@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -1048,29 +1049,33 @@ public class RegressionAnalysis {
 	private static boolean checker(String generalClass, String particularClass,
 			Map<String, String> CACHED_SUBCLASSES) {
 
+		if (particularClass.equals("AdministrativeRegion")
+				&& generalClass.equals("Settlement"))
+			System.out.println();
+
 		if (generalClass != null && particularClass != null) {
 			// both are same
 			if (generalClass.equals(particularClass))
 				return true;
 
-			// or in subsumption
-			List<String> trailCol = new ArrayList<String>();
-			List<String> allSuperClasses = Utilities.getAllMyParents(
-					particularClass, trailCol, CACHED_SUBCLASSES);
+			// or in subsumption, hierarchy path
+			List<String> trailPartClass = new ArrayList<String>();
+			trailPartClass = Utilities.getAllMyParents(particularClass,
+					trailPartClass, CACHED_SUBCLASSES);
 
-			logger.debug("SUPER CLASSES of " + particularClass + " = "
-					+ allSuperClasses.toString());
-			if (allSuperClasses.contains(generalClass))
+			List<String> trailGenClass = new ArrayList<String>();
+			trailGenClass = Utilities.getAllMyParents(generalClass,
+					trailGenClass, CACHED_SUBCLASSES);
+
+			List<String> intersect = ListUtils.intersection(trailGenClass,
+					trailPartClass);
+
+			if (intersect.size() > 0 && !intersect.contains("Agent")) {
+				// System.out.println("Gen = " + trailGenClass);
+				// System.out.println("Part = " + trailPartClass);
 				return true;
+			}
 
-			trailCol = new ArrayList<String>();
-			allSuperClasses = Utilities.getAllMyParents(generalClass, trailCol,
-					CACHED_SUBCLASSES);
-
-			logger.debug("SUPER CLASSES of " + generalClass + " = "
-					+ allSuperClasses.toString());
-			if (allSuperClasses.contains(particularClass))
-				return true;
 		} else {
 			if (generalClass != null && particularClass == null)
 				return true;

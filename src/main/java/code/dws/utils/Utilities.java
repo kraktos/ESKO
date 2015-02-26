@@ -353,10 +353,10 @@ public class Utilities {
 			List<String> coll, Map<String, String> CACHED_SUBCLASSES) {
 		String superCls = CACHED_SUBCLASSES.get(particularClass);
 		if (CACHED_SUBCLASSES.containsKey(superCls)) {
-			coll.add(superCls);
+				coll.add(superCls);
 			getAllMyParents(superCls, coll, CACHED_SUBCLASSES);
 		} else {
-			coll.add(superCls);
+				coll.add(superCls);
 		}
 		return coll;
 	}
