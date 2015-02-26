@@ -327,9 +327,9 @@ public class Evaluation {
 
 		double s = (double) 100 * n / d;
 		if (s < 60) {
-			logger.info(s);
-			logger.info("Algo = " + algoVals);
-			logger.info("Gold = " + goldVals);
+//			logger.info(s);
+//			logger.info("Algo = " + algoVals);
+//			logger.info("Gold = " + goldVals);
 		}
 	}
 
@@ -354,7 +354,7 @@ public class Evaluation {
 				algoPMCands = entry.getValue();
 				goldPMCands = goldMapPM.get(oieRelation);
 
-				logger.info("\nPrecision for " + oieRelation);
+//				logger.info("\nPrecision for " + oieRelation);
 				match(algoPMCands, goldPMCands, identifier);
 			}
 		}
@@ -368,7 +368,7 @@ public class Evaluation {
 				algoPMCands = prunedAlgoMapPM.get(oieRelation);
 
 				if (algoPMCands != null) {
-					logger.info("\nRecall for " + oieRelation);
+//					logger.info("\nRecall for " + oieRelation);
 					match(algoPMCands, goldPMCands, identifier);
 				}
 			}

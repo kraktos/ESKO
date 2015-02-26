@@ -71,7 +71,7 @@ public class Constants {
 
 	public static boolean INCLUDE_YAGO_TYPES;
 
-	public static boolean WORKFLOW_NORMAL;
+//	public static boolean WORKFLOW_NORMAL;
 
 	public static final String DOMAIN = "Domain";
 
@@ -254,8 +254,8 @@ public class Constants {
 
 			OIE_DATA_SEPERARTOR = prop.getProperty("OIE_DATA_SEPERARTOR");
 
-			WORKFLOW_NORMAL = Boolean.valueOf(prop
-					.getProperty("WORKFLOW_NORMAL"));
+//			WORKFLOW_NORMAL = Boolean.valueOf(prop
+//					.getProperty("WORKFLOW_NORMAL"));
 
 			DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
 

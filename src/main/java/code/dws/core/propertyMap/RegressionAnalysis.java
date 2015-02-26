@@ -364,8 +364,8 @@ public class RegressionAnalysis {
 	 * dbprop domain range
 	 * 
 	 * @param dbProps
-	 * @param actualdomain
-	 * @param actualRange
+	 * @param domainFromIM
+	 * @param rangeFromIM
 	 * @param triplesWriter
 	 * @param line
 	 * @param dbpObj
@@ -374,8 +374,8 @@ public class RegressionAnalysis {
 	 * @return
 	 * @throws IOException
 	 */
-	private static void shoudBeIn(List<String> dbProps, String actualdomain,
-			String actualRange, ArrayList<String> line,
+	private static void shoudBeIn(List<String> dbProps, String domainFromIM,
+			String rangeFromIM, ArrayList<String> line,
 			BufferedWriter triplesWriter, BufferedWriter statStriplesWriter,
 			String dbpSub, String dbpObj, Map<String, String> CACHED_SUBCLASSES)
 			throws IOException {
@@ -420,9 +420,8 @@ public class RegressionAnalysis {
 			}
 
 			// all good case
-			if (isSuperClass3(domainFromKBRelation, actualdomain,
-					CACHED_SUBCLASSES)
-					&& isSuperClass3(rangeFromKBRelation, actualRange,
+			if (checker(domainFromKBRelation, domainFromIM, CACHED_SUBCLASSES)
+					|| checker(rangeFromKBRelation, rangeFromIM,
 							CACHED_SUBCLASSES)) {
 				triplesWriter.write(line.get(0) + "\t" + line.get(1) + "\t"
 						+ line.get(2) + "\t" + Constants.DBPEDIA_INSTANCE_NS
@@ -432,15 +431,15 @@ public class RegressionAnalysis {
 				triplesWriter.flush();
 
 				statStriplesWriter.write(line.get(1) + "\t"
-						+ domainFromKBRelation + "\t" + actualdomain + "\t"
-						+ dbprop + "\t" + actualRange + "\t"
+						+ domainFromKBRelation + "\t" + domainFromIM + "\t"
+						+ dbprop + "\t" + rangeFromIM + "\t"
 						+ rangeFromKBRelation + "\n");
 
 				statStriplesWriter.flush();
 			} else {
 				statStriplesWriter.write(line.get(1) + "~!" + "\t"
-						+ domainFromKBRelation + "\t" + actualdomain + "\t"
-						+ dbprop + "\t" + actualRange + "\t"
+						+ domainFromKBRelation + "\t" + domainFromIM + "\t"
+						+ dbprop + "\t" + rangeFromIM + "\t"
 						+ rangeFromKBRelation + "\n");
 
 				statStriplesWriter.flush();
@@ -1037,24 +1036,45 @@ public class RegressionAnalysis {
 		return val;
 	}
 
-	private static boolean isSuperClass3(String generalClass,
-			String particularClass, Map<String, String> CACHED_SUBCLASSES) {
+	/**
+	 * takes two classes, one from KB relation restriction and one from IM type,
+	 * It is a valid pair driven by different cases
+	 * 
+	 * @param generalClass
+	 * @param particularClass
+	 * @param CACHED_SUBCLASSES
+	 * @return
+	 */
+	private static boolean checker(String generalClass, String particularClass,
+			Map<String, String> CACHED_SUBCLASSES) {
 
-		if (generalClass == null && particularClass == null)
-			return false;
-		else if (generalClass == null)
-			return true;
+		if (generalClass != null && particularClass != null) {
+			// both are same
+			if (generalClass.equals(particularClass))
+				return true;
 
-		if (generalClass.equals(particularClass))
-			return true;
+			// or in subsumption
+			List<String> trailCol = new ArrayList<String>();
+			List<String> allSuperClasses = Utilities.getAllMyParents(
+					particularClass, trailCol, CACHED_SUBCLASSES);
 
-		List<String> trailCol = new ArrayList<String>();
-		List<String> allSuperClasses = Utilities.getAllMyParents(
-				particularClass, trailCol, CACHED_SUBCLASSES);
-		logger.debug("SUPER CLASSES of " + particularClass + " = "
-				+ allSuperClasses.toString());
-		if (allSuperClasses.contains(generalClass))
-			return true;
+			logger.debug("SUPER CLASSES of " + particularClass + " = "
+					+ allSuperClasses.toString());
+			if (allSuperClasses.contains(generalClass))
+				return true;
+
+			trailCol = new ArrayList<String>();
+			allSuperClasses = Utilities.getAllMyParents(generalClass, trailCol,
+					CACHED_SUBCLASSES);
+
+			logger.debug("SUPER CLASSES of " + generalClass + " = "
+					+ allSuperClasses.toString());
+			if (allSuperClasses.contains(particularClass))
+				return true;
+		} else {
+			if (generalClass == null)
+				return true;
+		}
 
 		return false;
 
