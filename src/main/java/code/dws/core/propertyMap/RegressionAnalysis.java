@@ -123,7 +123,7 @@ public class RegressionAnalysis {
 					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
 			DISTRIBUTION_NEW_TRIPLES = "/NEW_TRIPLES_REVERB_DOM_RAN_"
-					+ (INVERSE ? "INVERSE_THRESH" : "DIRECT_THRESH")
+					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
 					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
 			logger.info("Configuration loaded...");
@@ -421,7 +421,7 @@ public class RegressionAnalysis {
 
 			// all good case
 			if (checker(domainFromKBRelation, domainFromIM, CACHED_SUBCLASSES)
-					|| checker(rangeFromKBRelation, rangeFromIM,
+					&& checker(rangeFromKBRelation, rangeFromIM,
 							CACHED_SUBCLASSES)) {
 				triplesWriter.write(line.get(0) + "\t" + line.get(1) + "\t"
 						+ line.get(2) + "\t" + Constants.DBPEDIA_INSTANCE_NS
@@ -1072,7 +1072,7 @@ public class RegressionAnalysis {
 			if (allSuperClasses.contains(particularClass))
 				return true;
 		} else {
-			if (generalClass == null)
+			if (generalClass != null && particularClass == null)
 				return true;
 		}
 
