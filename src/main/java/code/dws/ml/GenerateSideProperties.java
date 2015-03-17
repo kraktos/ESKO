@@ -39,6 +39,8 @@ import com.hp.hpl.jena.query.QuerySolution;
  */
 public class GenerateSideProperties {
 
+	public static final String FILE_FOR_SIDE_PROPS_DISTRIBUTION = "/REVERB_NUMERIC_SIDE_PROPS.tsv";
+
 	/**
 	 * logger
 	 */
@@ -49,7 +51,6 @@ public class GenerateSideProperties {
 
 	static SimpleDateFormat formateYear = new SimpleDateFormat("yyyy");
 
-	static Map<String, Map<Pair<String, String>, Long>> GLBL_COLL = new HashMap<String, Map<Pair<String, String>, Long>>();
 
 	static Map<String, Long> propMap = new HashMap<String, Long>();
 
@@ -116,7 +117,7 @@ public class GenerateSideProperties {
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(
 					Constants.OIE_DATA_PATH).getParent()
-					+ "/REVERB_NUMERIC_SIDE_PROPS.tsv"));
+					+ FILE_FOR_SIDE_PROPS_DISTRIBUTION));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -207,27 +208,7 @@ public class GenerateSideProperties {
 		}
 	}
 
-	/**
-	 * @param oieRel
-	 * @param immutablePair
-	 */
-	private static void writeOut(String oieRel,
-			ImmutablePair<String, String> immutablePair) {
-		long val = 0;
-		Map<Pair<String, String>, Long> map = null;
-		if (!GLBL_COLL.containsKey(oieRel)) {
-			map = new HashMap<Pair<String, String>, Long>();
-		} else {
-			map = GLBL_COLL.get(oieRel);
-		}
-
-		if (map.containsKey(immutablePair))
-			val = map.get(immutablePair);
-
-		val = val + 1;
-		map.put(immutablePair, Long.valueOf(val));
-		GLBL_COLL.put(oieRel, map);
-	}
+	
 
 	/**
 	 * @param domSideProp
