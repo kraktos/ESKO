@@ -8,17 +8,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +41,6 @@ public class GenerateSideProperties {
 	 */
 	public final static Logger logger = LoggerFactory
 			.getLogger(GenerateSideProperties.class);
-
-	static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-	static SimpleDateFormat formateYear = new SimpleDateFormat("yyyy");
-
 
 	static Map<String, Long> propMap = new HashMap<String, Long>();
 
@@ -163,6 +153,8 @@ public class GenerateSideProperties {
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			DBWrapper.shutDown();
 		}
 	}
 
@@ -207,8 +199,6 @@ public class GenerateSideProperties {
 			e.printStackTrace();
 		}
 	}
-
-	
 
 	/**
 	 * @param domSideProp
@@ -283,42 +273,4 @@ public class GenerateSideProperties {
 		return sideProps;
 	}
 
-	/**
-	 * @param kbSub
-	 * @param sideProperty
-	 * @return
-	 * @throws ParseException
-	 */
-	private static double getNumericValue(String sideProperty, String kbInst) {
-		String dates = null;
-		Date date = null;
-		String year = null;
-
-		List<QuerySolution> list = SPARQLEndPointQueryAPI
-				.queryDBPediaEndPoint("select ?val where {<http://dbpedia.org/resource/"
-						+ kbInst
-						+ "> <http://dbpedia.org/ontology/"
-						+ sideProperty + "> ?val}");
-		if (list.size() == 0)
-			list = SPARQLEndPointQueryAPI
-					.queryDBPediaEndPoint("select ?val where {<http://dbpedia.org/resource/"
-							+ kbInst
-							+ "> <http://dbpedia.org/property/"
-							+ sideProperty + "> ?val}");
-
-		for (QuerySolution querySol : list) {
-			// Get the next result row
-			// QuerySolution querySol = results.next();
-			dates = querySol.get("val").toString();
-			dates = StringUtils.substringBefore(dates, "^");
-
-			try {
-				date = formatDate.parse(dates);
-				year = formateYear.format(date);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		return (year != null) ? Double.valueOf(year) : 0;
-	}
 }
