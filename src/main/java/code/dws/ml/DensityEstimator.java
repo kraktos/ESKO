@@ -3,7 +3,9 @@
  */
 package code.dws.ml;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,13 +22,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.query.QuerySolution;
-
 import weka.estimators.KernelEstimator;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
+
+import com.hp.hpl.jena.query.QuerySolution;
 
 /**
  * @author adutta
@@ -66,7 +68,18 @@ public class DensityEstimator {
 
 			// feed an estimator
 			createEstimators();
+
+			test();
 		}
+	}
+
+	private static void test() {
+		String prop = "is managing editor of";
+		KernelEstimator kde = ESTIMATORS.get(prop);
+		logger.info("Std Deviation = " + kde.getStdDev());
+		logger.info("Probability = " + kde.getProbability(40));
+		logger.info("Probability = " + kde.getProbability(50));
+		logger.info("Probability = " + kde.getProbability(500));
 	}
 
 	/**
@@ -83,32 +96,92 @@ public class DensityEstimator {
 			temp = 0L;
 			oieRel = entry.getKey();
 
-			// look for
-			for (Entry<Pair<String, String>, Long> e : entry.getValue()
-					.entrySet()) {
-				if (e.getValue().longValue() > temp) {
-					temp = e.getValue();
-					pair = e.getKey();
+			// if there isnt any estimator predefined, create that
+			if (!ESTIMATORS.containsKey(oieRel)) {
+				// look for
+				for (Entry<Pair<String, String>, Long> e : entry.getValue()
+						.entrySet()) {
+					if (e.getValue().longValue() > temp) {
+						temp = e.getValue();
+						pair = e.getKey();
+					}
 				}
+				// select the best pair for this realtion
+				getDataForThisPair(oieRel, pair);
 			}
-
-			getDataForThisPair(pair);
 		}
 	}
 
-	private static void getDataForThisPair(Pair<String, String> pair) {
+	/**
+	 * create estimator for each realtion from actual data from DBpedia
+	 * 
+	 * @param oieRel
+	 * @param pair
+	 */
+	private static void getDataForThisPair(String oieRel,
+			Pair<String, String> pair) {
 		String latDom = pair.getLeft();
 		String latRan = pair.getRight();
 
-		String query = "";
-		logger.info(latDom + "\t" + latRan);
-		
+		String subVal = null;
+		String objVal = null;
+
+		Date date1 = null;
+		String year1 = null;
+		Date date2 = null;
+		String year2 = null;
+
+		double arg1 = 0;
+		double arg2 = 0;
+
+		KernelEstimator estimator = new KernelEstimator(0.0001);
+
+		String query = "select distinct ?s1 ?o1 where {?s ?p ?o. "
+				+ "?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>. "
+				+ "?s <http://dbpedia.org/ontology/" + latDom + "> ?s1. "
+				+ "?o <http://dbpedia.org/ontology/" + latRan
+				+ "> ?o1. } LIMIT 1000";
+
+		List<QuerySolution> list = SPARQLEndPointQueryAPI
+				.queryDBPediaEndPoint(query);
+
+		// Get the next result row
+		for (QuerySolution querySol : list) {
+
+			// QuerySolution querySol = results.next();
+			subVal = querySol.get("s1").toString();
+			objVal = querySol.get("o1").toString();
+
+			try {
+				date1 = formatDate.parse(subVal);
+				year1 = formateYear.format(date1);
+
+				date2 = formatDate.parse(objVal);
+				year2 = formateYear.format(date2);
+
+			} catch (ParseException e) {
+			}
+
+			arg1 = (year1 != null) ? Double.valueOf(year1) : 0;
+			arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
+
+			if (arg1 > 0 && arg2 > 0) {
+				estimator.addValue(Math.abs(arg1 - arg2), 1);
+			}
+		}
+
+		logger.info("Adding estimator for " + oieRel + "; Size = "
+				+ ESTIMATORS.size());
+		ESTIMATORS.put(oieRel, estimator);
+
 	}
 
 	/**
 	 * create a map of relation and individual estimators
+	 * 
+	 * @throws IOException
 	 */
-	private static void feedValues() {
+	private static void feedValues() throws IOException {
 
 		String[] elem = null;
 		String oieSub = null;
@@ -125,6 +198,7 @@ public class DensityEstimator {
 
 		String relation = null;
 		KernelEstimator kEst = null;
+		double dataPointVal = 0;
 
 		// load the data into memory
 		try {
@@ -138,6 +212,10 @@ public class DensityEstimator {
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
 
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(
+				Constants.OIE_DATA_PATH).getParent()
+				+ "/REVERB_MAPPING_PROB.tsv"));
+
 		try {
 			for (String line : oieTriples) {
 				elem = line.split(Constants.OIE_DATA_SEPERARTOR);
@@ -146,7 +224,7 @@ public class DensityEstimator {
 				oieObj = elem[2];
 
 				// process only the properties valid for the workflow
-				if (GLBL_COLL.containsKey(oieRel)) {
+				if (ESTIMATORS.containsKey(oieRel)) {
 					// retrieve the pairs of side properties
 
 					// get the top-k concepts, confidence pairs
@@ -162,7 +240,22 @@ public class DensityEstimator {
 						kbObj = objCands.get(0).split("\t")[0];
 
 					if (kbSub != null && kbObj != null) {
-						queryAllValuePairs(oieRel, kbSub, kbObj);
+						dataPointVal = queryAllPairs(oieRel, kbSub, kbObj);
+						// if its a valid data point, get its probability
+						if (dataPointVal != 0) {
+							writer.write(oieSub
+									+ "\t"
+									+ oieRel
+									+ "\t"
+									+ oieObj
+									+ "\t"
+									+ kbSub
+									+ "\t"
+									+ kbObj
+									+ "\t"
+									+ ESTIMATORS.get(oieRel).getProbability(
+											dataPointVal) + "\n");
+						}
 					}
 				}
 			}
@@ -172,7 +265,7 @@ public class DensityEstimator {
 
 	}
 
-	private static void queryAllValuePairs(String oieRel, String kbSub,
+	private static double queryAllPairs(String oieRel, String kbSub,
 			String kbObj) {
 		double subVal = 0;
 		double objVal = 0;
@@ -181,27 +274,24 @@ public class DensityEstimator {
 
 		KernelEstimator estimator = null;
 
-		// if there is already an estimator predefined, retrieve that
-		if (!ESTIMATORS.containsKey(oieRel)) {
-			estimator = new KernelEstimator(0.0001);
-		} else {
-			estimator = ESTIMATORS.get(oieRel);
-		}
-
+		// just iterate all the pairs and return the data value (difference in
+		// lateral property values)
 		for (Entry<Pair<String, String>, Long> entry : GLBL_COLL.get(oieRel)
 				.entrySet()) {
 			pair = entry.getKey();
 
 			subVal = getNumericValue(pair.getLeft(), kbSub);
 			objVal = getNumericValue(pair.getRight(), kbObj);
+
 			// logger.info(subVal + "\t" + objVal + "\t" + oieRel);
 			if (subVal > 0 && objVal > 0) {
-				logger.info(pair + "\t" + entry.getValue() + "\t" + oieRel);
-				estimator.addValue(Math.abs(subVal - objVal), 1);
-				ESTIMATORS.put(oieRel, estimator);
-				break;
+				// logger.info(pair + "\t" + entry.getValue() + "\t" + oieRel);
+				return Math.abs(subVal - objVal);
+				// ESTIMATORS.put(oieRel, estimator);
+				// break;
 			}
 		}
+		return 0;
 	}
 
 	private static void print() {
