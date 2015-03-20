@@ -69,7 +69,11 @@ public class DensityEstimator {
 			// feed an estimator
 			createEstimators();
 
-			test();
+			try {
+				feedValues();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -177,7 +181,8 @@ public class DensityEstimator {
 	}
 
 	/**
-	 * create a map of relation and individual estimators
+	 * go through the data set and look into all possible candidate combinations
+	 * with each probability
 	 * 
 	 * @throws IOException
 	 */
@@ -196,8 +201,6 @@ public class DensityEstimator {
 		String kbSub = null;
 		String kbObj = null;
 
-		String relation = null;
-		KernelEstimator kEst = null;
 		double dataPointVal = 0;
 
 		// load the data into memory
@@ -228,38 +231,49 @@ public class DensityEstimator {
 					// retrieve the pairs of side properties
 
 					// get the top-k concepts, confidence pairs
-					// UTF-8 at this stage
+					// UTF-8 at this stage. Write out all pairs with
+					// probabilities
 					subCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-							.cleanse(oieSub).replaceAll("\\_+", " "), 1);
+							.cleanse(oieSub).replaceAll("\\_+", " "), 5);
 					objCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-							.cleanse(oieObj).replaceAll("\\_+", " "), 1);
+							.cleanse(oieObj).replaceAll("\\_+", " "), 5);
 
-					if (subCands != null && subCands.size() > 0)
-						kbSub = subCands.get(0).split("\t")[0];
-					if (objCands != null && objCands.size() > 0)
-						kbObj = objCands.get(0).split("\t")[0];
+					for (String s : subCands) {
+						kbSub = s.split("\t")[0];
+						for (String o : objCands) {
+							kbObj = o.split("\t")[0];
 
-					if (kbSub != null && kbObj != null) {
-						dataPointVal = queryAllPairs(oieRel, kbSub, kbObj);
-						// if its a valid data point, get its probability
-						if (dataPointVal != 0) {
-							writer.write(oieSub
-									+ "\t"
-									+ oieRel
-									+ "\t"
-									+ oieObj
-									+ "\t"
-									+ kbSub
-									+ "\t"
-									+ kbObj
-									+ "\t"
-									+ ESTIMATORS.get(oieRel).getProbability(
-											dataPointVal) + "\n");
+							if (kbSub != null && kbObj != null) {
+								dataPointVal = queryAllPairs(oieRel, kbSub,
+										kbObj);
+								// if its a valid data point, get its
+								// probability
+								if (dataPointVal != 0) {
+									writer.write(oieSub
+											+ "\t"
+											+ oieRel
+											+ "\t"
+											+ oieObj
+											+ "\t"
+											+ kbSub
+											+ "\t"
+											+ kbObj
+											+ "\t"
+											+ Constants.formatter
+													.format(ESTIMATORS
+															.get(oieRel)
+															.getProbability(
+																	dataPointVal))
+											+ "\n");
+								}
+							}
 						}
 					}
+					writer.flush();
 				}
 			}
 		} finally {
+			writer.close();
 			DBWrapper.shutDown();
 		}
 
