@@ -50,6 +50,8 @@ public class DensityEstimator {
 
 	static Map<String, KernelEstimator> ESTIMATORS = new HashMap<String, KernelEstimator>();
 
+	static Map<Pair<String, String>, KernelEstimator> MAP = new HashMap<Pair<String, String>, KernelEstimator>();
+
 	private static double weight = 0.001;
 
 	/**
@@ -136,44 +138,55 @@ public class DensityEstimator {
 		String year1 = null;
 		Date date2 = null;
 		String year2 = null;
+		String query = null;
 
 		double arg1 = 0;
 		double arg2 = 0;
+		List<QuerySolution> list = null;
 
 		KernelEstimator estimator = new KernelEstimator(0.0001);
 
-		String query = "select distinct ?s1 ?o1 where {?s ?p ?o. "
-				+ "?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>. "
-				+ "?s <http://dbpedia.org/ontology/" + latDom + "> ?s1. "
-				+ "?o <http://dbpedia.org/ontology/" + latRan
-				+ "> ?o1. } LIMIT 1000";
+		if (!MAP.containsKey(pair)) {
+			query = "select distinct ?s1 ?o1 where {?s ?p ?o. "
+					+ "?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>. "
+					+ "?s <http://dbpedia.org/ontology/" + latDom + "> ?s1. "
+					+ "?o <http://dbpedia.org/ontology/" + latRan
+					+ "> ?o1. } LIMIT 1000";
 
-		List<QuerySolution> list = SPARQLEndPointQueryAPI
-				.queryDBPediaEndPoint(query);
+			list = SPARQLEndPointQueryAPI.queryDBPediaEndPoint(query);
 
-		// Get the next result row
-		for (QuerySolution querySol : list) {
+			// Get the next result row
+			for (QuerySolution querySol : list) {
 
-			// QuerySolution querySol = results.next();
-			subVal = querySol.get("s1").toString();
-			objVal = querySol.get("o1").toString();
+				// QuerySolution querySol = results.next();
+				subVal = querySol.get("s1").toString();
+				objVal = querySol.get("o1").toString();
 
-			try {
-				date1 = formatDate.parse(subVal);
-				year1 = formateYear.format(date1);
+				try {
+					date1 = formatDate.parse(subVal);
+					year1 = formateYear.format(date1);
 
-				date2 = formatDate.parse(objVal);
-				year2 = formateYear.format(date2);
+					date2 = formatDate.parse(objVal);
+					year2 = formateYear.format(date2);
 
-			} catch (ParseException e) {
+				} catch (ParseException e) {
+				}
+
+				arg1 = (year1 != null) ? Double.valueOf(year1) : 0;
+				arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
+
+				if (arg1 > 0 && arg2 > 0) {
+					estimator.addValue(Math.abs(arg1 - arg2), weight);
+				}
 			}
 
-			arg1 = (year1 != null) ? Double.valueOf(year1) : 0;
-			arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
-
-			if (arg1 > 0 && arg2 > 0) {
-				estimator.addValue(Math.abs(arg1 - arg2), weight);
+			// caching it
+			if (list.size() > 0) {
+				MAP.put(pair, estimator);
 			}
+		} else {
+			// if pre-exists just retrieve it
+			estimator = MAP.get(pair);
 		}
 
 		logger.info("Adding estimator for " + oieRel + "; Size = "
