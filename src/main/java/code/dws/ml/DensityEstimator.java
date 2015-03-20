@@ -50,6 +50,8 @@ public class DensityEstimator {
 
 	static Map<String, KernelEstimator> ESTIMATORS = new HashMap<String, KernelEstimator>();
 
+	private static double weight = 0.001;
+
 	/**
 	 * @param args
 	 */
@@ -170,7 +172,7 @@ public class DensityEstimator {
 			arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
 
 			if (arg1 > 0 && arg2 > 0) {
-				estimator.addValue(Math.abs(arg1 - arg2), 1);
+				estimator.addValue(Math.abs(arg1 - arg2), weight);
 			}
 		}
 
@@ -202,6 +204,7 @@ public class DensityEstimator {
 		String kbObj = null;
 
 		double dataPointVal = 0;
+		int ctr = 0;
 
 		// load the data into memory
 		try {
@@ -225,6 +228,8 @@ public class DensityEstimator {
 				oieSub = elem[0];
 				oieRel = elem[1];
 				oieObj = elem[2];
+
+				ctr++;
 
 				// process only the properties valid for the workflow
 				if (ESTIMATORS.containsKey(oieRel)) {
@@ -271,6 +276,11 @@ public class DensityEstimator {
 					}
 					writer.flush();
 				}
+
+				if (ctr % 1000 == 0 && ctr > 1000)
+					logger.info("Completed " + (double) ctr * 100
+							/ oieTriples.size());
+
 			}
 		} finally {
 			writer.close();
@@ -283,10 +293,7 @@ public class DensityEstimator {
 			String kbObj) {
 		double subVal = 0;
 		double objVal = 0;
-		long temp = 0;
 		Pair<String, String> pair = null;
-
-		KernelEstimator estimator = null;
 
 		// just iterate all the pairs and return the data value (difference in
 		// lateral property values)
