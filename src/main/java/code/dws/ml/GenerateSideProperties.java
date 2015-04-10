@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +40,7 @@ import com.hp.hpl.jena.query.QuerySolution;
  */
 public class GenerateSideProperties {
 
-	public static final String FILE_FOR_SIDE_PROPS_DISTRIBUTION = "/REVERB_NUMERIC_SIDE_PROPS.tsv";
+	public static final String FILE_FOR_SIDE_PROPS_DISTRIBUTION = "/REVERB_NUMERIC_SIDE_PROPS_CORRELATION.tsv";
 
 	/**
 	 * logger
@@ -43,6 +49,10 @@ public class GenerateSideProperties {
 			.getLogger(GenerateSideProperties.class);
 
 	static Map<String, Long> propMap = new HashMap<String, Long>();
+
+	static Map<String, String> CACHE = new HashMap<String, String>();
+
+	static Map<Pair<String, String>, Double> CACHE_PAIRS_PEARSON = new HashMap<Pair<String, String>, Double>();
 
 	/**
 	 * @param args
@@ -92,10 +102,10 @@ public class GenerateSideProperties {
 		String kbSub = null;
 		String kbObj = null;
 
-		List<String> subCands;
-		List<String> objCands;
-		List<String> domainSideProps;
-		List<String> rangeSideProps;
+		List<String> subCands = null;
+		List<String> objCands = null;
+		List<String> domainSideProps = null;
+		List<String> rangeSideProps = null;
 
 		BufferedWriter writer = null;
 
@@ -120,27 +130,48 @@ public class GenerateSideProperties {
 			ctr++;
 			// process only the properties valid for the workflow
 			if (propMap.containsKey(oieRel)) {
-				// get the top-k concepts, confidence pairs
-				// UTF-8 at this stage
-				subCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-						.cleanse(oieSub).replaceAll("\\_+", " "), 1);
-				objCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-						.cleanse(oieObj).replaceAll("\\_+", " "), 1);
-				if (subCands != null && subCands.size() > 0)
-					kbSub = subCands.get(0).split("\t")[0];
-				if (objCands != null && objCands.size() > 0)
-					kbObj = objCands.get(0).split("\t")[0];
-				if (kbSub != null && kbObj != null) {
-					// logger.info(oieSub + "\t" + kbSub + "\t" + oieRel + "\t"
-					// + oieObj + "\t" + kbObj);
-					domainSideProps = createDistributionOnSideProperties(Utilities
-							.utf8ToCharacter(kbSub));
-					rangeSideProps = createDistributionOnSideProperties(Utilities
-							.utf8ToCharacter(kbObj));
-					if (domainSideProps.size() > 0 && rangeSideProps.size() > 0) {
-						checkCompatibility(domainSideProps, rangeSideProps,
-								oieRel, writer);
+				try {
+					// get the top-k concepts, confidence pairs
+					// UTF-8 at this stage
+					if (!CACHE.containsKey(oieSub)) {
+						subCands = DBWrapper.fetchTopKLinksWikiPrepProb(
+								Utilities.cleanse(oieSub).replaceAll("\\_+",
+										" "), 1);
+						if (subCands != null && subCands.size() > 0) {
+							kbSub = subCands.get(0).split("\t")[0];
+							CACHE.put(oieSub, kbSub);
+						} else
+							CACHE.put(oieSub, null);
+					} else
+						kbSub = CACHE.get(oieSub);
+
+					if (!CACHE.containsKey(oieObj) && kbSub != null) {
+						objCands = DBWrapper.fetchTopKLinksWikiPrepProb(
+								Utilities.cleanse(oieObj).replaceAll("\\_+",
+										" "), 1);
+						if (objCands != null && objCands.size() > 0) {
+							kbObj = objCands.get(0).split("\t")[0];
+							CACHE.put(oieObj, kbObj);
+						} else
+							CACHE.put(oieObj, null);
+					} else
+						kbObj = CACHE.get(oieObj);
+
+					if (kbSub != null && kbObj != null) {
+						domainSideProps = createDistributionOnSideProperties(Utilities
+								.utf8ToCharacter(kbSub));
+						if (domainSideProps.size() > 0)
+							rangeSideProps = createDistributionOnSideProperties(Utilities
+									.utf8ToCharacter(kbObj));
+
+						if (domainSideProps.size() > 0
+								&& rangeSideProps.size() > 0) {
+							calculateCorrelation(domainSideProps,
+									rangeSideProps, oieRel, writer);
+						}
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 
@@ -178,17 +209,77 @@ public class GenerateSideProperties {
 	 * @param oieRel
 	 * @param writer
 	 */
-	private static void checkCompatibility(List<String> domainSideProps,
+	private static void calculateCorrelation(List<String> domainSideProps,
 			List<String> rangeSideProps, String oieRel, BufferedWriter writer) {
+
+		double val1 = 0;
+		double val2 = 0;
+		double correlation = 0;
+
+		String query = null;
+
+		RealMatrix matrix = null;
+		PearsonsCorrelation pearCorr = new PearsonsCorrelation();
+		int rowCtr = 0;
+		Pair<String, String> pair = null;
+
 		for (String domSideProp : domainSideProps) {
 			for (String ranSideProp : rangeSideProps) {
-				if (canBeCompared(domSideProp, ranSideProp)) {
+				pair = new ImmutablePair<String, String>(domSideProp,
+						ranSideProp);
+
+				if (!CACHE_PAIRS_PEARSON.containsKey(pair)) {
+
+					rowCtr = 0;
+					query = "select ?sub ?obj where {?S ?P ?O. ?S <"
+							+ domSideProp + "> ?sub. ?O <" + ranSideProp
+							+ "> ?obj} limit 500";
+
+					List<QuerySolution> list = SPARQLEndPointQueryAPI
+							.queryDBPediaEndPoint(query);
+
 					try {
-						writer.write(oieRel + "\t" + domSideProp + "\t"
-								+ ranSideProp + "\n");
-					} catch (IOException e) {
-						e.printStackTrace();
+						matrix = new Array2DRowRealMatrix(list.size(), 2);
+
+						for (QuerySolution querySol : list) {
+
+							try {
+								val1 = Double.parseDouble(StringUtils
+										.substringBefore(StringUtils
+												.substringBefore(
+														querySol.get("sub")
+																.toString(),
+														"^"), "-"));
+
+								val2 = Double.parseDouble(StringUtils
+										.substringBefore(StringUtils
+												.substringBefore(
+														querySol.get("obj")
+																.toString(),
+														"^"), "-"));
+
+								matrix.addToEntry(rowCtr, 0, val1);
+								matrix.addToEntry(rowCtr, 1, val2);
+								rowCtr++;
+							} catch (Exception e) {
+							}
+						}
+
+						correlation = pearCorr.computeCorrelationMatrix(matrix)
+								.getEntry(0, 1);
+
+					} catch (Exception e) {
 					}
+				} else {
+					correlation = CACHE_PAIRS_PEARSON.get(pair);
+				}
+
+				try {
+					writer.write(oieRel + "\t" + domSideProp + "\t"
+							+ ranSideProp + "\t" + correlation + "\n");
+					CACHE_PAIRS_PEARSON.put(pair, correlation);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -200,42 +291,55 @@ public class GenerateSideProperties {
 		}
 	}
 
-	/**
-	 * @param domSideProp
-	 * @param ranSideProp
-	 * @return
-	 */
-	private static boolean canBeCompared(String domSideProp, String ranSideProp) {
-		String domType = null;
-		String ranType = null;
-
-		String query = "select distinct ?val where {<" + domSideProp
-				+ "> <http://www.w3.org/2000/01/rdf-schema#range> ?val}";
-
-		List<QuerySolution> list = SPARQLEndPointQueryAPI
-				.queryDBPediaEndPoint(query);
-		if (list != null && list.size() > 0) {
-			for (QuerySolution querySol : list) {
-				domType = querySol.get("val").toString();
-			}
-		}
-
-		query = "select distinct ?val where {<" + ranSideProp
-				+ "> <http://www.w3.org/2000/01/rdf-schema#range> ?val}";
-
-		list = SPARQLEndPointQueryAPI.queryDBPediaEndPoint(query);
-		if (list != null && list.size() > 0) {
-			for (QuerySolution querySol : list) {
-				ranType = querySol.get("val").toString();
-			}
-		}
-
-		if (domType.equals(ranType)
-				&& domType.equals("http://www.w3.org/2001/XMLSchema#date"))
-			return true;
-
-		return false;
-	}
+	// /**
+	// * @param domSideProp
+	// * @param ranSideProp
+	// * @return
+	// */
+	// private static boolean canBeCompared(String domSideProp, String
+	// ranSideProp) {
+	// String domType = null;
+	// String ranType = null;
+	//
+	// Pair pair = new ImmutablePair<String, String>(domSideProp, ranSideProp);
+	//
+	// if (CACHE_PAIRS_PEARSON.containsKey(pair)) {
+	// return CACHE_PAIRS_PEARSON.get(pair);
+	// } else {
+	// String query = "select distinct ?val where {<" + domSideProp
+	// + "> <http://www.w3.org/2000/01/rdf-schema#range> ?val}";
+	//
+	// List<QuerySolution> list = SPARQLEndPointQueryAPI
+	// .queryDBPediaEndPoint(query);
+	// if (list != null && list.size() > 0) {
+	// for (QuerySolution querySol : list) {
+	// domType = querySol.get("val").toString();
+	// }
+	// }
+	//
+	// query = "select distinct ?val where {<" + ranSideProp
+	// + "> <http://www.w3.org/2000/01/rdf-schema#range> ?val}";
+	//
+	// list = SPARQLEndPointQueryAPI.queryDBPediaEndPoint(query);
+	// if (list != null && list.size() > 0) {
+	// for (QuerySolution querySol : list) {
+	// ranType = querySol.get("val").toString();
+	// }
+	// }
+	//
+	// if (domType != null && ranType != null && domType.equals(ranType)) {
+	// // && domType.equals("http://www.w3.org/2001/XMLSchema#date")) {
+	//
+	// CACHE_PAIRS_PEARSON.put(new ImmutablePair<String, String>(
+	// domSideProp, ranSideProp), true);
+	// return true;
+	// }
+	//
+	// CACHE_PAIRS_PEARSON.put(new ImmutablePair<String, String>(
+	// domSideProp, ranSideProp), false);
+	// return false;
+	// }
+	// }
 
 	/**
 	 * retrieve the list of numerical properties for a given instance. These
@@ -253,7 +357,6 @@ public class GenerateSideProperties {
 				+ "FILTER(?dataType != <http://www.w3.org/2001/XMLSchema#string>). "
 				+ "FILTER (!regex(str(?sideProp), \"wiki\", \"i\"))}";
 
-		// logger.info(query);
 		ParameterizedSparqlString sidePropQuery = new ParameterizedSparqlString(
 				query);
 

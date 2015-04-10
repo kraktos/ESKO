@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
+import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.QuerySolution;
 
 /**
@@ -46,7 +48,7 @@ public class DensityEstimator {
 
 	static SimpleDateFormat formateYear = new SimpleDateFormat("yyyy");
 
-	static Map<String, Map<Pair<String, String>, Long>> GLBL_COLL = new HashMap<String, Map<Pair<String, String>, Long>>();
+	static Map<String, Map<Pair<String, String>, Double>> MAX_CONFIDENT_PAIR = new HashMap<String, Map<Pair<String, String>, Double>>();
 
 	static Map<String, KernelEstimator> ESTIMATORS = new HashMap<String, KernelEstimator>();
 
@@ -54,27 +56,32 @@ public class DensityEstimator {
 
 	private static double weight = 0.001;
 
+	static Map<String, List<String>> CACHE = new HashMap<String, List<String>>();
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		if (args.length != 1) {
+		if (args.length != 2) {
 			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.ml.DensityEstimator CONFIG.cfg");
 		} else {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
 			// read it in memory
-			loadTheSideProperties();
+			loadTheSideProperties(args[1]);
 
 			// check the distribution
 			// print();
 
+			logger.info("Generating esimators for each OIE realtion");
 			// feed an estimator
 			createEstimators();
+			logger.info("Done generating esimators for each OIE realtion");
 
 			try {
-				feedValues();
+				logger.info("Feeding esimators for each OIE realtion");
+				runEstimators();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -96,26 +103,26 @@ public class DensityEstimator {
 	 */
 	private static void createEstimators() {
 		String oieRel = null;
-		long temp = 0L;
+		double temp = 0;
 		Pair<String, String> pair = null;
 
-		for (Entry<String, Map<Pair<String, String>, Long>> entry : GLBL_COLL
+		for (Entry<String, Map<Pair<String, String>, Double>> entry : MAX_CONFIDENT_PAIR
 				.entrySet()) {
-			temp = 0L;
+			temp = 0;
 			oieRel = entry.getKey();
 
 			// if there isnt any estimator predefined, create that
 			if (!ESTIMATORS.containsKey(oieRel)) {
 				// look for
-				for (Entry<Pair<String, String>, Long> e : entry.getValue()
+				for (Entry<Pair<String, String>, Double> e : entry.getValue()
 						.entrySet()) {
-					if (e.getValue().longValue() > temp) {
+					if (Math.abs(e.getValue().doubleValue()) > temp) {
 						temp = e.getValue();
 						pair = e.getKey();
 					}
 				}
-				// select the best pair for this realtion
-				getDataForThisPair(oieRel, pair);
+				// select the best pair for this relation
+				getDataForMaxConfidentPair(oieRel, pair);
 			}
 		}
 	}
@@ -126,7 +133,7 @@ public class DensityEstimator {
 	 * @param oieRel
 	 * @param pair
 	 */
-	private static void getDataForThisPair(String oieRel,
+	private static void getDataForMaxConfidentPair(String oieRel,
 			Pair<String, String> pair) {
 		String latDom = pair.getLeft();
 		String latRan = pair.getRight();
@@ -176,7 +183,7 @@ public class DensityEstimator {
 				arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
 
 				if (arg1 > 0 && arg2 > 0) {
-					estimator.addValue(Math.abs(arg1 - arg2), weight);
+					estimator.addValue(arg1 - arg2, weight);
 				}
 			}
 
@@ -201,7 +208,7 @@ public class DensityEstimator {
 	 * 
 	 * @throws IOException
 	 */
-	private static void feedValues() throws IOException {
+	private static void runEstimators() throws IOException {
 
 		String[] elem = null;
 		String oieSub = null;
@@ -210,14 +217,19 @@ public class DensityEstimator {
 
 		List<String> oieTriples = null;
 
-		List<String> subCands;
-		List<String> objCands;
+		List<String> subCands = new ArrayList<String>();
+		List<String> objCands = new ArrayList<String>();
 
 		String kbSub = null;
 		String kbObj = null;
 
-		double dataPointVal = 0;
+		Pair<String, String> maxPair = null;
+		Pair<String, String> pair = null;
+		double count = 0;
+
+		double dataPointVal = Double.MAX_VALUE;
 		int ctr = 0;
+		double max = 0;
 
 		// load the data into memory
 		try {
@@ -251,31 +263,58 @@ public class DensityEstimator {
 					// get the top-k concepts, confidence pairs
 					// UTF-8 at this stage. Write out all pairs with
 					// probabilities
-					subCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-							.cleanse(oieSub).replaceAll("\\_+", " "), 5);
-					objCands = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-							.cleanse(oieObj).replaceAll("\\_+", " "), 5);
+
+					if (!CACHE.containsKey(oieSub)) {
+						subCands = DBWrapper.fetchTopKLinksWikiPrepProb(
+								Utilities.cleanse(oieSub).replaceAll("\\_+",
+										" "), 5);
+						CACHE.put(oieSub, subCands);
+					} else
+						subCands = CACHE.get(oieSub);
+
+					if (!CACHE.containsKey(oieObj)) {
+						objCands = DBWrapper.fetchTopKLinksWikiPrepProb(
+								Utilities.cleanse(oieObj).replaceAll("\\_+",
+										" "), 5);
+						CACHE.put(oieObj, objCands);
+					} else
+						objCands = CACHE.get(oieObj);
+
+					for (Entry<Pair<String, String>, Double> entry : MAX_CONFIDENT_PAIR
+							.get(oieRel).entrySet()) {
+						pair = entry.getKey();
+						count = entry.getValue();
+
+						if (count > max) {
+							max = count;
+							maxPair = pair;
+						}
+					}
 
 					for (String s : subCands) {
 						kbSub = s.split("\t")[0];
+
 						for (String o : objCands) {
 							kbObj = o.split("\t")[0];
 
 							if (kbSub != null && kbObj != null) {
-								dataPointVal = queryAllPairs(oieRel, kbSub,
-										kbObj);
+								dataPointVal = getNumericValue(
+										maxPair.getLeft(), maxPair.getRight(),
+										Utilities.utf8ToCharacter(kbSub),
+										Utilities.utf8ToCharacter(kbObj));
+
 								// if its a valid data point, get its
 								// probability
-								if (dataPointVal != 0) {
+								if (dataPointVal < Double.MAX_VALUE) {
 									writer.write(oieSub
 											+ "\t"
 											+ oieRel
 											+ "\t"
 											+ oieObj
 											+ "\t"
-											+ kbSub
+											+ Utilities.utf8ToCharacter(kbSub)
 											+ "\t"
-											+ kbObj
+											+ Utilities.utf8ToCharacter(kbObj)
 											+ "\t"
 											+ Constants.formatter
 													.format(ESTIMATORS
@@ -283,14 +322,15 @@ public class DensityEstimator {
 															.getProbability(
 																	dataPointVal))
 											+ "\n");
+
+									writer.flush();
 								}
 							}
 						}
 					}
-					writer.flush();
 				}
 
-				if (ctr % 1000 == 0 && ctr > 1000)
+				if (ctr % 1000 == 0)
 					logger.info("Completed " + (double) ctr * 100
 							/ oieTriples.size());
 
@@ -302,69 +342,34 @@ public class DensityEstimator {
 
 	}
 
-	private static double queryAllPairs(String oieRel, String kbSub,
-			String kbObj) {
-		double subVal = 0;
-		double objVal = 0;
-		Pair<String, String> pair = null;
-
-		// just iterate all the pairs and return the data value (difference in
-		// lateral property values)
-		for (Entry<Pair<String, String>, Long> entry : GLBL_COLL.get(oieRel)
-				.entrySet()) {
-			pair = entry.getKey();
-
-			subVal = getNumericValue(pair.getLeft(), kbSub);
-			objVal = getNumericValue(pair.getRight(), kbObj);
-
-			// logger.info(subVal + "\t" + objVal + "\t" + oieRel);
-			if (subVal > 0 && objVal > 0) {
-				// logger.info(pair + "\t" + entry.getValue() + "\t" + oieRel);
-				return Math.abs(subVal - objVal);
-				// ESTIMATORS.put(oieRel, estimator);
-				// break;
-			}
-		}
-		return 0;
-	}
-
-	private static void print() {
-		for (Entry<String, Map<Pair<String, String>, Long>> e : GLBL_COLL
-				.entrySet()) {
-			logger.info(e.getKey() + " ===> ");
-			for (Entry<Pair<String, String>, Long> e2 : e.getValue().entrySet()) {
-				logger.info(e2.getKey() + "\t" + e2.getValue());
-			}
-		}
-
-	}
-
 	/**
 	 * read the generated side props file ans load in memory
+	 * 
+	 * @param arg
 	 */
-	private static void loadTheSideProperties() {
+	private static void loadTheSideProperties(String arg) {
 		String[] elem = null;
 
 		List<String> propRelations = null;
 
-		String location = new File(Constants.OIE_DATA_PATH).getParent()
-				+ GenerateSideProperties.FILE_FOR_SIDE_PROPS_DISTRIBUTION;
+		String location = new File(Constants.OIE_DATA_PATH).getParent() + "/"
+				+ arg;
 
 		try {
 			propRelations = FileUtils.readLines(new File(location), "UTF-8");
 			for (String line : propRelations) {
 				elem = line.split("\t");
 
-				writeOut(
+				geConfidentPair(
 						elem[0],
 						new ImmutablePair<String, String>(StringUtils.replace(
 								elem[1], Constants.DBPEDIA_CONCEPT_NS, ""),
 								StringUtils.replace(elem[2],
-										Constants.DBPEDIA_CONCEPT_NS, "")));
+										Constants.DBPEDIA_CONCEPT_NS, "")),
+						elem[3]);
 			}
-
 		} catch (IOException e) {
-			logger.error("Problem while reaing input OIE data file");
+			logger.error("Problem while reading input OIE data file");
 		}
 	}
 
@@ -373,24 +378,22 @@ public class DensityEstimator {
 	 * 
 	 * @param oieRel
 	 * @param immutablePair
+	 * @param pearsonCoeff
 	 */
-	private static void writeOut(String oieRel,
-			ImmutablePair<String, String> immutablePair) {
-		long val = 0;
+	private static void geConfidentPair(String oieRel,
+			ImmutablePair<String, String> immutablePair, String pearsonCoeff) {
+		double val = 0;
 
-		Map<Pair<String, String>, Long> map = null;
-		if (!GLBL_COLL.containsKey(oieRel)) {
-			map = new HashMap<Pair<String, String>, Long>();
+		Map<Pair<String, String>, Double> map = null;
+		if (!MAX_CONFIDENT_PAIR.containsKey(oieRel)) {
+			map = new HashMap<Pair<String, String>, Double>();
 		} else {
-			map = GLBL_COLL.get(oieRel);
+			map = MAX_CONFIDENT_PAIR.get(oieRel);
 		}
+		val = Double.valueOf(pearsonCoeff);
+		map.put(immutablePair, val);
 
-		if (map.containsKey(immutablePair))
-			val = map.get(immutablePair);
-
-		val = val + 1;
-		map.put(immutablePair, Long.valueOf(val));
-		GLBL_COLL.put(oieRel, map);
+		MAX_CONFIDENT_PAIR.put(oieRel, map);
 	}
 
 	/**
@@ -399,35 +402,53 @@ public class DensityEstimator {
 	 * @return
 	 * @throws ParseException
 	 */
-	private static double getNumericValue(String sideProperty, String kbInst) {
-		String dates = null;
-		Date date = null;
-		String year = null;
+	private static double getNumericValue(String domSide, String ranSide,
+			String kbSub, String kbObj) {
+
+		String queryStr = "select ?val where{{select ?val where{<http://dbpedia.org/resource/"
+				+ kbSub
+				+ "> <http://dbpedia.org/ontology/"
+				+ domSide
+				+ "> ?val} limit 1} union {select ?val where{<http://dbpedia.org/resource/"
+				+ kbObj
+				+ "> <http://dbpedia.org/ontology/"
+				+ ranSide
+				+ "> ?val} limit 1}}";
+
+		// logger.info(query);
+		ParameterizedSparqlString query = new ParameterizedSparqlString(
+				queryStr);
+		query.setIri("?kbSub", "http://dbpedia.org/resource/" + kbSub);
+		query.setIri("?kbObj", "http://dbpedia.org/resource/" + kbObj);
 
 		List<QuerySolution> list = SPARQLEndPointQueryAPI
-				.queryDBPediaEndPoint("select ?val where {<http://dbpedia.org/resource/"
-						+ kbInst
-						+ "> <http://dbpedia.org/ontology/"
-						+ sideProperty + "> ?val}");
-		if (list.size() == 0)
-			list = SPARQLEndPointQueryAPI
-					.queryDBPediaEndPoint("select ?val where {<http://dbpedia.org/resource/"
-							+ kbInst
-							+ "> <http://dbpedia.org/property/"
-							+ sideProperty + "> ?val}");
+				.queryDBPediaEndPoint(query.toString());
 
-		for (QuerySolution querySol : list) {
+		if (list != null && list.size() == 2) {
 			// Get the next result row
 			// QuerySolution querySol = results.next();
-			dates = querySol.get("val").toString();
-			dates = StringUtils.substringBefore(dates, "^");
+			double val1 = getDateVal(list.get(0));
+			double val2 = getDateVal(list.get(1));
 
-			try {
-				date = formatDate.parse(dates);
-				year = formateYear.format(date);
-			} catch (ParseException e) {
-			}
+			return val1 - val2;
+		} else
+			return Double.MAX_VALUE;
+	}
+
+	private static double getDateVal(QuerySolution querySol) {
+		String dates;
+		Date date;
+		String year = null;
+
+		dates = querySol.get("val").toString();
+		dates = StringUtils.substringBefore(dates, "^");
+
+		try {
+			date = formatDate.parse(dates);
+			year = formateYear.format(date);
+		} catch (ParseException e) {
 		}
 		return (year != null) ? Double.valueOf(year) : 0;
 	}
+
 }
