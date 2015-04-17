@@ -15,9 +15,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -195,6 +197,30 @@ public class Utilities {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static Map<Pair<String, String>, Double> sortByValue(Map<?, ?> map,
+			double cutOff) {
+		List<Object> list = new LinkedList<Object>(map.entrySet());
+		Collections.sort(list, new Comparator<Object>() {
+			@SuppressWarnings("rawtypes")
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o2)).getValue())
+						.compareTo(((Map.Entry) (o1)).getValue());
+			}
+		});
+
+		Map<Pair<String, String>, Double> result = new LinkedHashMap<Pair<String, String>, Double>();
+		for (Iterator<Object> it = list.iterator(); it.hasNext();) {
+			Map.Entry<Pair<String, String>, Double> entry = (Entry<Pair<String, String>, Double>) it
+					.next();
+			if (result.size() < cutOff)
+				result.put(entry.getKey(), entry.getValue());
+			else
+				return result;
+		}
+		return result;
+	}
+
 	/**
 	 * split a word at capitals, needed for DBP relations
 	 * 
@@ -353,10 +379,10 @@ public class Utilities {
 			List<String> coll, Map<String, String> CACHED_SUBCLASSES) {
 		String superCls = CACHED_SUBCLASSES.get(particularClass);
 		if (CACHED_SUBCLASSES.containsKey(superCls)) {
-				coll.add(superCls);
+			coll.add(superCls);
 			getAllMyParents(superCls, coll, CACHED_SUBCLASSES);
 		} else {
-				coll.add(superCls);
+			coll.add(superCls);
 		}
 		return coll;
 	}

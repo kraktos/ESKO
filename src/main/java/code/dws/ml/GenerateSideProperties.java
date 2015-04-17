@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,8 @@ import com.hp.hpl.jena.query.QuerySolution;
  */
 public class GenerateSideProperties {
 
-	public static final String FILE_FOR_SIDE_PROPS_DISTRIBUTION = "/REVERB_NUMERIC_SIDE_PROPS_CORRELATION.tsv";
+	public static final String SIDE_PROP_CORRELATION = "/REVERB_NUMERIC_SIDE_PROPS_CORRELATION.tsv";
+	public static final String SIDE_PROP_COUNTS = "/REVERB_NUMERIC_SIDE_PROPS_COUNTS.tsv";
 
 	/**
 	 * logger
@@ -53,6 +55,8 @@ public class GenerateSideProperties {
 	static Map<String, String> CACHE = new HashMap<String, String>();
 
 	static Map<Pair<String, String>, Double> CACHE_PAIRS_PEARSON = new HashMap<Pair<String, String>, Double>();
+
+	private static Map<String, Map<Pair<String, String>, Long>> COUNT_MAP = new HashMap<String, Map<Pair<String, String>, Long>>();
 
 	/**
 	 * @param args
@@ -108,6 +112,7 @@ public class GenerateSideProperties {
 		List<String> rangeSideProps = null;
 
 		BufferedWriter writer = null;
+		BufferedWriter writerCounts = null;
 
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
@@ -117,7 +122,11 @@ public class GenerateSideProperties {
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(
 					Constants.OIE_DATA_PATH).getParent()
-					+ FILE_FOR_SIDE_PROPS_DISTRIBUTION));
+					+ SIDE_PROP_CORRELATION));
+
+			writerCounts = new BufferedWriter(new FileWriter(new File(
+					Constants.OIE_DATA_PATH).getParent() + SIDE_PROP_COUNTS));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -175,13 +184,35 @@ public class GenerateSideProperties {
 				}
 			}
 
+			// if (ctr == 5000)
+			// break;
+
 			if (ctr % 1000 == 0 && ctr > 1000)
 				logger.info("Completed " + (double) ctr * 100
 						/ oieTriples.size());
 		}
 
 		try {
+			for (Entry<String, Map<Pair<String, String>, Long>> e1 : COUNT_MAP
+					.entrySet()) {
+				for (Entry<Pair<String, String>, Long> e2 : e1.getValue()
+						.entrySet()) {
+
+					writerCounts.write(e1.getKey() + "\t"
+							+ e2.getKey().getLeft() + "\t"
+							+ e2.getKey().getRight() + "\t" + e2.getValue()
+							+ "\n");
+				}
+				writerCounts.flush();
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
 			writer.close();
+			writerCounts.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -230,6 +261,8 @@ public class GenerateSideProperties {
 
 				if (!CACHE_PAIRS_PEARSON.containsKey(pair)) {
 
+					updateCount(oieRel, pair);
+
 					rowCtr = 0;
 					query = "select ?sub ?obj where {?S ?P ?O. ?S <"
 							+ domSideProp + "> ?sub. ?O <" + ranSideProp
@@ -267,6 +300,7 @@ public class GenerateSideProperties {
 
 						correlation = pearCorr.computeCorrelationMatrix(matrix)
 								.getEntry(0, 1);
+						CACHE_PAIRS_PEARSON.put(pair, correlation);
 
 					} catch (Exception e) {
 					}
@@ -277,7 +311,7 @@ public class GenerateSideProperties {
 				try {
 					writer.write(oieRel + "\t" + domSideProp + "\t"
 							+ ranSideProp + "\t" + correlation + "\n");
-					CACHE_PAIRS_PEARSON.put(pair, correlation);
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -340,6 +374,26 @@ public class GenerateSideProperties {
 	// return false;
 	// }
 	// }
+
+	private static void updateCount(String oieRel, Pair<String, String> pair) {
+
+		long val = 0;
+		Map<Pair<String, String>, Long> map = null;
+		if (!COUNT_MAP.containsKey(oieRel))
+			map = new HashMap<Pair<String, String>, Long>();
+		else
+			map = COUNT_MAP.get(oieRel);
+
+		if (!map.containsKey(pair))
+			val = 1L;
+		else {
+			val = map.get(pair);
+			val = val + 1;
+		}
+
+		map.put(pair, val);
+		COUNT_MAP.put(oieRel, map);
+	}
 
 	/**
 	 * retrieve the list of numerical properties for a given instance. These

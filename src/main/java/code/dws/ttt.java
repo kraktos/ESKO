@@ -7,6 +7,7 @@ import java.util.List;
 
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
+import code.dws.utils.Utilities;
 
 import com.hp.hpl.jena.query.QuerySolution;
 
@@ -16,27 +17,32 @@ public class ttt {
 		List<QuerySolution> list = null;
 		String s;
 
-		BufferedWriter scriptWrtr = new BufferedWriter(new FileWriter(
-				"/home/adutta/git/DATA/TVShow.dat"));
+		String[] values = {"Website", "RadioProgram", "Artwork", "Cartoon", "Film", 
+				"Musical", "MusicalWork", "Software", "TelevisionShow", "TelevisionEpisode",
+				"TelevisionSeason", "WrittenWork"};
+		
+		for (String val:values) {
+			BufferedWriter scriptWrtr = new BufferedWriter(new FileWriter(
+					"/home/adutta/git/DATA/" + val + ".dat"));
+			Constants.loadConfigParameters(new String[] { "", "CONFIG.cfg" });
+			String query = "select * where {?a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+					+ " <http://dbpedia.org/ontology/" + val + ">}";
+			for (int k = 0; k < 200000; k++) {
+				s = query + " limit 1000 offset " + k;
+				k = k + 1000;
 
-		Constants.loadConfigParameters(new String[] { "", "CONFIG.cfg" });
-		String query = "select * where {?a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
-				+ " <http://dbpedia.org/ontology/Film>}";
+				System.out.println(s);
+				list = SPARQLEndPointQueryAPI.queryDBPediaEndPoint(s);
+				System.out.println(list.size());
 
-		for (int k = 1000; k < 90000; k++) {
-			s = query + " limit 1000 offset " + k;
-			k = k + 1000;
-
-			System.out.println(s);
-			list = SPARQLEndPointQueryAPI.queryDBPediaEndPoint(s);
-			System.out.println(list.size());
-
-			for (QuerySolution querySol : list) {
-				scriptWrtr.write(querySol.get("a").toString() + "\n");
+				for (QuerySolution querySol : list) {
+					scriptWrtr.write(Utilities.utf8ToCharacter(querySol
+							.get("a").toString()) + "\n");
+				}
+				scriptWrtr.flush();
 			}
-			scriptWrtr.flush();
+			scriptWrtr.close();
 		}
-		scriptWrtr.close();
 
 	}
 }

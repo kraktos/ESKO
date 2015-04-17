@@ -31,6 +31,7 @@ import code.dws.utils.Utilities;
 
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.QuerySolution;
+import com.ibm.icu.math.BigDecimal;
 
 /**
  * @author adutta
@@ -48,7 +49,9 @@ public class DensityEstimator {
 
 	static SimpleDateFormat formateYear = new SimpleDateFormat("yyyy");
 
-	static Map<String, Map<Pair<String, String>, Double>> MAX_CONFIDENT_PAIR = new HashMap<String, Map<Pair<String, String>, Double>>();
+	static Map<String, Map<Pair<String, String>, Pair<Long, Double>>> PAIR_DISTRIBUTION = new HashMap<String, Map<Pair<String, String>, Pair<Long, Double>>>();
+
+	static Map<String, Map<Pair<String, String>, Double>> RANKED_PAIR_DISTRIBUTION = new HashMap<String, Map<Pair<String, String>, Double>>();
 
 	static Map<String, KernelEstimator> ESTIMATORS = new HashMap<String, KernelEstimator>();
 
@@ -69,15 +72,18 @@ public class DensityEstimator {
 			Constants.loadConfigParameters(new String[] { "", args[0] });
 
 			// read it in memory
-			loadTheSideProperties(args[1]);
+
+			loadTheSidePropertyDistribution(args[1]);
 
 			// check the distribution
-			// print();
+			rankTheDistribution();
 
 			logger.info("Generating esimators for each OIE realtion");
 			// feed an estimator
 			createEstimators();
 			logger.info("Done generating esimators for each OIE realtion");
+
+//			System.exit(1);
 
 			try {
 				logger.info("Feeding esimators for each OIE realtion");
@@ -85,6 +91,45 @@ public class DensityEstimator {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * key here is to look through the in memory DS and apply simple scaling and
+	 * re-ranking to figure out the top-k possible side properties.
+	 */
+	private static void rankTheDistribution() {
+
+		String rel = null;
+
+		long N = 0;
+		long ruleCount = 0;
+		double coeff = 0;
+		double newScore = 0;
+
+		Pair<String, String> pair;
+
+		for (Map.Entry<String, Map<Pair<String, String>, Pair<Long, Double>>> entry : PAIR_DISTRIBUTION
+				.entrySet()) {
+			rel = entry.getKey();
+
+			Map<Pair<String, String>, Double> m = new HashMap<Pair<String, String>, Double>();
+
+			if (rel.indexOf("is the county seat of") != -1)
+				System.out.println();
+			N = entry.getValue().size();
+			for (Map.Entry<Pair<String, String>, Pair<Long, Double>> en : entry
+					.getValue().entrySet()) {
+				pair = en.getKey();
+				ruleCount = en.getValue().getLeft();
+				coeff = en.getValue().getRight();
+				newScore = ((double) ruleCount / N) * Math.abs(coeff);
+
+				if (!Double.isNaN(newScore))
+					m.put(pair, newScore);
+			}
+			m = Utilities.sortByValue(m, 1);
+			RANKED_PAIR_DISTRIBUTION.put(rel, m);
 		}
 	}
 
@@ -106,7 +151,7 @@ public class DensityEstimator {
 		double temp = 0;
 		Pair<String, String> pair = null;
 
-		for (Entry<String, Map<Pair<String, String>, Double>> entry : MAX_CONFIDENT_PAIR
+		for (Entry<String, Map<Pair<String, String>, Double>> entry : RANKED_PAIR_DISTRIBUTION
 				.entrySet()) {
 			temp = 0;
 			oieRel = entry.getKey();
@@ -116,10 +161,7 @@ public class DensityEstimator {
 				// look for
 				for (Entry<Pair<String, String>, Double> e : entry.getValue()
 						.entrySet()) {
-					if (Math.abs(e.getValue().doubleValue()) > temp) {
-						temp = e.getValue();
-						pair = e.getKey();
-					}
+					pair = e.getKey();
 				}
 				// select the best pair for this relation
 				getDataForMaxConfidentPair(oieRel, pair);
@@ -141,14 +183,10 @@ public class DensityEstimator {
 		String subVal = null;
 		String objVal = null;
 
-		Date date1 = null;
-		String year1 = null;
-		Date date2 = null;
-		String year2 = null;
 		String query = null;
 
-		double arg1 = 0;
-		double arg2 = 0;
+		double diff = 0;
+
 		List<QuerySolution> list = null;
 
 		KernelEstimator estimator = new KernelEstimator(0.0001);
@@ -169,22 +207,10 @@ public class DensityEstimator {
 				subVal = querySol.get("s1").toString();
 				objVal = querySol.get("o1").toString();
 
-				try {
-					date1 = formatDate.parse(subVal);
-					year1 = formateYear.format(date1);
+				diff = getDifference(subVal, objVal);
 
-					date2 = formatDate.parse(objVal);
-					year2 = formateYear.format(date2);
-
-				} catch (ParseException e) {
-				}
-
-				arg1 = (year1 != null) ? Double.valueOf(year1) : 0;
-				arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
-
-				if (arg1 > 0 && arg2 > 0) {
-					estimator.addValue(arg1 - arg2, weight);
-				}
+				if (diff != Double.MAX_VALUE)
+					estimator.addValue(diff, weight);
 			}
 
 			// caching it
@@ -199,6 +225,44 @@ public class DensityEstimator {
 		logger.info("Adding estimator for " + oieRel + "; Size = "
 				+ ESTIMATORS.size());
 		ESTIMATORS.put(oieRel, estimator);
+
+	}
+
+	private static double getDifference(String subVal, String objVal) {
+		Date date1 = null;
+		String year1 = null;
+		Date date2 = null;
+		String year2 = null;
+
+		double arg1 = 0;
+		double arg2 = 0;
+
+		try {
+			date1 = formatDate.parse(subVal);
+			year1 = formateYear.format(date1);
+
+			date2 = formatDate.parse(objVal);
+			year2 = formateYear.format(date2);
+
+			arg1 = (year1 != null) ? Double.valueOf(year1) : 0;
+			arg2 = (year2 != null) ? Double.valueOf(year2) : 0;
+
+		} catch (ParseException e) {
+
+			try {
+				arg1 = new BigDecimal(StringUtils.substringBefore(subVal, "^"))
+						.doubleValue();
+				arg2 = new BigDecimal(StringUtils.substringBefore(objVal, "^"))
+						.doubleValue();
+			} catch (Exception e1) {
+				// all non-comparable cases will come here
+			}
+		}
+
+		if (arg1 > 0 && arg2 > 0)
+			return arg1 - arg2;
+		else
+			return Double.MAX_VALUE;
 
 	}
 
@@ -280,15 +344,9 @@ public class DensityEstimator {
 					} else
 						objCands = CACHE.get(oieObj);
 
-					for (Entry<Pair<String, String>, Double> entry : MAX_CONFIDENT_PAIR
+					for (Entry<Pair<String, String>, Double> entry : RANKED_PAIR_DISTRIBUTION
 							.get(oieRel).entrySet()) {
-						pair = entry.getKey();
-						count = entry.getValue();
-
-						if (count > max) {
-							max = count;
-							maxPair = pair;
-						}
+						maxPair = entry.getKey();
 					}
 
 					for (String s : subCands) {
@@ -347,7 +405,7 @@ public class DensityEstimator {
 	 * 
 	 * @param arg
 	 */
-	private static void loadTheSideProperties(String arg) {
+	private static void loadTheSidePropertyDistribution(String arg) {
 		String[] elem = null;
 
 		List<String> propRelations = null;
@@ -355,12 +413,13 @@ public class DensityEstimator {
 		String location = new File(Constants.OIE_DATA_PATH).getParent() + "/"
 				+ arg;
 
+		logger.info("Loading the side property distributions");
 		try {
 			propRelations = FileUtils.readLines(new File(location), "UTF-8");
 			for (String line : propRelations) {
 				elem = line.split("\t");
 
-				geConfidentPair(
+				loadTheDistributionInMemory(
 						elem[0],
 						new ImmutablePair<String, String>(StringUtils.replace(
 								elem[1], Constants.DBPEDIA_CONCEPT_NS, ""),
@@ -380,20 +439,36 @@ public class DensityEstimator {
 	 * @param immutablePair
 	 * @param pearsonCoeff
 	 */
-	private static void geConfidentPair(String oieRel,
+	private static void loadTheDistributionInMemory(String oieRel,
 			ImmutablePair<String, String> immutablePair, String pearsonCoeff) {
-		double val = 0;
+		long val = 0;
 
-		Map<Pair<String, String>, Double> map = null;
-		if (!MAX_CONFIDENT_PAIR.containsKey(oieRel)) {
-			map = new HashMap<Pair<String, String>, Double>();
+		Map<Pair<String, String>, Pair<Long, Double>> map = null;
+		Pair<Long, Double> localPair = null;
+
+		if (!PAIR_DISTRIBUTION.containsKey(oieRel)) {
+			map = new HashMap<Pair<String, String>, Pair<Long, Double>>();
 		} else {
-			map = MAX_CONFIDENT_PAIR.get(oieRel);
+			map = PAIR_DISTRIBUTION.get(oieRel);
 		}
-		val = Double.valueOf(pearsonCoeff);
-		map.put(immutablePair, val);
 
-		MAX_CONFIDENT_PAIR.put(oieRel, map);
+		if (map.size() == 0)
+			val = 1;
+		else {
+			if (map.containsKey(immutablePair)) {
+				val = map.get(immutablePair).getLeft();
+				val = val + 1;
+			} else
+				val = 1;
+		}
+		localPair = new ImmutablePair<Long, Double>(val,
+				Double.valueOf(pearsonCoeff));
+
+		// one particular propertry pair will always have the same pearson
+		// co-efficient
+		map.put(immutablePair, localPair);
+
+		PAIR_DISTRIBUTION.put(oieRel, map);
 	}
 
 	/**
@@ -424,31 +499,32 @@ public class DensityEstimator {
 		List<QuerySolution> list = SPARQLEndPointQueryAPI
 				.queryDBPediaEndPoint(query.toString());
 
-		if (list != null && list.size() == 2) {
-			// Get the next result row
-			// QuerySolution querySol = results.next();
-			double val1 = getDateVal(list.get(0));
-			double val2 = getDateVal(list.get(1));
-
-			return val1 - val2;
-		} else
+		if (list != null && list.size() == 2)
+			return getDifference(list.get(0).get("val").toString(), list.get(1)
+					.get("val").toString());
+		else
 			return Double.MAX_VALUE;
 	}
 
-	private static double getDateVal(QuerySolution querySol) {
-		String dates;
-		Date date;
-		String year = null;
-
-		dates = querySol.get("val").toString();
-		dates = StringUtils.substringBefore(dates, "^");
-
-		try {
-			date = formatDate.parse(dates);
-			year = formateYear.format(date);
-		} catch (ParseException e) {
-		}
-		return (year != null) ? Double.valueOf(year) : 0;
-	}
+	// private static double getDateVal(QuerySolution querySol) {
+	// String dates;
+	// Date date;
+	// String year = null;
+	//
+	// dates = querySol.get("val").toString();
+	// dates = StringUtils.substringBefore(dates, "^");
+	//
+	// try {
+	// date = formatDate.parse(dates);
+	// year = formateYear.format(date);
+	// } catch (ParseException e) {
+	// try {
+	// year = new BigDecimal(dates).doubleValue();
+	// } catch (Exception e1) {
+	// // all non-comparable cases will come here
+	// }
+	// }
+	// return (year != null) ? Double.valueOf(year) : 0;
+	// }
 
 }
