@@ -15,9 +15,8 @@ look into folder /preProcess for bash scripts to process the NELL input. We are 
 
 For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands
 
-**gunzip NELL.08m.920.esv.csv.gz**
-
-**./processNell.sh NELL.08m.920.esv.csv**
+***gunzip NELL.08m.920.esv.csv.gz***
+***./processNell.sh NELL.08m.920.esv.csv***
 
 For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following commands 
 
