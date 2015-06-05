@@ -29,7 +29,8 @@ this generates a scripts for the IM pipeline under the folder  **/src/main/resou
 ####4. Database Setup
 Clean up any pre existing instance matchings with the SQL 
 
-***delete from wikiStat.OIE_REFINED;***
+***delete from wikiStat.OIE_REFINED;***  This can take some time. Please be patient.
+
 
 ####5. Running IM
 
