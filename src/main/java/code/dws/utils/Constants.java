@@ -48,11 +48,6 @@ public class Constants {
 
 	public static String OIE_DATA_PATH;
 
-	/**
-	 * location of the output file generated the IE Engine ReVerb
-	 */
-	public static final String NELL_DATA_PATH = "/home/arnab/Work/data/NELL/Nell.csv";
-
 	public static boolean IS_NELL;
 
 	static boolean USE_LOGIT;
@@ -71,7 +66,7 @@ public class Constants {
 
 	public static boolean INCLUDE_YAGO_TYPES;
 
-//	public static boolean WORKFLOW_NORMAL;
+	// public static boolean WORKFLOW_NORMAL;
 
 	public static final String DOMAIN = "Domain";
 
@@ -254,8 +249,8 @@ public class Constants {
 
 			OIE_DATA_SEPERARTOR = prop.getProperty("OIE_DATA_SEPERARTOR");
 
-//			WORKFLOW_NORMAL = Boolean.valueOf(prop
-//					.getProperty("WORKFLOW_NORMAL"));
+			// WORKFLOW_NORMAL = Boolean.valueOf(prop
+			// .getProperty("WORKFLOW_NORMAL"));
 
 			DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
 

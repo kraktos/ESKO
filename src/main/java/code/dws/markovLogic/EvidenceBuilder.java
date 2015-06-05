@@ -55,11 +55,11 @@ public class EvidenceBuilder {
 
 		if (Constants.IS_NELL) {
 			this.propertyName = args[0];
-			oieFile = new File(Constants.NELL_DATA_PATH);
+			oieFile = new File(Constants.OIE_DATA_PATH);
 			/**
 			 * process the full NELL data dump
 			 */
-			this.processTriple(oieFile, OIE.NELL, ",");
+			this.processTriple(oieFile, Constants.OIE_DATA_SEPERARTOR);
 
 		} else {
 			// if (!Constants.WORKFLOW_NORMAL) {
@@ -84,7 +84,7 @@ public class EvidenceBuilder {
 			/**
 			 * process the full REVERB data dump
 			 */
-			this.processTriple(oieFile, OIE.REVERB, ";");
+			this.processTriple(oieFile, Constants.OIE_DATA_SEPERARTOR);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class EvidenceBuilder {
 	 *            delimiter, comma or tab or something else
 	 * @throws IOException
 	 */
-	private void processTriple(File inputFile, OIE oieType, String delimit)
+	private void processTriple(File inputFile, String delimit)
 			throws IOException {
 
 		String triple;
