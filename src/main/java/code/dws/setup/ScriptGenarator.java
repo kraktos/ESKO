@@ -107,7 +107,7 @@ public class ScriptGenarator {
 			}
 		}
 
-		logger.info("echo \"Done with " + PROPS.size() + " clusters\n");
+		logger.info("echo \"Done with " + PROPS.size() + " relations (clusters)\n");
 
 		for (int k = 0; k < numberOfMachines; k++) {
 			try {
