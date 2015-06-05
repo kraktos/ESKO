@@ -13,22 +13,21 @@ CONFIG.cfg = all the parameters and setup values are provided here with respecti
 ####1. Data process
 look into folder /preProcess for bash scripts to process the NELL input. We are necessarily not looking into entity-vs-literal relations. 
 
-For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands
+For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands after extracting
 
-***gunzip NELL.08m.920.esv.csv.gz***
 ***./processNell.sh NELL.08m.920.esv.csv***
 
 For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following commands 
 
-**./processReverb.sh reverb_clueweb_tuples-1.1.txt**
-
+***./processReverb.sh reverb_clueweb_tuples-1.1.txt***
 
 ####2. CONFIG file changes
 alter the param "OIE_DATA_PATH" in CONFIG.cfg to set the location of newly generated file (Nell/reverb).
 
 ####3. Script Generation for IM 
-**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>**
-this generates a scripts for the IM pipeline under the folder  ***/src/main/resources/script/***
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>***
+this generates a scripts for the IM pipeline under the folder  **/src/main/resources/script/** in the name of
+**WF.(X).PIPELINE.N(Y).sh** where (X) is the workflow number 1,2,3 and (Y) is the node number.
  
  
 ### Database setup
