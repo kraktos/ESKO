@@ -8,7 +8,7 @@ mvn clean package install
 
 
 ##Setup
-CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions.
+CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions. Some of the important parameters you need to set. These are placed in order of importance in the config file. 
 
 ### General setup
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg**
