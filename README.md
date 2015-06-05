@@ -28,8 +28,9 @@ For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following comman
 alter the param "OIE_DATA_PATH" in CONFIG.cfg to set the location of newly generated file (Nell/reverb).
 
 ####3. Script Generation for IM 
-**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>**
-this generates a scripts for the IM pipeline.
+**Command** : java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>**
+this generates a scripts for the IM pipeline under the folder
+ 
  
 ### Database setup
 
