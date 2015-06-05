@@ -12,6 +12,7 @@ CONFIG.cfg = all the parameters and setup values are provided here with respecti
 
 ####1. Data process
 look into folder /preProcess for bash scripts to process the NELL input. We are necessarily not looking into entity-vs-literal relations. 
+
 ***./processNell.sh NELL.08m.920.esv.csv***
 
 ***./processReverb.sh reverb_clueweb_tuples-1.1.txt***
