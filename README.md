@@ -27,7 +27,7 @@ alter the param "OIE_DATA_PATH" in CONFIG.cfg to set the location of newly gener
 ####3. Script Generation for IM 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>***
 this generates a scripts for the IM pipeline under the folder  **/src/main/resources/script/** in the name of
-**WF.(X).PIPELINE.N(Y).sh** where (X) is the workflow number 1,2,3 and (Y) is the node number.
+**WF.x.PIPELINE.Ny.sh** where 'x' is the workflow number 1,2,3 and 'y' is the node number.
  
  
 ### Database setup
