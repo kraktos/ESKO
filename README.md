@@ -22,8 +22,7 @@ alter the param **OIE_DATA_PATH** in CONFIG.cfg to set the location of newly gen
 
 ####3. Script Generation for IM 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>***
-this generates a scripts for the IM pipeline under the folder  **/src/main/resources/script/** in the name of
-**WF.x.PIPELINE.Ny.sh** where 'x' is the workflow number 1,2,3 and 'y' is the node number.
+this generates a scripts for the IM pipeline under the folder  **/src/main/resources/script/** in the name of **WF.x.PIPELINE.Ny.sh** where 'x' is the workflow number 1,2,3 and 'y' is the node number.
  
  
 ####4. Database Setup
@@ -42,7 +41,7 @@ Very important, browse to the location where the scripts lie
 
 Then issue the IM script command for running the whole pipeline.
 
-***./WF.x.PIPELINE.Ny.sh *** for running the Workflow x on Node y
+***./WF.x.PIPELINE.Ny.sh*** for running the Workflow x on Node y
 
 All the MLN related files, evidences will be generated for each relation or relation cluster (depending on the workflow) under the location **/src/main/resources/output/**.
 
