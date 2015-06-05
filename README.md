@@ -19,7 +19,8 @@ For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands
 
 **./processNell.sh NELL.08m.920.esv.csv**
 
-For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following commands
+For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following commands 
+
 **./processReverb.sh reverb_clueweb_tuples-1.1.txt**
 
 
