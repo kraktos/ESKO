@@ -8,7 +8,21 @@ mvn clean package install
 
 
 ##Setup
-CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions. Some of the important parameters you need to set. These are placed in order of importance in the config file. 
+CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions. Some of the important parameters you need to set. These are placed in order of importance in the config file.
+
+###Preprocess
+look into folder /preProcess for bash scripts to process the NELL input. We are necessarily not looking into entity-vs-literal relations. 
+
+For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands
+
+**gunzip NELL.08m.920.esv.csv.gz
+**./processNell.sh NELL.08m.920.esv.csv
+
+For a REVERB input file reverb_clueweb_tuples-1.1.txt issue the following commands
+**./processReverb.sh reverb_clueweb_tuples-1.1.txt
+
+
+ 
 
 ### General setup
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg**
