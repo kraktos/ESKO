@@ -34,7 +34,18 @@ Clean up any pre existing instance matchings with the SQL
 
 ####5. Running IM
 
-***./WF.x.PIPELINE.Ny.sh*** for running the Workflow x on Node y
+Open /src/main/resources/script/MAPPER.sh and change the root directory as defined under DIR and rockit installation location defined under ROCKIT. Similarly, change these two values in the file ***/src/main/resources/script/BOOTSTRAPPER.sh***
+
+Very important, browse to the location where the scripts lie
+
+***cd src/main/resources/script/***
+
+Then issue the IM script command for running the whole pipeline.
+
+***./WF.x.PIPELINE.Ny.sh *** for running the Workflow x on Node y
+
+All the MLN related files, evidences will be generated for each relation or relation cluster (depending on the workflow) under the location **/src/main/resources/output/**.
+
 
 ## Execution
 
