@@ -127,40 +127,21 @@ public class ScriptGenarator {
 	 */
 	private static void loadOIEProps(String oieFilePath) {
 
-		if (Constants.IS_NELL) {
+		if (Constants.IS_NELL || Constants.WORKFLOW == 1) {
 			// // load the NELL file in memory as a collection
-			// ArrayList<ArrayList<String>> nellFile =
-			// FileUtil.genericFileReader(
-			// GenerateNewProperties.class
-			// .getResourceAsStream(oieFilePath), PATH_SEPERATOR,
-			// false);
-			//
-			// // iterate the file
-			// for (ArrayList<String> line : nellFile) {
-			// oieProp = line.get(1);
-			// if (!PROPS.contains(oieProp.trim()))
-			// PROPS.add(oieProp);
-			// }
-			//
-			// log.info("Loaded all properties from "
-			// + GenerateNewProperties.NELL_FILE_PATH + ";  "
-			// + PROPS.size());
-
+			List<String> props = Generator.getReverbProperties(-1,
+					Long.parseLong(Constants.INSTANCE_THRESHOLD));
+			for (String s : props) {
+				PROPS.add(s.replaceAll("\\s+", "-"));
+			}
 		} else {
 			if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
-
 				String directory = ClusterAnalyzer.getOptimalClusterPath();
-				logger.info("Generating opti Clusters from " + directory);
+				logger.info("Generating optimal Clusters from " + directory);
 
 				for (Entry<String, List<String>> e : ClusterAnalyzer
 						.getOptimalCluster(directory).entrySet()) {
 					PROPS.add(e.getKey());
-				}
-			} else if (Constants.WORKFLOW == 1) {
-				List<String> props = Generator.getReverbProperties(-1,
-						Long.parseLong(Constants.INSTANCE_THRESHOLD));
-				for (String s : props) {
-					PROPS.add(s.replaceAll("\\s+", "-"));
 				}
 			}
 		}

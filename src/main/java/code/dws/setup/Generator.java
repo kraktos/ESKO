@@ -161,7 +161,7 @@ public class Generator {
 
 			while (scan.hasNextLine()) {
 				line = scan.nextLine();
-				arr = line.split(";");
+				arr = line.split(Constants.OIE_DATA_SEPERARTOR);
 				if (COUNT_PROPERTY_INST.containsKey(arr[1])) {
 					val = COUNT_PROPERTY_INST.get(arr[1]);
 					val++;
