@@ -26,7 +26,10 @@ this generates a scripts for the IM pipeline under the folder  **/src/main/resou
 **WF.x.PIPELINE.Ny.sh** where 'x' is the workflow number 1,2,3 and 'y' is the node number.
  
  
-### Database setup
+#### Database Setup
+Clean up any pre existing instance matchings with the SQL 
+
+***delete from wikiStat.OIE_REFINED;***
 
 ## Execution
 
