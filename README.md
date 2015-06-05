@@ -10,7 +10,7 @@ mvn clean package install
 ##Setup
 CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions. Some of the important parameters you need to set. These are placed in order of importance in the config file.
 
-###1. Data process
+####1. Data process
 look into folder /preProcess for bash scripts to process the NELL input. We are necessarily not looking into entity-vs-literal relations. 
 
 For a NELL input file NELL.08m.920.esv.csv.gz issue the following two commands
