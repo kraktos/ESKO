@@ -22,7 +22,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+	
 import weka.estimators.KernelEstimator;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -50,7 +50,7 @@ public class DensityEstimator {
 	static SimpleDateFormat formateYear = new SimpleDateFormat("yyyy");
 
 	static Map<String, Map<Pair<String, String>, Pair<Long, Double>>> PAIR_DISTRIBUTION = new HashMap<String, Map<Pair<String, String>, Pair<Long, Double>>>();
-
+	
 	static Map<String, Map<Pair<String, String>, Double>> RANKED_PAIR_DISTRIBUTION = new HashMap<String, Map<Pair<String, String>, Double>>();
 
 	static Map<String, KernelEstimator> ESTIMATORS = new HashMap<String, KernelEstimator>();
