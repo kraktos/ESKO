@@ -31,6 +31,10 @@ Clean up any pre existing instance matchings with the SQL
 
 ***delete from wikiStat.OIE_REFINED;***
 
+####5. Running IM
+
+***./WF.x.PIPELINE.Ny.sh*** for running the Workflow x on Node y
+
 ## Execution
 
 ### Download the source
