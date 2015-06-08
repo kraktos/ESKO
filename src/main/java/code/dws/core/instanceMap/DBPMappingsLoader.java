@@ -58,50 +58,45 @@ public class DBPMappingsLoader {
 
 			DBWrapper.init(Constants.UPDT_OIE_POSTFIXED);
 
-			if (Constants.IS_NELL) {
-				PREDICATE = args[0];
-				readOutputFiles();
-			} else {
+			Path filePath = Paths.get("src/main/resources/output/");
 
-				Path filePath = Paths.get("src/main/resources/output/");
-
-				// VISIT THE FOLDER LOCATION AND ITERATE THROUGH ALL SUB FOLDERS
-				// FOR
-				// THE EXACT OUTPUT FILE
-				final List<Path> files = new ArrayList<Path>();
-				FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
-					@Override
-					public FileVisitResult visitFile(Path file,
-							BasicFileAttributes attrs) throws IOException {
-						if (file.endsWith("out.db"))
-							files.add(file);
-						return FileVisitResult.CONTINUE;
-					}
-				};
-
-				try {
-					// gets the only relevant output files
-					Files.walkFileTree(filePath, fv);
-
-					// iterate the files
-					for (Path path : files) {
-						clusterName = path.getParent().toString()
-								.replaceAll("src/main/resources/output/", "")
-								.replaceAll("ds_", "");
-
-						PREDICATE = clusterName;
-
-						logger.info("Currently in location " + clusterName
-								+ " .... ");
-						readOutputFiles();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-					DBWrapper.updateResidualOIERefined();
-					DBWrapper.shutDown();
+			// VISIT THE FOLDER LOCATION AND ITERATE THROUGH ALL SUB FOLDERS
+			// FOR
+			// THE EXACT OUTPUT FILE
+			final List<Path> files = new ArrayList<Path>();
+			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file,
+						BasicFileAttributes attrs) throws IOException {
+					if (file.endsWith("out.db"))
+						files.add(file);
+					return FileVisitResult.CONTINUE;
 				}
+			};
+
+			try {
+				// gets the only relevant output files
+				Files.walkFileTree(filePath, fv);
+
+				// iterate the files
+				for (Path path : files) {
+					clusterName = path.getParent().toString()
+							.replaceAll("src/main/resources/output/", "")
+							.replaceAll("ds_", "");
+
+					PREDICATE = clusterName;
+
+					logger.info("Currently in location " + clusterName
+							+ " .... ");
+					readOutputFiles();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				DBWrapper.updateResidualOIERefined();
+				DBWrapper.shutDown();
 			}
+
 		}
 	}
 
