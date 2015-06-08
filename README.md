@@ -33,7 +33,7 @@ Clean up any pre existing instance matchings with the SQL
 
 ####5. Running IM
 
-Open /src/main/resources/script/MAPPER.sh and change the root directory as defined under DIR and rockit installation location defined under ROCKIT. Similarly, change these two values in the file ***/src/main/resources/script/BOOTSTRAPPER.sh***
+Open ***/src/main/resources/script/MAPPER.sh*** and change the root directory as defined under **DIR** and rockit installation location defined under **ROCKIT**. Similarly, change these two values in the file ***/src/main/resources/script/BOOTSTRAPPER.sh***
 
 Very important, browse to the location where the scripts lie
 
@@ -43,7 +43,11 @@ Then issue the IM script command for running the whole pipeline.
 
 ***./WF.x.PIPELINE.Ny.sh*** for running the Workflow x on Node y
 
-All the MLN related files, evidences will be generated for each relation or relation cluster (depending on the workflow) under the location **/src/main/resources/output/**.
+All the MLN related files, evidences will be generated for each relation or relation cluster (depending on the workflow) under the location **/src/main/resources/output/**. At this point all the instance mappings have been generated and stored in the respective output folders. Issu the following command to read those mappings and write to the database (table OIE_REFINED).
+
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg***
+
+
 
 
 ## Execution
@@ -59,7 +63,6 @@ It must be noted the whole application is developed as three different component
 #### Instance Matching
 After the inflating the compressed file, browse to the location /home/unixUser/ESKO/ and  run from the command line
 
-java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg
 
 ./WF.1.PIPELINE.sh for running the Workflow 1 
 
