@@ -6,9 +6,12 @@ Suppose, you are in this location "/home/unixUser/" the rest of the setup follow
 ##Project Structure
 
 some root directory, lets say **/home/adutta/git**. The full project structure should look like this.
+
 **/home/adutta/git**
-	ESKO
-	DATA
+	
+	**ESKO**
+	
+	**DATA**
 ### Compile
 mvn clean package
 
