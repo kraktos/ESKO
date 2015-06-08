@@ -20,6 +20,8 @@ some root directory, lets say **/home/adutta/git**. The full project structure s
 
 --**DATA**
 
+----OIE data files
+
 ### Compile
 mvn clean package
 
