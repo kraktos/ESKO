@@ -9,8 +9,16 @@ some root directory, lets say **/home/adutta/git**. The full project structure s
 
 **/home/adutta/git**
 
-**ESKO**
-**DATA**
+--**ESKO**
+
+----pom.xml
+
+----CONFIG.cfg
+
+----src (and doc and rest)
+
+
+--**DATA**
 
 ### Compile
 mvn clean package
