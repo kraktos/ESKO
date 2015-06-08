@@ -8,9 +8,7 @@ Suppose, you are in this location "/home/unixUser/" the rest of the setup follow
 some root directory, lets say **/home/adutta/git**. The full project structure should look like this.
 
 **/home/adutta/git**
-	
 	**ESKO**
-	
 	**DATA**
 ### Compile
 mvn clean package
