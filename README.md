@@ -49,6 +49,7 @@ All the MLN related files, evidences will be generated for each relation or rela
 
 ##Running PM
 
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg***
 
 
 ## Execution
