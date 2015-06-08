@@ -43,12 +43,15 @@ public class OIEFactSeperator {
 	 */
 	public static void main(String[] args) {
 
-		// load constants file
-		Constants.loadConfigParameters(new String[] { "", args[0] });
+		if (args.length != 1) {
+			log.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg");
+		} else {
+			// load constants file
+			Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		// load OIE data file in memory and generate F+ and F- files
-		readOieFile(Constants.OIE_DATA_PATH);
-
+			// load OIE data file in memory and generate F+ and F- files
+			readOieFile(Constants.OIE_DATA_PATH);
+		}
 	}
 
 	/**
