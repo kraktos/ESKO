@@ -11,6 +11,7 @@ some root directory, lets say **/home/adutta/git**. The full project structure s
 
 **ESKO**
 **DATA**
+
 ### Compile
 mvn clean package
 
