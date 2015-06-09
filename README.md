@@ -7,20 +7,18 @@ Suppose, you are in this location "/home/unixUser/" the rest of the setup follow
 
 some root directory, lets say **/home/adutta/git**. The full project structure should look like this.
 
-**/home/adutta/git**
+|**/home/adutta/git**
 
---**ESKO**
+|---**ESKO**
 
-----pom.xml
+|------pom.xml
 
-----CONFIG.cfg
+|------CONFIG.cfg
 
-----src (and doc and rest)
+|------src (and doc and rest)
 
 
---**DATA**
-
-----OIE data files
+|---**DATA**(OIE data files)
 
 ### Compile
 mvn clean package
