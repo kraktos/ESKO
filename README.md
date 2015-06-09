@@ -66,13 +66,13 @@ All the MLN related files, evidences will be generated for each relation or rela
 
 ##Property Matching (PM)
 
-There is a clear need to distinguish between the evidence facts and the target facts (which will lead to knowledge generation). The following line does that. It generate two files **/DATA/fPlus.dat** and  **/DATA/fMinus.dat**.
+There is a clear need to distinguish between the evidence facts and the target facts (which will lead to knowledge generation). The following line does that. It generate two files **/DATA/fPlus.dat** and  **/DATA/fMinus.dat**. Since it queries DBpedia endpoint, it can take sometime.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg***
 
 ###PM: Rule based approach
 
-Since this is based on generating association rules, first, run the association generator 
+Since this is based on generating association rules, first, run the association generator. internally it uses the **/DATA/fPlus.dat** as generated in the former step.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg***
 
