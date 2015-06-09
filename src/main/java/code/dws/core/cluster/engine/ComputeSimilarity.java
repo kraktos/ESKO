@@ -203,7 +203,7 @@ public class ComputeSimilarity {
 					+ fileName));
 
 			// create a property collection
-			Generator.getReverbProperties(-1,
+			Generator.getOIERelations(-1,
 					Long.parseLong(Constants.INSTANCE_THRESHOLD));
 
 			Map<String, THashSet<ImmutablePair<String, String>>> propertyInstances = Generator

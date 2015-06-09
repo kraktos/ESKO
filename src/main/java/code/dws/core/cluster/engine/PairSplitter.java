@@ -131,7 +131,7 @@ public class PairSplitter {
 		if (dataTypeIdentifier.equals("OIE")
 				|| dataTypeIdentifier.equals("BOTH")) {
 			try {
-				revbProps = Generator.getReverbProperties(-1,
+				revbProps = Generator.getOIERelations(-1,
 						Long.parseLong(Constants.INSTANCE_THRESHOLD));
 
 				logger.info("Loaded " + revbProps.size() + " OIE properties");

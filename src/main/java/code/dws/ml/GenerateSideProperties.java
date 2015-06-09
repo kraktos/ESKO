@@ -224,7 +224,7 @@ public class GenerateSideProperties {
 	 * retrieve the relations which would be eventually used in the workflow
 	 */
 	private static void getValidProps() {
-		List<String> props = Generator.getReverbProperties(-1,
+		List<String> props = Generator.getOIERelations(-1,
 				Long.parseLong(Constants.INSTANCE_THRESHOLD));
 
 		for (String prop : props) {

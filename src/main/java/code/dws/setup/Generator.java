@@ -134,13 +134,13 @@ public class Generator {
 	 * atLeastInstancesCount number of instances
 	 * 
 	 * 
-	 * @param topKRevbProps
+	 * @param topKOIERelations
 	 * @param atLeastInstancesCount
 	 * 
 	 * @return List of properties
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<String> getReverbProperties(int topKRevbProps,
+	public static List<String> getOIERelations(int topKOIERelations,
 			Long atLeastInstancesCount) {
 
 		String line = null;
@@ -188,7 +188,7 @@ public class Generator {
 				ret.add(e.getKey());
 
 				c++;
-				if (topKRevbProps != -1 && c == topKRevbProps)
+				if (topKOIERelations != -1 && c == topKOIERelations)
 					return ret;
 			}
 		} catch (FileNotFoundException e) {

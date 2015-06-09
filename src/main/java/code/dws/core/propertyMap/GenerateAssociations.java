@@ -45,10 +45,6 @@ public class GenerateAssociations {
 	public static Logger logger = Logger.getLogger(GenerateAssociations.class
 			.getName());
 
-	// data separator of the NELL data file
-	private static final String PATH_SEPERATOR = (Constants.IS_NELL) ? ","
-			: ";";
-
 	private static boolean refinedMode = true;
 
 	private static Map<String, List<String>> propertyClusterNames;
@@ -64,7 +60,6 @@ public class GenerateAssociations {
 			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg");
 		else {
 			init(args[0]);
-
 			findDomRanRestrictions(Constants.OIE_DATA_PATH);
 		}
 	}
@@ -93,7 +88,6 @@ public class GenerateAssociations {
 		if (Constants.INCLUDE_YAGO_TYPES)
 			YagoDbpediaMapping.main(new String[] { "" });
 
-		// if (!Constants.WORKFLOW_NORMAL) {
 		if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
 			String directory = ClusterAnalyzer.getOptimalClusterPath();
 
@@ -101,10 +95,10 @@ public class GenerateAssociations {
 			propertyClusterNames = ClusterAnalyzer.getOptimalCluster(directory);
 
 		} else { // normal workflow, without cluster
-			propertyNames.addAll(Generator.getReverbProperties(-1, 100L));
+			propertyNames.addAll(Generator.getOIERelations(-1,
+					Long.parseLong(Constants.INSTANCE_THRESHOLD)));
 			logger.info("total properties added = " + propertyNames.size());
 		}
-
 	}
 
 	/**
@@ -159,7 +153,7 @@ public class GenerateAssociations {
 		while (scan.hasNextLine()) {
 			line = scan.nextLine();
 
-			elems = line.split(PATH_SEPERATOR);
+			elems = line.split(Constants.OIE_DATA_SEPERARTOR);
 			try {
 				logger.debug(elems[0] + "\t" + elems[1] + "\t" + elems[2]
 						+ "\n");
@@ -224,22 +218,18 @@ public class GenerateAssociations {
 	private static boolean isRelevantProperty(String oieRawProp) {
 		boolean flag = false;
 
-		if (Constants.IS_NELL)
+		if (propertyNames.contains(oieRawProp)) {
 			flag = true;
-		else {
-			if (propertyNames.contains(oieRawProp)) {
-				flag = true;
-			} else {
-				if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
-					for (Entry<String, List<String>> clusterName : propertyClusterNames
-							.entrySet()) {
-						for (String relation : clusterName.getValue()) {
-							if (!propertyNames.contains(relation)) {
-								propertyNames.add(relation);
+		} else {
+			if (Constants.WORKFLOW == 2 || Constants.WORKFLOW == 3) {
+				for (Entry<String, List<String>> clusterName : propertyClusterNames
+						.entrySet()) {
+					for (String relation : clusterName.getValue()) {
+						if (!propertyNames.contains(relation)) {
+							propertyNames.add(relation);
 
-								if (relation.equals(oieRawProp))
-									flag = true;
-							}
+							if (relation.equals(oieRawProp))
+								flag = true;
 						}
 					}
 				}

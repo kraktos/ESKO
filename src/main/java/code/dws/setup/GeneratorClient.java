@@ -31,7 +31,7 @@ public class GeneratorClient {
 		// load the configuration from the file
 		Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		List<String> properties = Generator.getReverbProperties(-1, 100L);
+		List<String> properties = Generator.getOIERelations(-1, 100L);
 
 		FileUtil.writeOut(properties, "Top." + 100 + ".Reverb.Properties.dat");
 	}

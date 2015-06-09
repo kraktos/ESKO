@@ -129,7 +129,7 @@ public class ScriptGenarator {
 
 		if (Constants.IS_NELL || Constants.WORKFLOW == 1) {
 			// // load the NELL file in memory as a collection
-			List<String> props = Generator.getReverbProperties(-1,
+			List<String> props = Generator.getOIERelations(-1,
 					Long.parseLong(Constants.INSTANCE_THRESHOLD));
 			for (String s : props) {
 				PROPS.add(s.replaceAll("\\s+", "-"));
