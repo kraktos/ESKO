@@ -37,7 +37,7 @@ look into folder /preProcess for bash scripts to process the NELL input. We are 
 ####2. CONFIG file changes
 alter the param **OIE_DATA_PATH** in CONFIG.cfg to set the location of newly generated file (Nell/reverb). Consider **INSTANCE_THRESHOLD** as well. 
 
-####3. Script Generation for IM 
+####3. Script Generation
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.setup.ScriptGenarator CONFIG.cfg <#machines>***
 this generates a scripts for the IM pipeline under the folder  **/src/main/resources/script/** in the name of **WF.x.PIPELINE.Ny.sh** where 'x' is the workflow number 1,2,3 and 'y' is the node number.
  
@@ -48,7 +48,7 @@ Clean up any pre existing instance matchings with the SQL
 ***delete from wikiStat.OIE_REFINED;***  This can take some time. Please be patient.
 
 
-##Running IM
+##**I**nstance **M**atching (IM)
 
 Open ***/src/main/resources/script/MAPPER.sh*** and change the root directory as defined under **DIR** and rockit installation location defined under **ROCKIT**. Similarly, change these two values in the file ***/src/main/resources/script/BOOTSTRAPPER.sh***
 
@@ -64,11 +64,15 @@ All the MLN related files, evidences will be generated for each relation or rela
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg***
 
-##Running PM
+##**P**roperty **M**atching (PM)
 
 There is a clear need to distinguish between the evidence facts and the target facts (which will lead to knowledge generation). The following line does that. It generate two files **/DATA/fPlus.dat** and  **/DATA/fMinus.dat**.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg***
+
+###PM: Rule based approach
+
+###PM: Cluster based approach
 
 
 ## Execution
