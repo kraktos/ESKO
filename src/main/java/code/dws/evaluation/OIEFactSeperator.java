@@ -195,42 +195,38 @@ public class OIEFactSeperator {
 		List<QuerySolution> listResults = SPARQLEndPointQueryAPI
 				.queryDBPediaEndPoint(sparqlQuery);
 
-		// if still empty
-		if (listResults.size() == 0) {
-			candSubj = Utilities.utf8ToCharacter(candSubj);
-			candObj = Utilities.utf8ToCharacter(candObj);
+		if (listResults != null) {
+			// if still empty
+			if (listResults.size() == 0) {
+				candSubj = Utilities.utf8ToCharacter(candSubj);
+				candObj = Utilities.utf8ToCharacter(candObj);
 
-			if (candSubj.endsWith("%"))
-				candSubj = candSubj.replaceAll("%", "");
+				if (candSubj.endsWith("%"))
+					candSubj = candSubj.replaceAll("%", "");
 
-			if (candObj.endsWith("%"))
-				candObj = candObj.replaceAll("%", "");
+				if (candObj.endsWith("%"))
+					candObj = candObj.replaceAll("%", "");
 
-			sparqlQuery = "select * where {<"
-					+ Constants.DBPEDIA_INSTANCE_NS
-					+ candSubj
-					+ "> ?val <"
-					+ Constants.DBPEDIA_INSTANCE_NS
-					+ candObj
-					+ ">. "
-					+ "?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>."
-					+ "FILTER(!regex(str(?val), 'http://dbpedia.org/ontology/wikiPageWikiLink'))}";
+				sparqlQuery = "select * where {<"
+						+ Constants.DBPEDIA_INSTANCE_NS
+						+ candSubj
+						+ "> ?val <"
+						+ Constants.DBPEDIA_INSTANCE_NS
+						+ candObj
+						+ ">. "
+						+ "?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>."
+						+ "FILTER(!regex(str(?val), 'http://dbpedia.org/ontology/wikiPageWikiLink'))}";
 
-			// fetch the result set
-			listResults = SPARQLEndPointQueryAPI
-					.queryDBPediaEndPoint(sparqlQuery);
-		}
+				// fetch the result set
+				listResults = SPARQLEndPointQueryAPI
+						.queryDBPediaEndPoint(sparqlQuery);
+			}
 
-		// debug point if interested in seeing the assertion in KB
-		// for (QuerySolution querySol : listResults) {
-		// possiblePred = querySol.get("val").toString();
-		//
-		// log.info(candSubj + "\t" + possiblePred + "\t" + candObj);
-		// }
-
-		if (listResults.size() > 0)
-			return true;
-		else
+			if (listResults != null && listResults.size() > 0)
+				return true;
+			else
+				return false;
+		} else
 			return false;
 
 	}
