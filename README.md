@@ -48,7 +48,7 @@ Clean up any pre existing instance matchings with the SQL
 ***delete from wikiStat.OIE_REFINED;***  This can take some time. Please be patient.
 
 
-##**I**nstance **M**atching (IM)
+##Instance Matching (IM)
 
 Open ***/src/main/resources/script/MAPPER.sh*** and change the root directory as defined under **DIR** and rockit installation location defined under **ROCKIT**. Similarly, change these two values in the file ***/src/main/resources/script/BOOTSTRAPPER.sh***
 
@@ -64,13 +64,18 @@ All the MLN related files, evidences will be generated for each relation or rela
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg***
 
-##**P**roperty **M**atching (PM)
+##Property Matching (PM)
 
 There is a clear need to distinguish between the evidence facts and the target facts (which will lead to knowledge generation). The following line does that. It generate two files **/DATA/fPlus.dat** and  **/DATA/fMinus.dat**.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg***
 
 ###PM: Rule based approach
+
+Since this is based on generating association rules, first, run the association generator 
+
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg***
+
 
 ###PM: Cluster based approach
 
