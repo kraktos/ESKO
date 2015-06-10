@@ -147,4 +147,16 @@ Further optimise for optimal clusters
 
 ## Evaluation
 
+## Additional
+
+You might be interested to gain some initial insights into the input data set. Here you have few utility classes which would generate some additional data files. The R scripts are also provided. using those, it is possible to generate plots showing the data behaviours. 
+
+###1.Instance distributions
+
+This class generates a file called **/DATA/oie.properties.instances.distribution.tsv**. This file has two columns, first one is "Instance Count"  and second is "No. of relations with that instance count", Hence, an entry like (233, 4) means there are 4 realtions in the input data set with 233 instances each.
+
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.statistics.DataAnalyzer CONFIG.cfg***
+
+
+
 
