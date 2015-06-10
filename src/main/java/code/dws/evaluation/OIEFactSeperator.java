@@ -105,9 +105,6 @@ public class OIEFactSeperator {
 			oieRawSubj = elems[0];
 			oieRawObj = elems[2];
 
-			if (oieRawSubj.indexOf("A Bird") != -1)
-				System.out.println();
-
 			// get the top-k concepts for the subject
 			candidateSubjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
 					.cleanse(oieRawSubj).replaceAll("\\_+", " ").trim(),
