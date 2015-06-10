@@ -43,16 +43,11 @@ public class DataAnalyzer {
 	public final static Logger logger = LoggerFactory
 			.getLogger(DataAnalyzer.class);
 
-	public static int TOPK_REV_PROPS = 500;
 	private static String OIE_FILE_PATH = null;
 	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
-	private static THashMap<String, Long> EMPTY_PROPERTY_MAP = new THashMap<String, Long>();
+	// private static THashMap<String, Long> EMPTY_PROPERTY_MAP = new
+	// THashMap<String, Long>();
 	private static THashMap<Long, Long> COUNT_FREQUENY = new THashMap<Long, Long>();
-
-	private static final String HEADER = "http://dbpedia.org/resource/";
-
-	// top-k wikipedia links
-	private static final int TOP_K = 5;
 
 	// number of gold standard facts
 	private static final int SIZE = 10000;
@@ -94,10 +89,10 @@ public class DataAnalyzer {
 			// property
 			// createGoldStandard();
 
-			for (Entry<String, Long> e : EMPTY_PROPERTY_MAP.entrySet()) {
-				logger.info(e.getKey() + "\t" + e.getValue() + "\t"
-						+ COUNT_PROPERTY_INST.get(e.getKey()));
-			}
+			// for (Entry<String, Long> e : EMPTY_PROPERTY_MAP.entrySet()) {
+			// logger.info(e.getKey() + "\t" + e.getValue() + "\t"
+			// + COUNT_PROPERTY_INST.get(e.getKey()));
+			// }
 
 		}
 
@@ -208,11 +203,11 @@ public class DataAnalyzer {
 
 				// get top-k candidates of the subject
 				topkSubjects = DBWrapper.fetchTopKLinksWikiPrepProb(oieSub,
-						TOP_K);
+						Constants.TOP_K_MATCHES);
 
 				// get the topk instances for oieObj
 				topkObjects = DBWrapper.fetchTopKLinksWikiPrepProb(oieObj,
-						TOP_K);
+						Constants.TOP_K_MATCHES);
 
 				if (!linkExists(topkSubjects, topkObjects)) {
 
@@ -303,11 +298,13 @@ public class DataAnalyzer {
 			for (int j = 0; j < ((topkSubjects.size() > topkObjects.size()) ? topkSubjects
 					.size() : topkObjects.size()); j++) {
 
-				candSub = (j > topkSubjects.size() - 1) ? "-" : HEADER
-						+ topkSubjects.get(j).split("\t")[0];
+				candSub = (j > topkSubjects.size() - 1) ? "-"
+						: Constants.DBPEDIA_INSTANCE_NS
+								+ topkSubjects.get(j).split("\t")[0];
 
-				candObj = (j > topkObjects.size() - 1) ? "-" : HEADER
-						+ topkObjects.get(j).split("\t")[0];
+				candObj = (j > topkObjects.size() - 1) ? "-"
+						: Constants.DBPEDIA_INSTANCE_NS
+								+ topkObjects.get(j).split("\t")[0];
 
 				writer.write("\t" + "\t" + "\t"
 						+ Utilities.utf8ToCharacter(candSub) + "\t" + "" + "\t"
@@ -318,7 +315,7 @@ public class DataAnalyzer {
 		if (topkSubjects.size() > 0
 				&& (topkObjects == null || topkObjects.size() == 0)) {
 			for (String candSub : topkSubjects) {
-				writer.write("\t" + "\t" + "\t" + HEADER
+				writer.write("\t" + "\t" + "\t" + Constants.DBPEDIA_INSTANCE_NS
 						+ Utilities.utf8ToCharacter(candSub.split("\t")[0])
 						+ "\t" + "-" + "\t" + "-" + "\n");
 			}
@@ -327,7 +324,7 @@ public class DataAnalyzer {
 				&& topkObjects != null) {
 			for (String candObj : topkObjects) {
 				writer.write("\t" + "\t" + "\t" + "-" + "\t" + "-" + "\t"
-						+ HEADER
+						+ Constants.DBPEDIA_INSTANCE_NS
 						+ Utilities.utf8ToCharacter(candObj.split("\t")[0])
 						+ "\n");
 			}
