@@ -37,7 +37,7 @@ public class Generator {
 	private final static Logger logger = LoggerFactory
 			.getLogger(Generator.class);
 
-	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
+	private static Map<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
 
 	private static Map<String, THashSet<ImmutablePair<String, String>>> PROPS_INSTANCES_MAP = new HashMap<String, THashSet<ImmutablePair<String, String>>>();
 
@@ -46,6 +46,13 @@ public class Generator {
 	 */
 	public Generator() {
 
+	}
+
+	/**
+	 * @return the cOUNT_PROPERTY_INST
+	 */
+	public static Map<String, Long> getRelationOccurrenceCountMap() {
+		return COUNT_PROPERTY_INST;
 	}
 
 	public static Map<String, THashSet<ImmutablePair<String, String>>> getPropInstance() {
@@ -74,8 +81,6 @@ public class Generator {
 		int c = 0;
 		List<String> ret = new ArrayList<String>();
 		THashSet<ImmutablePair<String, String>> list = null;
-
-		COUNT_PROPERTY_INST = new THashMap<String, Long>();
 
 		try {
 			@SuppressWarnings("resource")
@@ -195,9 +200,6 @@ public class Generator {
 			logger.error(e.getMessage());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			COUNT_PROPERTY_INST.clear();
-			COUNT_PROPERTY_INST = null;
 		}
 		return ret;
 	}
