@@ -95,7 +95,6 @@ public class DataAnalyzer {
 			// }
 
 		}
-
 	}
 
 	/**
@@ -130,9 +129,15 @@ public class DataAnalyzer {
 
 		logger.info("Number of instances = " + sum);
 
-		writer.write("Instance Count\tNo. of such relations\n");
+		long c = 0;
+		writer.write("IC\n");
 		for (Entry<Long, Long> e : COUNT_FREQUENY.entrySet()) {
-			writer.write(e.getKey() + "\t" + e.getValue() + "\n");
+			c = 0;
+			while (c != e.getValue().longValue()) {
+				writer.write(e.getKey() + "\n");
+				c++;
+			}
+			// writer.write(e.getKey() + "\t" + e.getValue() + "\n");
 		}
 		writer.flush();
 		writer.close();
