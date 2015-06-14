@@ -107,7 +107,8 @@ public class ScriptGenarator {
 			}
 		}
 
-		logger.info("echo \"Done with " + PROPS.size() + " relations (clusters)\n");
+		logger.info("echo \"Done with " + PROPS.size()
+				+ " relations (clusters)\n");
 
 		for (int k = 0; k < numberOfMachines; k++) {
 			try {
@@ -131,6 +132,22 @@ public class ScriptGenarator {
 			// // load the NELL file in memory as a collection
 			List<String> props = Generator.getOIERelations(-1,
 					Long.parseLong(Constants.INSTANCE_THRESHOLD));
+
+			// props.clear();
+			// props.add("is located in");
+			// props.add("is in");
+			// props.add("was born in");
+			// props.add("is a registered trademark of");
+			// props.add("located in");
+			// props.add("is a suburb of");
+			// props.add("is part of");
+			// props.add("is the capital of");
+			// props.add("stands for");
+			// props.add("is a city in");
+			// props.add("originated in");
+			// props.add("is the home of");
+			//
+
 			for (String s : props) {
 				PROPS.add(s.replaceAll("\\s+", "-"));
 			}

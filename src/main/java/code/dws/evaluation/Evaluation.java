@@ -229,7 +229,7 @@ public class Evaluation {
 				if (rltnCandidates.size() > 0)
 					goldMapPM.put(arr[1], rltnCandidates);
 				else {
-					logger.info("Thullu with " + arr[1]);
+					logger.info("No mapping relation for  " + arr[1]);
 				}
 
 				goldMapIM.put(oieFact, dbpFact);
@@ -325,11 +325,11 @@ public class Evaluation {
 			d = algoVals.size();
 		}
 
-		double s = (double) 100 * n / d;
+		// double s = (double) 100 * n / d;
 
-		logger.info(s);
-		logger.info("Algo = " + algoVals);
-		logger.info("Gold = " + goldVals);
+		// logger.info(s);
+		// logger.info("Algo = " + algoVals);
+		// logger.info("Gold = " + goldVals);
 
 	}
 
@@ -354,7 +354,7 @@ public class Evaluation {
 				algoPMCands = entry.getValue();
 				goldPMCands = goldMapPM.get(oieRelation);
 
-				logger.info("\nPrecision for " + oieRelation);
+				// logger.info("\nPrecision for "s + oieRelation);
 				match(algoPMCands, goldPMCands, identifier);
 			}
 		}
@@ -368,7 +368,7 @@ public class Evaluation {
 				algoPMCands = prunedAlgoMapPM.get(oieRelation);
 
 				if (algoPMCands != null) {
-					logger.info("\nRecall for " + oieRelation);
+					// logger.info("\nRecall for " + oieRelation);
 					match(algoPMCands, goldPMCands, identifier);
 				}
 			}
@@ -398,6 +398,7 @@ public class Evaluation {
 
 		FactDao algoFact = null;
 		FactDao goldFact = null;
+		boolean flag = true;
 
 		// FOR PRECISION
 		if (identifier.equals("P")) {
@@ -440,7 +441,6 @@ public class Evaluation {
 				}
 			}
 		}
-
 		if (identifier.equals("R")) {
 			for (Map.Entry<FactDao, FactDao> entry : goldMapIM.entrySet()) {
 				goldFact = entry.getValue();
