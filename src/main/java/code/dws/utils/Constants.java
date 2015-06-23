@@ -132,6 +132,15 @@ public class Constants {
 	public static final String GET_REFINED_MAPPINGS_SQL = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
 	/**
+	 * SQL for getting the top-1 subject and object mapping together.
+	 */
+	public static final String GET_TOP_1_TOGETHER_SQL = "select A.URI, I from (select  URI,  'S' as I, "
+			+ "(SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  where "
+			+ "SF =? group by BINARY URI order by p desc limit 1) as A UNION select B.URI, I from (select  URI, "
+			+ " 'O' as I, (SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  "
+			+ "where SF =? group by BINARY URI order by p desc limit 1) as B";
+
+	/**
 	 * SQL to fetch the probabilities of the same as links from terms to
 	 * concepts
 	 */

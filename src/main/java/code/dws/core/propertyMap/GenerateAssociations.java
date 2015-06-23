@@ -56,10 +56,11 @@ public class GenerateAssociations {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		if (args.length != 1)
-			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg");
+		if (args.length != 2)
+			logger.error("Usage: java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg <0 or 1>");
 		else {
 			init(args[0]);
+			refinedMode = (args[1].equals("1")) ? true : false;
 			findDomRanRestrictions(Constants.OIE_DATA_PATH);
 		}
 	}
@@ -131,8 +132,10 @@ public class GenerateAssociations {
 				INVERSE_PROP_LOG));
 
 		// init DB for getting the most frequent URI for the NELL terms
+
+		// DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
 		if (!refinedMode)
-			DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
+			DBWrapper.init(Constants.GET_TOP_1_TOGETHER_SQL);
 
 		// another run mode with refined mapping, not just top-1
 		if (refinedMode)
@@ -165,11 +168,17 @@ public class GenerateAssociations {
 
 				if (isRelevantProperty(oieRawProp)) {
 
-					candidates = DBWrapper.fetchRefinedMapping(
-							Utilities.cleanse(oieRawSubj).trim(),
-							(Constants.IS_NELL) ? oieRawProp.trim().replaceAll(
-									"\\s+", "_") : oieRawProp.trim(), Utilities
-									.cleanse(oieRawObj).trim());
+					if (!refinedMode)
+						candidates = DBWrapper.fetchTop1Mapping(Utilities
+								.cleanse(oieRawSubj).trim(),
+								Utilities.cleanse(oieRawObj).trim());
+					else
+						candidates = DBWrapper.fetchRefinedMapping(
+								Utilities.cleanse(oieRawSubj).trim(),
+								(Constants.IS_NELL) ? oieRawProp.trim()
+										.replaceAll("\\s+", "_") : oieRawProp
+										.trim(), Utilities.cleanse(oieRawObj)
+										.trim());
 
 					try {
 						candidateSubjs = new ArrayList<String>();

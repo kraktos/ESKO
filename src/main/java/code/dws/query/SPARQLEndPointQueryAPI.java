@@ -82,7 +82,6 @@ public class SPARQLEndPointQueryAPI {
 					qexec = QueryExecutionFactory.sparqlService(
 							Constants.DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP, query);
 					results = qexec.execSelect();
-
 				} catch (Exception eee) {
 					logger.error("Problem with query + " + query);
 				}

@@ -178,8 +178,6 @@ public class DBWrapper {
 		return types;
 	}
 
-	
-
 	/**
 	 * find the top k candidates for a given surface form/term/ oie instance
 	 * 
@@ -456,6 +454,54 @@ public class DBWrapper {
 		}
 
 		return null;
+	}
+
+	/**
+	 * find the top-1 candidate for the subject and object together. easier
+	 * query than two simultaneous call
+	 * 
+	 * @param oieSub
+	 * @param oieObj
+	 * @return
+	 */
+	public static List<String> fetchTop1Mapping(String oieSub, String oieObj) {
+		ResultSet rs = null;
+		List<String> results = null;
+
+		try {
+			pstmt.setString(1, oieSub);
+			pstmt.setString(2, oieSub);
+			pstmt.setString(3, oieObj);
+			pstmt.setString(4, oieObj);
+			
+			rs = pstmt.executeQuery();
+			results = new ArrayList<String>();
+
+			while (rs.next()) {
+
+				if (rs.getString(2).equals("S")) {
+					results.add(0, Utilities.characterToUTF8((rs.getString(1))
+							.replaceAll("\\s", "_")));
+					results.add(1, "X");
+				} else {
+					if (rs.getString(2).equals("O")) {
+						if (results.get(0) == null) 
+							results.add(0, "X");
+						
+						if (results.get(1) != null) 
+							results.remove(1);
+						
+						results.add(1, Utilities.characterToUTF8((rs
+									.getString(1)).replaceAll("\\s", "_")));
+						
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return results;
 	}
 
 	/**
