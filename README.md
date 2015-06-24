@@ -82,7 +82,7 @@ The last argument says, if you want to use the refined output (1) from the IM st
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.RegressionAnalysis CONFIG.cfg <threshold>***
 
-Set threshold to any desired value between 0-100, this is a percentage, so 3 means 3%. The actual property mappings are generated in a file as **/DATA/PROPERTY_MAPPINGS_DIRECT_THRESH_<threshold>_WF_<#>.tsv**. Start playing with it.
+Set threshold to any desired value between 0-100, this is a percentage, so 3 means 3%. The actual property mappings are generated in a file as **/DATA/PROPERTY_MAPPINGS_DIRECT_THRESH_<threshold>_WF_#.tsv**. Start playing with it. # denotes the workflow you set in the CONFIG file.
 
 ###PM: Cluster based approach
 
