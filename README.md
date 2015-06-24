@@ -72,11 +72,15 @@ There is a clear need to distinguish between the evidence facts and the target f
 
 ###PM: Rule based approach
 
-Since this is based on generating association rules, first, run the association generator. internally it uses the **/DATA/fPlus.dat** as generated in the former step.
+1. Since this is based on generating association rules, first, run the association generator. internally it uses the **/DATA/fPlus.dat** as generated in the former step.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg <0/1>***
-
 The last argument says, if you want to use the refined output (1) from the IM step or use top-1 (0) mappings.
+
+
+2. Once the associations are generated, use the following command to actually generate the mappings.
+
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.RegressionAnalysis CONFIG.cfg <threshold>***
 
 ###PM: Cluster based approach
 
