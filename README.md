@@ -74,8 +74,9 @@ There is a clear need to distinguish between the evidence facts and the target f
 
 Since this is based on generating association rules, first, run the association generator. internally it uses the **/DATA/fPlus.dat** as generated in the former step.
 
-***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg***
+***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.propertyMap.GenerateAssociations CONFIG.cfg <0/1>***
 
+The last argument says, if you want to use the refined output (1) from the IM step or use top-1 (0) mappings.
 
 ###PM: Cluster based approach
 
