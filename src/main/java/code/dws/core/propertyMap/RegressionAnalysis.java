@@ -60,6 +60,8 @@ public class RegressionAnalysis {
 
 	private static String DISTRIBUTION_NEW_TRIPLES = null;
 
+	private static String PROPERTY_MAPPINGS = null;
+
 	private static Map<String, Map<String, Map<Pair<String, String>, Long>>> GLOBAL_TRANSCS_MAP = new HashMap<String, Map<String, Map<Pair<String, String>, Long>>>();
 
 	// tolerance of error, 1.1 means 10%
@@ -118,12 +120,16 @@ public class RegressionAnalysis {
 			PROP_STATS = "/MAP_PERCENT_VS_TAU_REVERB_"
 					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
 					+ +OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
-			
+
 			NEW_TRIPLES = "/NEW_TRIPLES_REVERB_"
 					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
 					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
 			DISTRIBUTION_NEW_TRIPLES = "/NEW_TRIPLES_REVERB_DOM_RAN_"
+					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
+					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
+
+			PROPERTY_MAPPINGS = "/PROPERTY_MAPPINGS_"
 					+ (INVERSE ? "INVERSE_THRESH_" : "DIRECT_THRESH_")
 					+ OIE_PROPERTY_MAPPED_THRESHOLD + "_WF_";
 
@@ -238,12 +244,15 @@ public class RegressionAnalysis {
 				directory + DISTRIBUTION_NEW_TRIPLES + Constants.WORKFLOW
 						+ ".tsv"));
 
+		BufferedWriter propMappingsWriter = new BufferedWriter(new FileWriter(
+				directory + PROPERTY_MAPPINGS + Constants.WORKFLOW + ".tsv"));
+
 		// read the file into memory
 		ArrayList<ArrayList<String>> fMinusFile = FileUtil.genericFileReader(
 				new FileInputStream(filePath), Constants.OIE_DATA_SEPERARTOR,
 				false);
 
-		// init DB for getting the most frequebt URI for the NELL terms
+		// init DB for getting the most frequent URI for the NELL terms
 
 		// MOST FREQUENT CASE
 		// DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
@@ -264,14 +273,33 @@ public class RegressionAnalysis {
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);
 
+					printOut(dbProps, oieProp, propMappingsWriter);
+
 					reCreateTriples(dbProps, line, triplesWriter,
 							statStriplesWriter, CACHED_SUBCLASSES);
 				}
 			}
 		}
 
+		propMappingsWriter.close();
 		triplesWriter.close();
 		statStriplesWriter.close();
+	}
+
+	private static void printOut(List<String> dbProps, String oieProp,
+			BufferedWriter propMappingsWriter) {
+
+		try {
+			for (String dbProp : dbProps)
+				propMappingsWriter.write(dbProp + "\t" + oieProp + "\n");
+
+			propMappingsWriter.flush();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	/**

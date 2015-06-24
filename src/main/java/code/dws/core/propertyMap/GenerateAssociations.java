@@ -78,6 +78,8 @@ public class GenerateAssociations {
 		// get the OIE File Path
 		DIRECTORY = new File(Constants.OIE_DATA_PATH).getParent().toString();
 
+		// Reverb has multiple wF options, hence it has been concatenated with
+		// the file name, NELL doesnot (its just WF 1)		
 		INVERSE_PROP_LOG = (Constants.IS_NELL) ? DIRECTORY
 				+ "/INVERSE_PROP.log" : DIRECTORY + "/REVERB_INVERSE_PROP.WF."
 				+ Constants.WORKFLOW + ".log";
@@ -443,12 +445,14 @@ public class GenerateAssociations {
 		List<QuerySolution> listResults = SPARQLEndPointQueryAPI
 				.queryDBPediaEndPoint(sparqlQuery);
 
-		for (QuerySolution querySol : listResults) {
-			possiblePred = querySol.get("val").toString();
+		if (listResults != null) {
+			for (QuerySolution querySol : listResults) {
+				possiblePred = querySol.get("val").toString();
 
-			// add the sub classes to a set
-			returnPredicates.add(possiblePred);
-			sBuf.append(possiblePred + "\t");
+				// add the sub classes to a set
+				returnPredicates.add(possiblePred);
+				sBuf.append(possiblePred + "\t");
+			}
 		}
 
 		return sBuf.toString().trim();
