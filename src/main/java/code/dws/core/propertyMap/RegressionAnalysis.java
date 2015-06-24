@@ -237,6 +237,7 @@ public class RegressionAnalysis {
 		// nell property in concern
 		String oieProp = null;
 
+		List<String> dbProps = null;
 		// write transactions to the file for analysis
 		BufferedWriter triplesWriter = new BufferedWriter(new FileWriter(
 				directory + NEW_TRIPLES + Constants.WORKFLOW + ".tsv"));
@@ -271,9 +272,9 @@ public class RegressionAnalysis {
 			if (line.size() == 4) {
 
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
-					List<String> dbProps = FINAL_MAPPINGS.get(oieProp);
+					dbProps = FINAL_MAPPINGS.get(oieProp);
 
-					printOut(dbProps, oieProp, propMappingsWriter);
+					// printOut(dbProps, oieProp, propMappingsWriter);
 
 					reCreateTriples(dbProps, line, triplesWriter,
 							statStriplesWriter, CACHED_SUBCLASSES);
