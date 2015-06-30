@@ -136,7 +136,7 @@ public class RegressionAnalysis {
 			logger.info("Configuration loaded...");
 			logger.info("Building Class hierarchy...");
 			CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
-
+ 
 			// initiate the paths
 			GenerateAssociations.init(args[0]);
 
@@ -163,8 +163,8 @@ public class RegressionAnalysis {
 				run(inputLog, clusterNames);
 
 				// new triples will be generated on the fMinus file
-				if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
-					createNewTriples(directory + "/fMinus.dat", clusterNames);
+//				if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
+//					createNewTriples(directory + "/fMinus.dat", clusterNames);
 			} finally {
 
 				MAP_PRED_COUNT.clear();
@@ -274,7 +274,7 @@ public class RegressionAnalysis {
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					dbProps = FINAL_MAPPINGS.get(oieProp);
 
-					// printOut(dbProps, oieProp, propMappingsWriter);
+					printOut(dbProps, oieProp, propMappingsWriter);
 
 					reCreateTriples(dbProps, line, triplesWriter,
 							statStriplesWriter, CACHED_SUBCLASSES);
@@ -1078,9 +1078,9 @@ public class RegressionAnalysis {
 	private static boolean checker(String generalClass, String particularClass,
 			Map<String, String> CACHED_SUBCLASSES) {
 
-		if (particularClass.equals("AdministrativeRegion")
-				&& generalClass.equals("Settlement"))
-			System.out.println();
+//		if (particularClass.equals("AdministrativeRegion")
+//				&& generalClass.equals("Settlement"))
+//			System.out.println();
 
 		if (generalClass != null && particularClass != null) {
 			// both are same

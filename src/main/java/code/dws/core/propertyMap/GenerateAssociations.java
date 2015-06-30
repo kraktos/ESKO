@@ -164,9 +164,9 @@ public class GenerateAssociations {
 						+ "\n");
 
 				// get the oie subjects and objects
-				oieRawSubj = elems[0];
+				oieRawSubj = elems[0].replaceAll("\\_+", " ");
 				oieRawProp = elems[1];
-				oieRawObj = elems[2];
+				oieRawObj = elems[2].replaceAll("\\_+", " ");
 
 				if (isRelevantProperty(oieRawProp)) {
 
