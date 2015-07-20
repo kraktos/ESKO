@@ -20,6 +20,16 @@ some root directory, lets say **/home/adutta/git**. The full project structure s
 
 |---**DATA**(OIE data files)
 
+###Dependancies
+The following tools/sofwares should be first installed.
+1. MAP inference engine "RockIt". This is avialable with a detailed documentation of its own at https://code.google.com/p/rockit/
+2. Maven (https://maven.apache.org/)
+3. MySQL database (https://www.mysql.com/)
+4. Mysql client (not required, but helpful in general) (https://www.mysql.com/products/workbench/)
+5. jdk (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+ 
+
+
 ### Compile
 mvn clean package
 
