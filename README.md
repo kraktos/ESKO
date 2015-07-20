@@ -93,34 +93,6 @@ Set threshold to any desired value between 0-100, this is a percentage, so 3 mea
 ###PM: Cluster based approach
 
 
-## Execution
-
-### Download the source
-Download the compressed file from here. This would create two folders as,
-/home/unixUser/DATA/ and /home/unixUser/ESKO/. An extrensive java documentation is available under /home/unixUser/ESKO/doc/.
-
-### Running the Pipeline
-It must be noted the whole application is developed as three different components and not as an one click step.
-
-
-#### Instance Matching
-After the inflating the compressed file, browse to the location /home/unixUser/ESKO/ and  run from the command line
-
-
-./WF.1.PIPELINE.sh for running the Workflow 1 
-
-./WF.2.PIPELINE.sh for running the Workflow 2
-
-./WF.3.PIPELINE.sh for running the Workflow 3
-
-
-
-The outputs will be generated under /home/unixUser/ESKO/src/main/resources/output/
-
-This module, takes an OIE file as input, and produces instance mappings for the subject and object terms and dumps them into the database. The next step, uses these refined mappings to process further.
-
-#### Clustering
-
 The first step is to split the given input OIE data set file into pairs  of OIE realtions. For instance, a given OIE data set with n relations will have n*(n-1)/2 pairs. These pairs are computed and splitted into different files.
 To achieve this, run the following
 
@@ -150,9 +122,6 @@ Find the optimal. and set it in the CONFIG file. The file will be in /home/unixU
 
 Further optimise for optimal clusters
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterOptimizer CONFIG.cfg <partially optimised file from previous step>**
-
-
-
 
 
 #### Knowledge Generation
