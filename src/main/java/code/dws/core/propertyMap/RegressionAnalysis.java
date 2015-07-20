@@ -64,6 +64,8 @@ public class RegressionAnalysis {
 
 	private static Map<String, Map<String, Map<Pair<String, String>, Long>>> GLOBAL_TRANSCS_MAP = new HashMap<String, Map<String, Map<Pair<String, String>, Long>>>();
 
+	static Map<String, List<String>> propertyClusterNames = new HashMap<>();
+
 	// tolerance of error, 1.1 means 10%
 	private static final double ERROR_TOLERANCE = 1;
 
@@ -136,7 +138,7 @@ public class RegressionAnalysis {
 			logger.info("Configuration loaded...");
 			logger.info("Building Class hierarchy...");
 			CACHED_SUBCLASSES = Utilities.buildClassHierarchy();
- 
+
 			// initiate the paths
 			GenerateAssociations.init(args[0]);
 
@@ -162,9 +164,10 @@ public class RegressionAnalysis {
 
 				run(inputLog, clusterNames);
 
+				printOut();
 				// new triples will be generated on the fMinus file
-//				if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
-//					createNewTriples(directory + "/fMinus.dat", clusterNames);
+				// if (OIE_PROPERTY_MAPPED_THRESHOLD > 0)
+				createNewTriples(directory + "/fMinus.dat", clusterNames);
 			} finally {
 
 				MAP_PRED_COUNT.clear();
@@ -191,8 +194,7 @@ public class RegressionAnalysis {
 			// cluster
 			// name
 
-			Map<String, List<String>> propertyClusterNames = ClusterAnalyzer
-					.getOptimalCluster(directory);
+			propertyClusterNames = ClusterAnalyzer.getOptimalCluster(directory);
 
 			for (Map.Entry<String, List<String>> entry : propertyClusterNames
 					.entrySet()) {
@@ -274,7 +276,7 @@ public class RegressionAnalysis {
 				if (FINAL_MAPPINGS.containsKey(oieProp)) {
 					dbProps = FINAL_MAPPINGS.get(oieProp);
 
-					printOut(dbProps, oieProp, propMappingsWriter);
+					// printOut(dbProps, oieProp, propMappingsWriter);
 
 					reCreateTriples(dbProps, line, triplesWriter,
 							statStriplesWriter, CACHED_SUBCLASSES);
@@ -282,19 +284,34 @@ public class RegressionAnalysis {
 			}
 		}
 
-		propMappingsWriter.close();
 		triplesWriter.close();
 		statStriplesWriter.close();
 	}
 
-	private static void printOut(List<String> dbProps, String oieProp,
-			BufferedWriter propMappingsWriter) {
+	private static void printOut() {
 
 		try {
-			for (String dbProp : dbProps)
-				propMappingsWriter.write(dbProp + "\t" + oieProp + "\n");
+			BufferedWriter propMappingsWriter = new BufferedWriter(
+					new FileWriter(directory + PROPERTY_MAPPINGS
+							+ Constants.WORKFLOW + ".tsv"));
 
-			propMappingsWriter.flush();
+			for (Entry<String, List<String>> propCl : FINAL_MAPPINGS.entrySet()) {
+				for (String dbProp : propCl.getValue()) {
+					if (Constants.WORKFLOW == 1) {
+						propMappingsWriter.write(dbProp + "\t"
+								+ propCl.getKey() + "\n");
+					} else {
+						for (String s : propertyClusterNames.get(propCl
+								.getKey())) {
+							propMappingsWriter.write(dbProp + "\t" + s + "\n");
+						}
+					}
+
+				}
+
+				propMappingsWriter.flush();
+
+			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -1078,9 +1095,9 @@ public class RegressionAnalysis {
 	private static boolean checker(String generalClass, String particularClass,
 			Map<String, String> CACHED_SUBCLASSES) {
 
-//		if (particularClass.equals("AdministrativeRegion")
-//				&& generalClass.equals("Settlement"))
-//			System.out.println();
+		// if (particularClass.equals("AdministrativeRegion")
+		// && generalClass.equals("Settlement"))
+		// System.out.println();
 
 		if (generalClass != null && particularClass != null) {
 			// both are same
