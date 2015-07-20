@@ -125,9 +125,11 @@ Further optimise for optimal clusters
 
 
 ##Knowledge Generation
+This is the final block of puzzle. One can generate new triples for the workflow 3, by issuing the following command,
 
+**java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.knowGen.GenerateTriples CONFIG.cfg**
 
-## Evaluation
+Note that the triples for wf1 and wf2 are already generated with the execution of the class code.dws.core.propertyMap.RegressionAnalysis.java
 
 ## Additional
 
