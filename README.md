@@ -46,6 +46,7 @@ this generates a scripts for the IM pipeline under the folder  **/src/main/resou
 Since, we use the most frequent wikipedia sense in out IM step, the whole sql file can be downlaoded from web.informatik.uni-mannheim.de/adutta/wikiPrep.tar.gz
 
 This is a self contained sql and issuing the command 
+
 ***source wikiPrep.sql*** from the mySQL command prompt will install the data in the DB.
 
 Clean up any pre existing instance matchings with the SQL 
