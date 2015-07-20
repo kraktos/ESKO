@@ -32,6 +32,9 @@ The following tools/sofwares should be first installed.
 5. Mysql client (not required, but helpful in general) (https://www.mysql.com/products/workbench/)
  
 6. jdk (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+7. Java IDE of ones own choice (I prefer Eclipse, https://eclipse.org/downloads/)
+
  
 
 
