@@ -70,13 +70,13 @@ All the MLN related files, evidences will be generated for each relation or rela
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.DBPMappingsLoader CONFIG.cfg***
 
-##Property Matching (PM)
+##Relation Matching (RM)
 
 There is a clear need to distinguish between the evidence facts and the target facts (which will lead to knowledge generation). The following line does that. It generate two files **/DATA/fPlus.dat** and  **/DATA/fMinus.dat**. Since it queries DBpedia endpoint, it can take sometime.
 
 ***java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.evaluation.OIEFactSeperator CONFIG.cfg***
 
-###PM: Rule based approach
+###RM: Rule based approach
 
 1. Since this is based on generating association rules, first, run the association generator. internally it uses the **/DATA/fPlus.dat** as generated in the former step.
 
@@ -90,7 +90,7 @@ The last argument says, if you want to use the refined output (1) from the IM st
 
 Set threshold to any desired value between 0-100, this is a percentage, so 3 means 3%. The actual property mappings are generated in a file as **/DATA/PROPERTY_MAPPINGS_DIRECT_THRESH_<threshold>_WF_#.tsv**. Start playing with it. # denotes the workflow you set in the CONFIG file.
 
-###PM: Cluster based approach
+###RM: Cluster based approach
 
 
 The first step is to split the given input OIE data set file into pairs  of OIE realtions. For instance, a given OIE data set with n relations will have n*(n-1)/2 pairs. These pairs are computed and splitted into different files.
@@ -124,7 +124,7 @@ Further optimise for optimal clusters
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterOptimizer CONFIG.cfg <partially optimised file from previous step>**
 
 
-#### Knowledge Generation
+##Knowledge Generation
 
 
 ## Evaluation
