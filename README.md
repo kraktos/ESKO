@@ -43,6 +43,9 @@ The following tools/sofwares should be first installed.
 ### Compile
 mvn clean package
 
+Uncompress the files.tar.gz under src/main/resources/input/
+
+This files are required for the framework.
 
 ##Setup
 CONFIG.cfg = all the parameters and setup values are provided here with respective descriptions. Some of the important parameters you need to set. These are placed in order of importance in the config file. 
