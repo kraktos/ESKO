@@ -24,8 +24,10 @@ some root directory, lets say **/home/adutta/git**. The full project structure s
 The following tools/sofwares should be first installed.
 
 1. MAP inference engine "RockIt". This is avialable with a detailed documentation of its own at https://code.google.com/p/rockit/
- 
-2. Maven (https://maven.apache.org/)
+
+2. Install markov clustering tool, mcl (http://www.micans.org/mcl/index.html?sec_software)
+
+3. 2. Maven (https://maven.apache.org/)
 
 4. MySQL database (https://www.mysql.com/)
  
@@ -131,7 +133,7 @@ Combine these in the ratio of beta, using the following
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.BetaSearcher <WN pairwise score file> <Overlap pairwise score file>**
 
 
-run mcl clustering, on each combination. 
+run mcl clustering, on each combination. (a sample mcl running script is available under src/main/resources/script/mcl/)
 After clustering run,
 **java -cp target/ESKO-0.0.1-SNAPSHOT-jar-with-dependencies.jar code.dws.core.cluster.analysis.ClusterAnalyzer CONFIG.cfg**
 
