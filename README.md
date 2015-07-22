@@ -1,7 +1,6 @@
 # ESKO
 Enriching Structured Knowledge Base from Open Information Extraction
 
-Suppose, you are in this location "/home/unixUser/" the rest of the setup follows based on this directory structure.
 
 ##Project Structure
 
