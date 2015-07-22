@@ -147,6 +147,16 @@ public class Constants {
 	public static final String GET_WIKI_LINKS_APRIORI_SQL = "select  URI, (SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  where SF =? group by BINARY URI order by p desc limit ?";
 
 	/**
+	 * find those properites which are actually mapped on both sub and obj
+	 */
+	public static final String GET_FULLY_MAPPED_OIE_PROPS_SQL = "select distinct OIE_PRED from OIE_REFINED where DBP_SUB <> 'X' and DBP_OBJ <> 'X'";
+
+	public static final String GET_DOMAINS = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+
+	public static final String GET_RANGES = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+
+	
+	/**
 	 * given a surface form, fetch top titles it refers to
 	 */
 	public static final String GET_WIKI_TITLES_SQL = "select URI, SUM(COUNT) as cnt from wikiPrep where SF = ? group by BINARY URI order by cnt desc limit ?";

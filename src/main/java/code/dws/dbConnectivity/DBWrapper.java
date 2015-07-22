@@ -18,6 +18,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import code.dws.core.cluster.vector.VectorCluster;
 import code.dws.dto.FactDao;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
@@ -457,6 +458,47 @@ public class DBWrapper {
 	}
 
 	/**
+	 * works for both domain and range
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public static List<String> getOIEFeatures(String param) {
+		List<String> types = new ArrayList<String>();
+
+		try {
+			pstmt.setString(1, param);
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(1));
+				if (!VectorCluster.featureSpace.contains(rs.getString(1)))
+					VectorCluster.featureSpace.add(rs.getString(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return types;
+	} 
+	public static List<String> getFullyMappedFacts() {
+		List<String> types = new ArrayList<String>();
+
+		try {
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return types;
+	}
+
+	/**
 	 * find the top-1 candidate for the subject and object together. easier
 	 * query than two simultaneous call
 	 * 
@@ -473,7 +515,7 @@ public class DBWrapper {
 			pstmt.setString(2, oieSub);
 			pstmt.setString(3, oieObj);
 			pstmt.setString(4, oieObj);
-			
+
 			rs = pstmt.executeQuery();
 			results = new ArrayList<String>();
 
@@ -485,15 +527,15 @@ public class DBWrapper {
 					results.add(1, "X");
 				} else {
 					if (rs.getString(2).equals("O")) {
-						if (results.get(0) == null) 
+						if (results.get(0) == null)
 							results.add(0, "X");
-						
-						if (results.get(1) != null) 
+
+						if (results.get(1) != null)
 							results.remove(1);
-						
+
 						results.add(1, Utilities.characterToUTF8((rs
-									.getString(1)).replaceAll("\\s", "_")));
-						
+								.getString(1)).replaceAll("\\s", "_")));
+
 					}
 				}
 			}
