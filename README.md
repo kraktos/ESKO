@@ -72,6 +72,7 @@ This is a self contained sql and issuing the command
 ***source wikiPrep.sql*** 
 
 ***source SetupDB.sql***
+
 from the mySQL command prompt will install the data in the DB. Clean up any pre existing instance matchings with the SQL 
 
 ***delete from wikiStat.OIE_REFINED;***  This can take some time. Please be patient.
