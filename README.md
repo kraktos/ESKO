@@ -70,6 +70,7 @@ Since, we use the most frequent wikipedia sense in out IM step, the whole sql fi
 This is a self contained sql and issuing the command 
 
 ***source wikiPrep.sql*** 
+
 ***source SetupDB.sql***
 from the mySQL command prompt will install the data in the DB. Clean up any pre existing instance matchings with the SQL 
 
