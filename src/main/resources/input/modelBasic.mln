@@ -1,0 +1,27 @@
+
+// ****************** hidden predicates ******************
+
+propAsst(prop, inst, inst)
+sameAs(inst, inst)
+//cooccur(inst, inst)
+
+// ****************** observed predicates ******************
+
+*sameAsConf(inst, inst, float_)
+*propAsstConf(prop, inst, inst, float_)
+*isOfType(class, inst)
+*cooccurConf(inst, inst, float_)
+
+//conf: !cooccurConf(x, y, conf) v  cooccur(x, y)
+conf: !sameAsConf(x, y, conf) v  sameAs(x, y)
+
+!propAsstConf(P, x, y, passconf) v  propAsst(P, x, y).
+
+|x| sameAs(x,y) <= 1
+
+//conf: !propAsstConf(P, x, y, f) v !sameAsConf(dx, x, f1) v !sameAsConf(dy, y, f2) v cooccurConf(dx, dy, conf)
+
+// thats where the rubber hits the road
+
+
+
